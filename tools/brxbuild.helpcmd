@@ -1,0 +1,42 @@
+BRXBUILD                                                         MAINTC command
+
+Use the BRXBUILD command to issue a set of commands to create the complete
+BREXX executable file.
+
+The format of the BRXBUILD command is:
++----------+------------------------------------------------------------------+
+| BRXBUILD |                                                                  |
++----------+------------------------------------------------------------------+
+
+BRXBUILD is a shorthand method to compile all the BREXX runtime routines.
+
+The following commands are issued:
+
+* Setup the GCC disk search order
+EXEC BRXSRCH
+*  Access the compiler output disk as A and erase all the files there
+ACCESS 193 A ( ERASE
+*  Create a CMS EXEC file with the names of all
+*  the ASSEMBLE files
+LISTFILE * ASSEMBLE F ( EXEC
+*  Run the ASSEMBLE command to compile the files from source
+EXEC EXPLOIT EXEC BRXASM &LITERAL &FN
+*  Create a CMS EXEC file with the names of all the C files
+LISTFILE * C F ( EXEC
+*  Run the GCC command to compile the files from source
+EXEC EXPLOIT EXEC BRXCOMP &LITERAL &FN
+*  Cleanup
+ERASE CMS EXEC
+ACCESS 191 A
+
+* Setup the GCC disk search order to build the DEBUG version of BREXX
+EXEC BRXSRCHD
+*  Access the compiler output disk as A and erase all the files there
+ACCESS 293 A ( ERASE
+*  Create a CMS EXEC file with the names of all the C files
+LISTFILE * C F ( EXEC
+*  Run the GCC command to compile the files from source
+EXEC EXPLOIT EXEC BRXCOMPD &LITERAL &FN
+*  Cleanup
+ERASE CMS EXEC
+ACCESS 191 A

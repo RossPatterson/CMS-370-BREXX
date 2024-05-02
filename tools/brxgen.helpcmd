@@ -1,0 +1,21 @@
+BRXGEN                                                           MAINTC command
+
+Use the BRXGEN command to create the runtime files for the BREXX interpretor.
+
+The format of the BRXGEN command is:
++----------+------------------------------------------------------------------+
+| BRXGEN   |                                                                  |
++----------+------------------------------------------------------------------+
+
+Usage Notes:
+
+1. Set up the proper minidisk search order with the BRXSRCH command before
+   using this command.
+
+2. The BRXGEN EXEC creates the following files on the A disk:
+
+   BREXX TEXT
+
+          Contains the combined TEXT files to make up the BREXX interpretor.
+          The output TEXT file will then be loaded into memory when CMS
+          is started, and will execute EXECs written in REXX.

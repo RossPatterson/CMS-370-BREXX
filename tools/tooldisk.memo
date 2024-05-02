@@ -6,11 +6,17 @@ GCCASM   EXEC      Assemble a GCCLIB assembler program
 GCCCOMP  EXEC      Compile a GCCLIB C program
 GCCGEN   EXEC      Generate GCCLIB System disk files
 
+GCCBUILD EXEC
+
 BRXSRCH  EXEC      Establish a disk search order for BREXX code
+BRXSRCHD EXEC      Establish a disk search order for a debug version of BREXX
 BRXSRCHT EXEC      Establish a disk search order for a test version of BREXX
 
-BRXASM   EXEC      Assemble a BREXX assembler program
-BRXCOMP  EXEC      Compile a BREXX C program
+BRXASM   EXEC      Assemble a BREXX component assembler program
+BRXCOMP  EXEC      Compile a BREXX component C program
+BRXCOMPD EXEC      Compile a debug version of a BREXX component C program
 BRXGEN   EXEC      Generate BREXX System disk files
+
+BRXBUILD EXEC     T1
 
 EXPLOIT  EXEC      Utility program on Y disk for generating system components
