@@ -147,7 +147,8 @@ RxInitialize(char *prorgram_name) {
     (context->rexxzeroStr) = _Add2Lits(&str, FALSE);
     Lscpy(&str, "ERROR");
     (context->rexxerrorStr) = _Add2Lits(&str, FALSE);
-
+    Lscpy(&str, "FAILURE");
+    (context->rexxfailureStr) = _Add2Lits(&str, FALSE);
     Lscpy(&str, "RESULT");
     (context->rexxresultStr) = _Add2Lits(&str, FALSE);
     Lscpy(&str, "NOVALUE");

@@ -368,6 +368,17 @@ I_StoreOption(const PLstr value, const int opt) {
                         (context->rexx_proc)[(context->rexx_rx_proc)]
                                 .lbl_error = &((context->rexxerrorStr)->key);
                     break;
+                case 'F':
+                    (context->rexx_proc)[(context->rexx_rx_proc)].condition |=
+                            SC_FAILURE;
+                    if (opt == set_signal_name_opt)
+                        (context->rexx_proc)[(context->rexx_rx_proc)]
+                                .lbl_failure = STACKP(
+                                1);
+                    else
+                        (context->rexx_proc)[(context->rexx_rx_proc)]
+                                .lbl_failure = &((context->rexxfailureStr)->key);
+                    break;
                 case 'H':
                     (context->rexx_proc)[(context->rexx_rx_proc)].condition |=
                             SC_HALT;
@@ -425,6 +436,10 @@ I_StoreOption(const PLstr value, const int opt) {
                 case 'E':
                     (context->rexx_proc)[(context->rexx_rx_proc)].condition &=
                             ~SC_ERROR;
+                    break;
+                case 'F':
+                    (context->rexx_proc)[(context->rexx_rx_proc)].condition &=
+                            ~SC_FAILURE;
                     break;
                 case 'H':
                     (context->rexx_proc)[(context->rexx_rx_proc)].condition &=

@@ -93,6 +93,7 @@
 #define SC_NOVALUE 0x04
 #define SC_NOTREADY 0x08
 #define SC_SYNTAX 0x10
+#define SC_FAILURE 0x20
 
 /* long jmp values */
 #define JMP_CONTINUE 2
@@ -174,6 +175,7 @@ struct trxproc {
     int form;  /* numeric form  */
     int condition; /* signal on condition */
     PLstr lbl_error; /* labels  */
+    PLstr lbl_failure; /*   */
     PLstr lbl_halt; /*   */
     PLstr lbl_novalue; /*   */
     PLstr lbl_notready; /*   */

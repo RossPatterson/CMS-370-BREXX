@@ -288,7 +288,7 @@ RxExecuteCmd(PLstr cmd, PLstr env) {
 
     RxSetSpecialVar(RCVAR,
                     (context->rexxrxReturnCode)); // set the returncode variable
-    if (((context->rexxrxReturnCode) < 0) &&
+    if (((context->rexxrxReturnCode) != 0) &&
         !((context->rexx_proc)[(context->rexx_rx_proc)].trace &
           off_trace)) {       // do the right thing for tracing
         if ((context->rexx_proc)[(context->rexx_rx_proc)].trace &
@@ -299,9 +299,13 @@ RxExecuteCmd(PLstr cmd, PLstr env) {
             if ((context->rexx_proc)[(context->rexx_rx_proc)].interactive_trace)
                 TraceInteractive(FALSE);
         }
-        if ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_ERROR)
-            RxSignalCondition(SC_ERROR);
     }
+    if (((context->rexxrxReturnCode) < 0) &&
+         ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_FAILURE))
+            RxSignalCondition(SC_FAILURE);
+    if (((context->rexxrxReturnCode) != 0) &&
+         ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_ERROR))
+            RxSignalCondition(SC_ERROR);
 #elif defined(__MVS__)
     (context->rexxrxReturnCode) = system(LSTR(* cmd));
 #else

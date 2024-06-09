@@ -83,6 +83,7 @@ struct Context {
    BinLeaf *rexxsiglStr;
    BinLeaf *rexxRCStr;
    BinLeaf *rexxerrorStr;
+   BinLeaf *rexxfailureStr;
    BinLeaf *rexxhaltStr;
    BinLeaf *rexxsyntaxStr;
    BinLeaf *rexxsystemStr;

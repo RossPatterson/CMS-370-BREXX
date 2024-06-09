@@ -1619,6 +1619,7 @@ C_select(void) {
 /*  SIGNAL [name] |                                               */
 /*         [VALUE] expr |                                         */
 /*         <ON | OFF> + ERROR    + [NAME name]  ;                 */
+/*                    | FAILURE  |                                */
 /*                    | HALT     |                                */
 /*                    | NOVALUE  |                                */
 /*                    | NOTREADY |                                */
@@ -1628,9 +1629,9 @@ C_select(void) {
 /*      are terminated.                                           */
 /*   o  VALUE, may be used for an evaluated label name.           */
 /*   o  ON|OFF, enable or disable exception traps. CONDITION      */
-/*      must be ERROR, HALT, NOVALUE, NOTREADY or SYNTAX.         */
+/*      must be ERROR, FAILURE, HALT, NOVALUE, NOTREADY or SYNTAX.*/
 /*      Control passes to the label of the condition name         */
-/*      if the event occurs while ON                              */
+/*      if the event occurs while ON.                             */
 /* -------------------------------------------------------------- */
 static void
 C_signal(void) {
@@ -1645,6 +1646,7 @@ C_signal(void) {
             if (!CMP("ON")) value = 1;
             nextsymbol();
             if (identCMP("ERROR") ||
+                identCMP("FAILURE") ||
                 identCMP("HALT") ||
                 identCMP("NOVALUE") ||
                 identCMP("NOTREADY") ||

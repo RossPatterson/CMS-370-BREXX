@@ -69,6 +69,9 @@ RxSignalCondition(int cnd) {
         case SC_ERROR:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_error;
             break;
+        case SC_FAILURE:
+            cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_failure;
+            break;
         case SC_HALT:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_halt;
             break;
