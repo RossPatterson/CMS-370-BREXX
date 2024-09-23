@@ -1577,6 +1577,10 @@ RxInterpret(void) {
                 if (func->label == UNKNOWN_LABEL)
                     (context->lstring_Lerror)(ERR_UNEXISTENT_LABEL, 1,
                                               &(leaf->key));
+
+                /* Set SIGL to the line we're jumping from. */
+                RxSetSpecialVar(SIGLVAR, TraceCurline(NULL, FALSE));
+
                 /* jump */
                 (context->interpreRxcip) = (CIPTYPE *) (
                         (byte huge *) (context->interpreRxcodestart) +
@@ -1604,6 +1608,9 @@ RxInterpret(void) {
                 /* clear stack */
                 (context->interpre_RxStckTop) =
                         (context->rexx_proc)[(context->rexx_rx_proc)].stacktop;
+
+                /* Set SIGL to the line we're jumping from. */
+                RxSetSpecialVar(SIGLVAR, TraceCurline(NULL, FALSE));
 
                 /* jump */
                 (context->interpreRxcip) = (CIPTYPE *) (
