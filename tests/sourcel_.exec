@@ -1,2 +1,4 @@
+/* SOURCELINE OK */
+say "Look for SOURCELINE OK"
 say SourceLine(1)
 /*say sourcetest() */
