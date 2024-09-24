@@ -127,23 +127,22 @@
 #undef OLD_MYSQL
 
 /* Name of package */
-#define PACKAGE "CMS-bREXX"
+#define PACKAGE "bREXX-CMS370"
 
 /* Define to the address where bug reports for this package should be sent. */
-// #define PACKAGE_BUGREPORT "Vasilis.Vlachoudis@cern.ch"
-#define PACKAGE_BUGREPORT "rpohara@msn.com"
+#define PACKAGE_BUGREPORT "h390-vm@groups.io"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "VM/370 bREXX Interpreter"
+#define PACKAGE_NAME "VM/370 BREXX Interpreter"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "CMS bREXX "CMS_VERSION
+#define PACKAGE_STRING "REXX-bREXX-2.1.9-CMS370-"CMS_VERSION
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "CMS-bREXX"
+#define PACKAGE_TARNAME "bREXX-CMS370"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "CMS "CMS_VERSION
+#define PACKAGE_VERSION "CMS-"CMS_VERSION
 
 /* Remove the trailing CR from system commands */
 #define RMLAST 1

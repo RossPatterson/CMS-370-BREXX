@@ -248,7 +248,17 @@ I_LoadOption(const PLstr value, const int opt) {
             break;
 
         case version_opt:
-            Lscpy(value, VERSIONSTR);
+            /* We know that rexx.h:VERSIONSTR ends with "Mmm dd yyyy", via
+               __DATE__, and we need it to be "dd Mmm yyyy". You can't do that
+               in a #define, so we do it here instead :-(
+             */
+            char * versionstr = malloc(strlen(VERSIONSTR)+1);
+            int vslen = strlen(VERSIONSTR);
+            strncpy(VERSIONSTR, versionstr, vslen-1);
+            strncpy(VERSIONSTR[vslen-11], versionstr[vslen-8], 3); // "Mmm"
+            strncpy(VERSIONSTR[vslen-7], versionstr[vslen-11], 3); // "dd "
+            Lscpy(value, versionstr);
+            free(versionstr);
             break;
 
         case os_opt:
