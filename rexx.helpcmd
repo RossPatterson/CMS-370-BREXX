@@ -35,7 +35,7 @@ The following instructions are supported (except for those marked with **):
    SELECT; when-list [OTHERWISE [statement-list]] END
    SIGNAL name
 ** SIGNAL VALUE expression
-** SIGNAL ON condition [NAME handler]
+   SIGNAL ON condition [** NAME handler]
 ** SIGNAL OFF condition
    TRACE [VALUE] expression
 
