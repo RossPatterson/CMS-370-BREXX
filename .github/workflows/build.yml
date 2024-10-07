@@ -60,16 +60,23 @@ jobs:
     needs: [build-cms]
     runs-on: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v1
+      #- uses: actions/checkout@v1
+
+      - name: Prepare files
+        run: |
+          mkdir BREXX
+        shell: bash
 
       - name: Get CMS binary
         uses: actions/download-artifact@v4
         with:
           name: BREXX
+          path: BREXX
 
-      #- name: ZIP CMS binary
-      #  run:
-      #    zip -r BREXX.zip BREXX
+      - name: ZIP CMS binary
+        run:
+          zip -r BREXX.zip BREXX
+
       - name: List files
         run: |
           ls -lR .
