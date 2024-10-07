@@ -67,9 +67,9 @@ jobs:
         with:
           name: BREXX
 
-      - name: ZIP CMS binary
-        run:
-          zip -r BREXX.zip BREXX
+      #- name: ZIP CMS binary
+      #  run:
+      #    zip -r BREXX.zip BREXX
 
       - name: Create Release
         id: create_release
