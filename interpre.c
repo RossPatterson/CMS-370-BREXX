@@ -255,8 +255,8 @@ I_LoadOption(const PLstr value, const int opt) {
             int vslen = strlen(VERSIONSTR);
             char * versionstr = malloc(vslen+1);
             strcpy(versionstr, VERSIONSTR);
-            strncpy(versionstr[vslen-8], VERSIONSTR[vslen-11], 3); // "Mmm"
-            strncpy(versionstr[vslen-11], VERSIONSTR[vslen-7], 3); // "dd "
+            strncpy(versionstr + vslen-8,  VERSIONSTR + vslen-11, 3); // "Mmm"
+            strncpy(versionstr + vslen-11, VERSIONSTR + vslen-7,  3); // "dd "
             Lscpy(value, versionstr);
             free(versionstr);
             break;
