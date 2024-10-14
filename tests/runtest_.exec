@@ -3,6 +3,7 @@ parse arg interpreter
 if interpreter='' then interpreter='rexx'
 parse source source 1 system .
 parse version rexx_version
+say 'Rexx version' rexx_version 'on' system
 suffix = '.exec'
 if system='CMS' then
 do
@@ -10,6 +11,7 @@ suffix = ''
 interpreter = ''
 "CP SPOOL CONS * START"
 end
+trace C
 interpreter ' abbrev_'||suffix
 interpreter ' abs_'||suffix
 interpreter ' address_'||suffix
