@@ -163,7 +163,7 @@ herccontrol "/" -w "^Ready;"
 herccontrol "/logoff" -w "^VM/370 Online"
 
 # Test suite
-# herccontrol "/runtest_" -w "^Ready;"
+herccontrol "/runtest_" -w "^Ready;"
 
 # SHUTDOWN
 herccontrol "/logon operator operator" -w "RECONNECTED AT"

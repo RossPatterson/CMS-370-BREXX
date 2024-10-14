@@ -100,6 +100,9 @@
 
 /*void ProcessInterrupt();*/
 
+/* ---------------- Local variables ------------------- */
+static int word_start, word_end;
+
 #define STACKTOP (context->interpre_RxStck)[(context->interpre_RxStckTop)]
 #define STACKP(i) (context->interpre_RxStck)[(context->interpre_RxStckTop)-(i)]
 
@@ -120,6 +123,7 @@
 # define DEBUGDISPLAYi(a, b)
 # define DEBUGDISPLAY2(a)
 #endif
+
 
 #define CHKERROR if ((context->interpre_RxStckTop)==STCK_SIZE-1) (context->lstring_Lerror)(ERR_STORAGE_EXHAUSTED,0)
 #define INCSTACK { (context->interpre_RxStckTop)++; CHKERROR; }
@@ -180,23 +184,27 @@ static void
 I_trigger_space(void) {
     Context *context = (Context *) CMSGetPG();
     /* normalise to 0 .. len-1 */
-    (context->interpre_DataStart) = (context->interpre_BreakEnd) - 1;
+    word_start--;
 
     /* skip leading spaces */
-    LSKIPBLANKS(*(context->interpre_ToParse), (context->interpre_DataStart));
+    LSKIPBLANKS(*(context->interpre_ToParse),word_start);
+    if (word_start >= (context->interpre_DataEnd))
+        word_start = (context->interpre_DataEnd) - 1;
 
-    /* find word */
-    (context->interpre_BreakStart) = (context->interpre_DataStart);
-    LSKIPWORD(*(context->interpre_ToParse), (context->interpre_BreakStart));
+    /* find end of word */
+    word_end = word_start;
+
+    LSKIPWORD(*(context->interpre_ToParse),word_end);
+    if (word_end >= (context->interpre_DataEnd))
+        word_end = (context->interpre_DataEnd) - 1;
+    (context->interpre_DataStart) = word_end + 1; /* Point past this word for the next word */
 
     /* skip trailing spaces */
-    (context->interpre_BreakEnd) = (context->interpre_BreakStart);
-    LSKIPBLANKS(*(context->interpre_ToParse), (context->interpre_BreakEnd));
 
     /* again in rexx strings 1..len */
     (context->interpre_DataStart)++;
-    (context->interpre_BreakStart)++;
-    (context->interpre_BreakEnd)++;
+    word_start++;
+    word_end++;
 } /* I_trigger_space */
 
 /* ------------- I_trigger_litteral -------------- */
@@ -640,140 +648,12 @@ I_CallFunction(void) {
                 i++;
             }
 
-            switch (func->systype) {
-                case SYST_UNKNOWN:
-                    /* Need to go through the (rather brain dead) IBM call convention */
-                    /* 1. RX is prefixed to the func name */
-                    sprintf(physical, "RX%.6s", LSTR(leaf->key));
-                    sprintf(logical, "RX%.6s %s", LSTR(leaf->key),
-                            LSTR(leaf->key));
-
-                    /* 2. Attempt to call function (i.e. with the RX) */
-                    i = CMSfunctionDataArray(physical,
-                                             logical,
-                                             ct == CT_PROCEDURE,
-                                             &ret_string,
-                                             realarg,
-                                             argv, lenv);
-                    if (!(i < 0)) func->systype = SYST_RX;
-
-                    /* 3. Function packaged loaded and attempt to call function (x3) */
-                    if (i < 0 &&
-                        !(context->interpre_no_user_fp)) { /* Not found (yet) */
-                        sprintf(load_package_cmd, "RXUSERFN LOAD RX%.6s",
-                                LSTR(leaf->key));
-                        i = CMScommand(load_package_cmd, 0);
-                        if (i == -3) (context->interpre_no_user_fp) = 1;
-                        if (!i) {
-                            i = CMSfunctionDataArray(physical,
-                                                     logical,
-                                                     ct == CT_PROCEDURE,
-                                                     &ret_string,
-                                                     realarg,
-                                                     argv, lenv);
-                            if (!(i < 0)) func->systype = SYST_RX;
-                        } else i = -3; /* Function is not in this package */
-                    }
-
-                    if (i < 0 &&
-                        !(context->interpre_no_loc_fp)) { /* Not found (yet) */
-                        sprintf(load_package_cmd, "RXLOCFN LOAD RX%.6s",
-                                LSTR(leaf->key));
-                        i = CMScommand(load_package_cmd, 0);
-                        if (i == -3) (context->interpre_no_loc_fp) = 1;
-                        if (!i) {
-                            i = CMSfunctionDataArray(physical,
-                                                     logical,
-                                                     ct == CT_PROCEDURE,
-                                                     &ret_string,
-                                                     realarg,
-                                                     argv, lenv);
-                            if (!(i < 0)) func->systype = SYST_RX;
-                        } else i = -3; /* Function is not in this package */
-                    }
-
-                    if (i < 0 &&
-                        !(context->interpre_no_sys_fp)) { /* Not found (yet) */
-                        sprintf(load_package_cmd, "RXSYSFN LOAD RX%.6s",
-                                LSTR(leaf->key));
-                        i = CMScommand(load_package_cmd, 0);
-                        if (i == -3) (context->interpre_no_sys_fp) = 1;
-                        if (!i) {
-                            i = CMSfunctionDataArray(physical,
-                                                     logical,
-                                                     ct == CT_PROCEDURE,
-                                                     &ret_string,
-                                                     realarg,
-                                                     argv, lenv);
-                            if (!(i < 0)) func->systype = SYST_RX;
-                        } else i = -3; /* Function is not in this package */
-                    }
-
-                    /* 4. RX is removed and the REXX function (i.e. an EXEC) searched for */
-                    /*    and run (without the RX) */
-                    if (i < 0) {
-                        /* Does the exec exist? */
-                        CMSFILEINFO *existingFileState;
-                        sprintf(physical, "%-8s%-8s%-2s", LSTR(leaf->key),
-                                "EXEC", "*");
-                        if (CMSfileState(physical, &existingFileState)) {
-                            /* File does not exist (or some other error) */
-                            i = -3;
-                        } else {
-                            sprintf(physical, "EXEC %.8s", LSTR(leaf->key));
-                            i = CMSfunctionDataArray(physical,
-                                                     physical,
-                                                     ct == CT_PROCEDURE,
-                                                     &ret_string,
-                                                     realarg,
-                                                     argv, lenv);
-                            if (!(i < 0)) func->systype = SYST_EXEC;
-                        }
-                    }
-
-                    /* 5. Final attempt to call function (without the RX) */
-                    if (i < 0) {
-                        i = CMSfunctionDataArray(LSTR(leaf->key),
-                                                 LSTR(leaf->key),
-                                                 ct == CT_PROCEDURE,
-                                                 &ret_string,
-                                                 realarg,
-                                                 argv, lenv);
-                        if (!(i < 0)) func->systype = SYST_BARE;
-                    }
-                    break;
-
-                case SYST_BARE:
-                    i = CMSfunctionDataArray(LSTR(leaf->key),
-                                             LSTR(leaf->key),
-                                             ct == CT_PROCEDURE,
-                                             &ret_string,
-                                             realarg,
-                                             argv, lenv);
-                    break;
-
-                case SYST_RX:
-                    sprintf(physical, "RX%.6s", LSTR(leaf->key));
-                    sprintf(logical, "RX%.6s %s", LSTR(leaf->key),
-                            LSTR(leaf->key));
-                    i = CMSfunctionDataArray(physical,
-                                             logical,
-                                             ct == CT_PROCEDURE,
-                                             &ret_string,
-                                             realarg,
-                                             argv, lenv);
-                    break;
-
-                case SYST_EXEC:
-                    sprintf(physical, "EXEC %.8s", LSTR(leaf->key));
-                    i = CMSfunctionDataArray(physical,
-                                             physical,
-                                             ct == CT_PROCEDURE,
-                                             &ret_string,
-                                             realarg,
-                                             argv, lenv);
-                    break;
-            }
+            sprintf(physical, "%s", LSTR(leaf->key));
+            i = HOSTFNC(physical,
+                        realarg,
+                        argv, lenv,
+                        ct == CT_PROCEDURE,
+                        &ret_string);
 
             /* Cleanup and handle result string */
             free(argv);
@@ -1577,6 +1457,7 @@ RxInterpret(void) {
                 if (func->label == UNKNOWN_LABEL)
                     (context->lstring_Lerror)(ERR_UNEXISTENT_LABEL, 1,
                                               &(leaf->key));
+
                 /* jump */
                 (context->interpreRxcip) = (CIPTYPE *) (
                         (byte huge *) (context->interpreRxcodestart) +
@@ -1866,7 +1747,7 @@ RxInterpret(void) {
                 /* Do not remove from stack */
                 (context->interpre_ToParse) = STACKTOP;
                 L2STR((context->interpre_ToParse));
-                (context->interpre_DataStart) = (context->interpre_BreakStart) =
+                word_start = (context->interpre_DataStart) = (context->interpre_BreakStart) =
                 (context->interpre_BreakEnd) = 1;
                 (context->interpre_SourceEnd) =
                         LLEN(*(context->interpre_ToParse)) + 1;
@@ -1876,26 +1757,23 @@ RxInterpret(void) {
                 /* Parse to stack */
             case OP_PVAR:
                 DEBUGDISPLAY0("PVAR");
-                if ((context->interpre_BreakEnd) <=
-                    (context->interpre_DataStart))
-                    (context->interpre_DataEnd) = (context->interpre_SourceEnd);
-                else
-                    (context->interpre_DataEnd) =
-                            (context->interpre_BreakStart);
 
-                if ((context->interpre_DataEnd) !=
-                    (context->interpre_DataStart))
+                if (word_end>word_start)
                     _Lsubstr(
                             (context->interpre_RxStck)[(context
                                     ->interpre_RxStckTop)--],
                             (context->interpre_ToParse),
-                            (context->interpre_DataStart),
-                            (context->interpre_DataEnd) -
-                            (context->interpre_DataStart));
+                            word_start, word_end - word_start);
                 else {
                     LZEROSTR(*(STACKTOP));
                     (context->interpre_RxStckTop)--;
                 }
+                /* In case the next PVAR or PDOT is the last one in a WORDPARSE(data)
+                 * invocation, set the word pointers up to consume all the remaining data.
+                 * If there's a TR_SPACE before the next one, it will reset them.
+                 */
+                word_start = (context->interpre_DataStart);
+                word_end = (context->interpre_DataEnd);
                 if ((context->interpre__trace)) {
                     (context->interpre_RxStckTop)++;
                     TraceInstruction(*(context->interpreRxcip));
@@ -1915,23 +1793,19 @@ RxInterpret(void) {
                     (context->interpre_RxStckTop)++;
                     STACKTOP = &((context->interpre__tmpstr)[(context
                             ->interpre_RxStckTop)]);
-                    if ((context->interpre_BreakEnd) <=
-                        (context->interpre_DataStart))
-                        (context->interpre_DataEnd) =
-                                (context->interpre_SourceEnd);
-                    else
-                        (context->interpre_DataEnd) =
-                                (context->interpre_BreakStart);
-                    if ((context->interpre_DataEnd) !=
-                        (context->interpre_DataStart))
+                    if (word_end>word_start)
                         _Lsubstr(STACKTOP, (context->interpre_ToParse),
-                                 (context->interpre_DataStart),
-                                 (context->interpre_DataEnd) -
-                                 (context->interpre_DataStart));
+                                 word_start,word_end-word_start);
                     else LZEROSTR(*(STACKTOP));
                     TraceInstruction(*(context->interpreRxcip));
                     (context->interpre_RxStckTop)--; /* free space */
                 }
+                /* In case the next PVAR or PDOT is the last one in a WORDPARSE(data)
+                 * invocation, set the word pointers up to consume all the remaining data.
+                 * If there's a TR_SPACE before the next one, it will reset them.
+                 */
+                word_start = (context->interpre_DataStart);
+                word_end = (context->interpre_DataEnd);
                 (context->interpreRxcip)++;
                 goto main_loop;
 
@@ -1946,10 +1820,14 @@ RxInterpret(void) {
                 /* trigger a litteral from stck */
             case OP_TR_LIT:
                 DEBUGDISPLAY("TR_LIT");
-                (context->interpre_DataStart) = (context->interpre_BreakEnd);
+                word_start = (context->interpre_DataStart) = (context->interpre_BreakEnd);
                 I_trigger_litteral(
                         (context->interpre_RxStck)[(context
                                 ->interpre_RxStckTop)--]);
+                if ((context->interpre_BreakEnd)<=(context->interpre_DataStart))
+                    word_end = (context->interpre_DataEnd) = (context->interpre_SourceEnd);
+                else
+                    word_end = (context->interpre_DataEnd) = (context->interpre_BreakStart);
                 goto main_loop;
 
                 /* TR_ABS   */
@@ -1959,16 +1837,21 @@ RxInterpret(void) {
 /**
 //   L2INT(**A);
 **/
-                (context->interpre_DataStart) = (context->interpre_BreakEnd);
+                word_start = (context->interpre_DataStart) = (context->interpre_BreakEnd);
                 (context->interpre_BreakStart) = (size_t) LINT(
                         *((context->interpre_RxStck)[(context
                                 ->interpre_RxStckTop)--]));
+
 
                 /* check for boundaries */
                 (context->interpre_BreakStart) = RANGE(1,
                                                        (context->interpre_BreakStart),
                                                        (context->interpre_SourceEnd));
                 (context->interpre_BreakEnd) = (context->interpre_BreakStart);
+                if ((context->interpre_BreakEnd)<=(context->interpre_DataStart))
+                    word_end = (context->interpre_DataEnd) = (context->interpre_SourceEnd);
+                else
+                    word_end = (context->interpre_DataEnd) = (context->interpre_BreakStart);
                 goto main_loop;
 
                 /* TR_REL   */
@@ -1976,10 +1859,11 @@ RxInterpret(void) {
             case OP_TR_REL:
                 DEBUGDISPLAY("TR_REL");
 
+
 /**
 //   L2INT(**A);
 **/
-                (context->interpre_DataStart) = (context->interpre_BreakStart);
+                word_start = (context->interpre_DataStart) = (context->interpre_BreakStart);
                 (context->interpre_BreakStart) = (context->interpre_DataStart) +
                                                  (size_t) LINT(
                                                          *((context
@@ -1991,15 +1875,29 @@ RxInterpret(void) {
                                                        (context->interpre_BreakStart),
                                                        (context->interpre_SourceEnd));
                 (context->interpre_BreakEnd) = (context->interpre_BreakStart);
+                if ((context->interpre_BreakEnd)<=(context->interpre_DataStart))
+                    word_end = (context->interpre_DataEnd) = (context->interpre_SourceEnd);
+                else
+                    word_end = (context->interpre_DataEnd) = (context->interpre_BreakStart);
                 goto main_loop;
 
                 /* TR_END   */
                 /* trigger to END of data */
             case OP_TR_END:
                 DEBUGDISPLAY0("TR_END");
-                (context->interpre_DataStart) = (context->interpre_BreakEnd);
+                word_start = (context->interpre_DataStart) = (context->interpre_BreakEnd);
                 (context->interpre_BreakStart) = (context->interpre_SourceEnd);
                 (context->interpre_BreakEnd) = (context->interpre_SourceEnd);
+                if ((context->interpre_BreakEnd)<=(context->interpre_DataStart))
+                    word_end = (context->interpre_DataEnd) = (context->interpre_SourceEnd);
+                else
+                    word_end = (context->interpre_DataEnd) = (context->interpre_BreakStart);
+                /* In case the next PVAR or PDOT is the last one in a WORDPARSE(data)
+                 * invocation, set the word pointers up to consume all the remaining data.
+                 * If there's a TR_SPACE before the next one, it will reset them.
+                 */
+                word_start = (context->interpre_DataStart);
+                word_end = (context->interpre_DataEnd);
                 goto main_loop;
 
                 /* RX_QUEUE   */
