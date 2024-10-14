@@ -11,7 +11,6 @@ suffix = ''
 interpreter = ''
 "CP SPOOL CONS * START"
 end
-trace C
 interpreter ' abbrev_'||suffix
 interpreter ' abs_'||suffix
 interpreter ' address_'||suffix
@@ -81,7 +80,7 @@ interpreter ' xrange_'||suffix
 interpreter ' x2b_'||suffix
 interpreter ' x2c_'||suffix
 interpreter ' x2d_'||suffix
-interpreter ' testexc'||suffix
+if system='CMS' then interpreter ' testexc'||suffix
 interpreter ' maths_'||suffix
 
 if system='CMS' then "CP SPOOL CONS STOP CLOSE"
