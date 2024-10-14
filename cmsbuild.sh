@@ -165,6 +165,7 @@ herccontrol "/logoff" -w "^VM/370 Online"
 # Test suite
 herccontrol "/logon maintc maintc" -w "^CMS"
 herccontrol "/" -w "^Ready;"
+herccontrol "/BRXSRCH" -w "^Ready;"
 herccontrol "/runtest_" -w "^Ready;"
 herccontrol "/logoff" -w "^VM/370 Online"
 
