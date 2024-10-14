@@ -1,5 +1,7 @@
-BREXX CMS Change LOG
+	BREXX CMS Change LOG
 ====================
+      - Add tests for PARSE instruction
+	  - Enable tests in builds
 I0073 - Implement SIGNAL ON ERROR for positive non-zero return codes
 I0075 - Implement SIGNAL ON FAILURE
 
