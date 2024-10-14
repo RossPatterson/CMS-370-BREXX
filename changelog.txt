@@ -1,6 +1,7 @@
-BREXX CMS Change LOG
+	BREXX CMS Change LOG
 ====================
-
+      - Add tests for PARSE instruction
+	  - Enable tests in builds
 1.0.0 - 15 April 2021
 F0049 - Version for VM/CE Build Process
 
