@@ -1,7 +1,9 @@
 	BREXX CMS Change LOG
 ====================
+1.1.0-beta
+I0080 - Make PARSE VERSION result conform to ANSI and TRL2 standards
       - Add tests for PARSE instruction
-	  - Enable tests in builds
+	  - Enable tests in builds and fix them to work
 I0073 - Implement SIGNAL ON ERROR for positive non-zero return codes
 I0075 - Implement SIGNAL ON FAILURE
 
