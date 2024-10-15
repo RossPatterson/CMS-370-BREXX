@@ -4,20 +4,20 @@
 
 SET LDRTBLS 64
 
-* Load the native GCC runtime library into memory.
-RESLIB LOAD GCCLIB (NAME GCCLIB
+* Load the native GCC runtime library from a segment
+SEGMENT LOAD GCCLIB ( SYSTEM SHARE
+&IF &RETCODE EQ 0 &GOTO -GCCDONE
+
+* Load the native GCC runtime library regular memory.
+NUCXTEXT GCCLIB ( SYSTEM PERM
 &IF &RETCODE NE 0 &TYPE SYSPROF Error loading GCCLIB into memory!
 &IF &RETCODE NE 0 &GOTO -DONE
-
-* Initialize the runtime library
-GCCLIB
+-GCCDONE
 
 * Now load bREXX into memory.
 RESLIB LOAD BREXX (NAME DMSREX
 &IF &RETCODE NE 0 &TYPE SYSPROF Error loading bREXX into memory!
 &IF &RETCODE NE 0 &GOTO -DONE
-
-* Initialize the bREXX interpretor
 DMSREX
 
 -DONE
