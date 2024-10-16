@@ -6,7 +6,8 @@ set -e
 
 # Get the latest gccbrx.cckd disk image
 herccontrol "detach 09F0"
-wget -nv https://github.com/adesutherland/CMS-370-GCCLIB/releases/download/v1.0.0/GCCLIB.zip
+# wget -nv https://github.com/adesutherland/CMS-370-GCCLIB/releases/download/v1.0.0/GCCLIB.zip
+wget -nv https://github.com/RossPatterson/CMS-370-GCCLIB/archive/refs/tags/r_1.0.2_beta-01.zip
 unzip GCCLIB.zip
 cp GCCLIB/gccbrx.cckd ..
 rm GCCLIB.zip
