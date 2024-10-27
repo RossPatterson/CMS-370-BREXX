@@ -4,9 +4,12 @@
 # Exit if there is an error
 set -e
 
+# Show the commands
+set -x
+
 # Get the latest gccbrx.cckd disk image
 herccontrol "detach 09F0"
-wget -nv https://github.com/adesutherland/CMS-370-GCCLIB/releases/download/v1.0.0/GCCLIB.zip
+wget -nv https://github.com/RossPatterson/CMS-370-GCCLIB/releases/download/v1.0.1/GCCLIB.zip
 unzip GCCLIB.zip
 cp GCCLIB/gccbrx.cckd ..
 rm GCCLIB.zip
@@ -20,8 +23,10 @@ herccontrol "/cp start d class a" -w "PUN"
 
 # LOGON MAINTC
 herccontrol "/cp disc" -w "^VM/370 Online"
-herccontrol "/logon maintc maintc" -w "^CMS"
-herccontrol "/" -w "^Ready;"
+herccontrol "/logon maintc maintc" -w "^VM Community Edition"
+herccontrol "/ACCESS (NOPROF" -w "^Ready;"
+herccontrol "/SET LDRTBLS 64" -w "^Ready;"
+herccontrol "/PROFILE" -w "^Ready;"
 herccontrol "/purge rdr" -w "^Ready;"
 
 herccontrol "/ACCESS 393 B" -w "^Ready;"
@@ -116,17 +121,23 @@ herccontrol "/ERASE TOOLDISK MEMO B" -w "^Ready"
 herccontrol "/COPYFILE NEWBREXX CONTROL B = = A (REPLACE" -w "^Ready"
 herccontrol "/ERASE NEWBREXX CONTROL B" -w "^Ready"
 
-herccontrol "/ipl cms" -w "^CMS"
-herccontrol "/" -w "^Ready;"
+herccontrol "/ipl cms" -w "^VM Community Edition"
+herccontrol "/ACCESS (NOPROF" -w "^Ready;"
+herccontrol "/SET LDRTBLS 64" -w "^Ready;"
+herccontrol "/PROFILE" -w "^Ready;"
 
 herccontrol "/BRXBUILD" -w "^Ready;" -t 240
-herccontrol "/ipl cms" -w "^CMS"
-herccontrol "/" -w "^Ready;"
+herccontrol "/ipl cms" -w "^VM Community Edition"
+herccontrol "/ACCESS (NOPROF" -w "^Ready;"
+herccontrol "/SET LDRTBLS 64" -w "^Ready;"
+herccontrol "/PROFILE" -w "^Ready;"
 
 herccontrol "/BRXSRCH" -w "^Ready;"
 herccontrol "/BRXGEN" -w "^Ready;"
-herccontrol "/ipl cms" -w "^CMS"
-herccontrol "/" -w "^Ready;"
+herccontrol "/ipl cms" -w "^VM Community Edition"
+herccontrol "/ACCESS (NOPROF" -w "^Ready;"
+herccontrol "/SET LDRTBLS 64" -w "^Ready;"
+herccontrol "/PROFILE" -w "^Ready;"
 
 # Make binary tape and vmarc
 herccontrol "/cp disc" -w "^VM/370 Online"
@@ -153,12 +164,12 @@ truncate -s-80 brexxbin.vmarc
 herccontrol "/logoff" -w "^VM/370 Online"
 
 # REBUILD CMS
-herccontrol "/logon maint cpcms" -w "^CMS"
+herccontrol "/logon maint cpcms" -w "^VM Community Edition"
 herccontrol "/" -w "^Ready"
 herccontrol "/NEWBREXX" -w "^Ready"
 herccontrol "/define storage 16m"  -w "CP ENTERED"
-herccontrol "/ipl 190 clear" -w "^CMS"
-herccontrol "/savesys cms" -w "^CMS"
+herccontrol "/ipl 190 clear" -w "^VM Community Edition"
+herccontrol "/savesys cms" -w "^VM Community Edition"
 herccontrol "/" -w "^Ready;"
 herccontrol "/logoff" -w "^VM/370 Online"
 
