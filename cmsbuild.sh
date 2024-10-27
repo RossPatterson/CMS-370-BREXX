@@ -17,7 +17,7 @@ rm -r GCCLIB
 herccontrol "attach 09F0 3350 gccbrx.cckd"
 
 # IPL
-herccontrol "ipl 141" -w "USER DSC LOGOFF AS AUTOLOG1"
+herccontrol "ipl 6a1" -w "USER DSC LOGOFF AS AUTOLOG1"
 herccontrol "/cp start c" -w "RDR"
 herccontrol "/cp start d class a" -w "PUN"
 
