@@ -1,0 +1,24 @@
+BRXASM                                                           MAINTC command
+
+Use the BRXASM command to compile any BREXX assembler language source file.
+
+The format of the BRXASM command is:
++----------+------------------------------------------------------------------+
+| BRXASM   | fn  [ options .... ]                                             |
++----------+------------------------------------------------------------------+
+
+where:
+
+fn       is the filename of the source file to be assembled and/or the filename
+         of assembled output files.  The file must have fixed-length,
+         80-character records.  By default, the assembler expects a CMS file
+         with a filetype of ASSEMBLE.
+
+options  are valid options for the CMS ASSEMBLE command (See HELP ASSEMBLE).
+
+Usage Notes:
+
+1. Set up the proper minidisk search order with the BRXSRCH command before
+   using this command.
+
+2. The BRXASM produces an output TEXT file from the compilation on the A-disk.
