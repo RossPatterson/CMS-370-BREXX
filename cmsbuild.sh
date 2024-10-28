@@ -4,6 +4,9 @@
 # Exit if there is an error
 set -e
 
+# Show the commands
+set -x
+
 # Get the latest gccbrx.cckd disk image
 herccontrol "detach 09F0"
 wget -nv https://github.com/adesutherland/CMS-370-GCCLIB/releases/download/v1.0.0/GCCLIB.zip
