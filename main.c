@@ -5,6 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <cmssys.h>
+#include <time.h>
 
 #include "lstring.h"
 #include "rexx.h"
@@ -78,7 +79,11 @@ main(int ac, char *av[]) {
                 return -1;
             }
             if (version) {
-                printf("BREXX Version %s\n", CMS_VERSION);
+                printf("BREXX Version %s ", VERSIONSTR " "
+                #ifndef __DEBUG__
+                    "no"
+                #endif
+                    "debug\n");
             }
             if (debug) {
                 printf("BREXX Entry Address is 0x%x saved in NUCON at 0x%x\n",
