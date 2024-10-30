@@ -1,13 +1,13 @@
 /* ERRORTEXT */
 say "Look for ERRORTEXT OK"
 /* These from the Rexx book. */
-if errortext(16) \== 'Label not found' then exit
-if errortext(60) \== '' then exit
+if errortext(16) \== 'Label not found' then say 'failed in test 1'
+if errortext(60) \== '' then say 'failed in test 2'
 /* These from Mark Hessling. */
-if errortext(10) \== "Unexpected or unmatched END" then exit
-if errortext(40) \== "Incorrect call to routine" then exit
+if errortext(10) \== "Unexpected or unmatched END" then say 'failed in test 3'
+if errortext(40) \== "Incorrect call to routine" then say 'failed in test 4'
 /* There is a 50 these days
-if errortext(50) \== "" then exit
+if errortext(50) \== "" then say 'failed in test 5'
 */
-if errortext( 1) \== "" then exit
+if errortext( 1) \== "" then say 'failed in test 6'
 say "ERRORTEXT OK"
