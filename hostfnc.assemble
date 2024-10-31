@@ -1,0 +1,299 @@
+  TITLE 'HOSTFNC - Call external functions from REXX programs'
+HOSTFNC  CSECT
+*------------------------------------------------------------*
+* This programs calls external functions in CMS from REXX    *
+* programs. These functions may be implemented in many       *
+* languages, or in CMS REXX function packages. This program  *
+* implements the interface to optionally load and call these *
+* functions.                                                 *
+*------------------------------------------------------------*
+         USING CMSCRAB,R13
+         USING HOSTFNC,R12
+@@HOSTFN PDPPRLG CINDEX=0,FRAME=WKAREALN,BASER=12,ENTRY=YES
+         LA    R15,@@HOSTFN-HOSTFNC
+         SLR   R12,R15
+         USING HOSTFNC,R12
+*------------------------------------------------------------*
+* Retrieve parameters. Entry R1 points to a parameter list   *
+* with the following entries:                                *
+*                                                            *
+* Offset           Contents                                  *
+* ------           --------                                  *
+*    0             Address of the external function name     *
+*                     padded to eight characters             *
+*    4             Integer Number of arguments               *
+*    8             Address of a set of pointers to the       *
+*                     argument strings                       *
+*   12             Address of a set of fullword lengths of   *
+*                     the associated argument strings        *
+*   16             Integer, 0 = function call,               *
+*                           1 = subroutine call              *
+*   20             Address of a word to receive an EVALBLOK  *
+*                     address for a result value             *
+*------------------------------------------------------------*
+         LM    R2,R7,0(R1)        Load argument pointers
+*------------------------------------------------------------*
+* Prefix the function or routine name with 'RX'
+*------------------------------------------------------------*
+         LR    R1,R2              Address of name string
+         BAL   R14,STRLEN         Fetch the string length
+         LTR   R15,R15            Null string?
+         BZ    BADARG             Error if yes
+         C     R15,=F'8'          Max length check
+         BH    BADARG             Error if too long
+         BCTR  R15,0              Length - 1
+         MVI   CALLNAME,C' '
+         MVC   CALLNAME+1(7),CALLNAME
+         MVC   CALLNAME(*-*),0(R2)
+         EX    R15,*-6            Blank pad name to 8 bytes
+         LA    R2,CALLNAME        Point to 8 character name
+*
+         MVC   LOADFUN(LOADFUNL),LOADFUNP Init plist
+         MVC   LOADNAME+2(6),0(R2) Prefix name with 'RX'
+         MVC   PLIST(8),LOADNAME  Set command name in PLIST
+         MVC   PLIST+8(8),=8X'FF'     followed by fence
+*
+*------------------------------------------------------------*
+* Build a Type 5 plist and try to call the function
+*------------------------------------------------------------*
+         ST    R2,ACOMVERB        Set 1st EPLIST word
+*------------------------------------------------------------*
+* BEGARGS and ENDARGS contain the function name only
+*------------------------------------------------------------*
+         ST    R2,BEGARGS         Beginning of the arguments
+         LA    R1,7(,R2)          Point to last byte
+FINDEND  DS    0H
+         CLI   0(R1),C' '         Trailing blank?
+         BNE   FOUNDEND           Loop complete if not
+         BCT   R1,FINDEND         Keep looking for non-blank
+FOUNDEND DS    0H
+         LA    R1,1(,R1)          One past the end of name
+         ST    R1,ENDARGS         End of the arguments
+*
+         XC    AFBLOCK,AFBLOCK    No file block
+*------------------------------------------------------------*
+* The list of arguments are a set of address, length pairs
+*------------------------------------------------------------*
+         LA    R15,ARGLIST
+         LTR   R3,R3              Any arguments
+         BZ    SKIPARGS
+NXTARG   DS    0H
+         MVC   0(4,R15),0(R4)     Set argument address
+         MVC   4(4,R15),0(R5)     Set argument length
+         LA    R4,4(,R4)          On to next address
+         LA    R5,4(,R5)          On to next length word
+         LA    R15,8(,R15)        Skip to next pair
+         BCT   R3,NXTARG          Loop for all arguments
+SKIPARGS DS    0H
+         MVC   0(8,R15),=8X'FF'   Add fence at the end
+*
+         LA    R15,ARGLIST        Set ARGLIST address
+         ST    R15,AARGLIST          in EPLIST
+*------------------------------------------------------------*
+* Set flag to specify a subroutine call or a function call
+*------------------------------------------------------------*
+         LA    R15,EPLIST
+         ST    R15,AEPLIST        Address of the EPLIST
+         LTR   R6,R6              Function or subroutine call?
+         BZ    NOTSUB             Skip next if function call
+         OI    AEPLIST,X'80'      Set flag for subroutine
+NOTSUB   DS    0H
+*------------------------------------------------------------*
+* Set the address of a word to contain the result
+*------------------------------------------------------------*
+         SR    R0,R0
+         ST    R0,AEVALBLK        No result yet
+         LA    R1,AEVALBLK        Point to Plist
+         ST    R1,ASYSFUNR        Set address of result word
+*------------------------------------------------------------*
+* Assume the function is already loaded, and call it.        *
+*------------------------------------------------------------*
+CALLIT   DS    0H
+         LA    R1,PLIST           Point to Plist
+         ICM   R1,B'1000',=X'05'  Call type is 5
+         L     R0,AEPLIST         Point to Eplist
+         BAL   R14,CALLTYP5       Issue call in __HOST05
+         LTR   R15,R15            Did it run?
+         BNM   CALLDONE           Go retrieve any result
+*------------------------------------------------------------*
+* Try to load the function in one of the 3 standard function *
+* package containers.                                        *
+*------------------------------------------------------------*
+         MVC   LOADFUN,=CL8'RXUSERFN' Check user package
+         LA    R1,LOADFUN
+         SVC   202
+         DC    AL4(1)
+         LTR   R15,R15            Is the function loaded now?
+         BZ    CALLIT             Go run if so
+*
+         MVC   LOADFUN,=CL8'RXLOCFN' In installation package?
+         LA    R1,LOADFUN
+         SVC   202
+         DC    AL4(1)
+         LTR   R15,R15            Is the function loaded now?
+         BZ    CALLIT             Go run if so
+*
+         MVC   LOADFUN,=CL8'RXSYSFN' In system package?
+         LA    R1,LOADFUN
+         SVC   202
+         DC    AL4(1)
+         LTR   R15,R15            Is the function loaded now?
+         BZ    CALLIT             Go run if so
+*------------------------------------------------------------*
+* Function is not present in any standard function package.
+* Look for an existing EXEC file without the RX prefix
+*------------------------------------------------------------*
+         LA    R1,HOSTFSCB
+         USING FSCBD,R1
+         MVC   FSCBFN,0(R2)       Set function file name
+         MVC   FSCBFT,=CL8'EXEC'  Set function file type
+         FSSTATE FSCB=(1)
+         LTR   R15,R15            Does function file exist?
+         BNZ   LASTCALL           Maybe an assembler MODULE?
+* Note:
+* IBM allocates an FBLOCK to pass the filetype to REXX. We will
+* do that when support for non-EXEC filetypes is added.
+*
+         MVC   PLIST(8),=CL8'EXEC'
+         MVC   PLIST+8(8),0(R2)   Set command name in PLIST
+         MVC   PLIST+16(8),=8X'FF'     followed by fence
+         LA    R1,PLIST
+         ICM   R1,B'1000',=X'05'
+         L     R0,AEPLIST         Point to Eplist
+         BAL   R14,CALLTYP5       Issue call in __HOST05
+         LTR   R15,R15
+         B     CALLDONE           Go retrieve any result
+*------------------------------------------------------------*
+* Finally, just try to call the function by its name
+*------------------------------------------------------------*
+LASTCALL DS    0H
+         MVC   PLIST(8),0(R2)     Set command name in PLIST
+         MVC   PLIST+8(8),=8X'FF'     followed by fence
+         LA    R1,PLIST
+         ICM   R1,B'1000',=X'05'
+         BAL   R14,CALLTYP5       Issue call in __HOST05
+*
+CALLDONE DS    0H                 Here on return from SVC
+         SR    R0,R0
+         ST    R0,0(,R7)          Assume subroutine, no result
+         LTR   R6,R6              Subroutine or function call?
+         BNZ   GOBACK             No result for a subroutine
+*
+         LR    R3,R15             Hold SVC return code
+         L     R2,AEVALBLK        Point to possible EVALBLOK
+         LTR   R2,R2              Was it defined?
+         BZ    GOBACK             Bif nothing to do
+         USING EVALBLOK,R2
+         L     R1,EVLEN           Size of result string plus
+         LA    R1,1(,R1)              one for null terminator
+         ST    R1,PLIST
+         LA    R1,PLIST
+         L     R15,=V(MALLOC)     Allocate C storage string
+         BALR  R14,R15
+         LR    R0,R15             Point to allocated storage
+         ST    R0,0(,R7)          Return result string ptr
+         L     R15,EVLEN          Length of the data
+         LR    R3,R15             Length of the data is rc
+         LA    R14,EVDATA         Data from EVALBLOK
+         LA    R1,1(,R15)         Length of data + 1
+         MVCL  R0,R14             Copy and pad with null
+*
+         LA    R1,EVALBLOK        Done with this EVALBLOK
+         L     R0,EVSIZE          Size in doublewords
+         DMSFRET DWORDS=(0),LOC=(1) Release the EVALBLOK
+         LR    R15,R3             R15 has the return code
+         B     GOBACK
+BADARG   DS    0H
+         L     R15,=F'-3'
+GOBACK   DS    0H
+         PDPEPIL                  Return to caller
+*
+*------------------------------------------------------------*
+* The HOSTCMD logic will setup for EXECCOMM callbacks, and
+* issue the call type X'05' SVC.
+* HOST05 returns to the CALLTYP5 caller via R14.
+*------------------------------------------------------------*
+CALLTYP5 DS    0H
+         STM   R0,R1,TYP5PLST
+         LA    R1,TYP5PLST
+         L     R15,=V(@@HOST05)
+         BR    R15
+*
+*------------------------------------------------------------*
+* Find the length of the C string pointed to by R1
+*------------------------------------------------------------*
+STRLEN   DS    0H
+         LR    R15,R1             First byte of string
+STRLEN10 DS    0H
+         CLI   0(R15),X'00'       Found delimiter?
+         BE    STRLEN20           Done if so
+         LA    R15,1(,R15)        Try next byte
+         B     STRLEN10
+STRLEN20 DS    0H                 Delimiter found
+         SR    R15,R1
+         BR    R14
+  TITLE 'HOSTFNC: Constants and literals'
+LOADFUNP DS    0D
+         DC    CL8'RXUSERFN'
+         DC    CL8'LOAD'
+         DC    CL8'RXXXXXXX'
+         DC    8X'FF'
+LOADFUNL EQU   *-LOADFUNP
+*
+FSCBP    FSCB  'filename EXEC A'
+*
+         LTORG ,
+  TITLE 'HOSTFNC: CMS System Control Blocks'
+FSCBD    FSCBD ,
+FSCBLEN  EQU   *-FSCBD
+*
+EVALBLOK DSECT
+EVNEXT   DS    F                  -> next block in chain
+EVSIZE   DS    F                  size in DW's
+EVLEN    DS    F                  length of data in bytes
+EVPAD    DS    F                  (reserved)
+*
+LEVALBLO EQU   *-EVALBLOK         length of basic area
+EVDATA   DS    C                  ****    Start of data...
+  TITLE 'HOSTFNC: Savearea and variables'
+*
+* This is the HOSTFNC dynamic storage area addressed by R13
+*
+         CMSCRAB
+         ORG   MAINSTK
+PLIST    DS    3D                 Tokenized plist
+*
+AEPLIST  DS    A                  Address of EPLIST
+*                                 X'80' flag indicates
+*                                    subroutine call instead
+*                                    of function call
+*
+EPLIST   DS    0D                 Extended plist -
+ACOMVERB DS    A                  Address of command verb
+BEGARGS  DS    A                  Begining of argument string
+ENDARGS  DS    A                  Past end of argument string
+AFBLOCK  DS    A                  Address of file block
+AARGLIST DS    A                  Address of argument list
+ASYSFUNR DS    A                  Address of result word
+EPLISTLN EQU   *-EPLIST
+*
+ARGLIST  DS    0D                 Room for 10 argument
+         DS    20A                  address/length pairs
+         DS    8X'FF'             Fence
+*
+AEVALBLK DS    A                  Address of EVALBLOK
+*
+         DS    0D
+LOADFUN  DC    CL8'RXUSERFN'
+         DC    CL8'LOAD'
+LOADNAME DC    CL8'RXXXXXXX'
+         DC    8X'FF'
+*
+HOSTFSCB DS    ((FSCBLEN+7)/8)D
+*
+CALLNAME DS    CL8                8 character function name
+*
+TYP5PLST DS    2A                 Plist for HOST05 call
+WKAREALN EQU   *-CMSCRAB
+         REGEQU ,
+         END

@@ -88,7 +88,7 @@ ENVSET   DS     0H                                                      00840000
 *------------------------------------------------------------*          00880000
          MVC   SBSL(SBSLLEN),SBSP Set MF=L pattern                      00900000
          SUBCOM SET,NAME='EXECCOMM',ENTRY=EXECCOMM,                    *00910000
-               UWORD=(R13),INTTYPE=ALL,KEY=USER,                       *00920000
+               UWORD=(R13),INTTYPE=ALL,KEY=NUCLEUS,                    *
                MF=(E,SBSL)                                              00930000
 *------------------------------------------------------------*          00940000
 * address COMMAND is called with a call type X'01' plist     *          00950000
@@ -149,24 +149,24 @@ GOBACK   DS    0H                                                       01320000
          SLR   R12,R15
          USING HOSTCMD,R12
 *------------------------------------------------------------*
-* Retrieve parameters. Entry R0 and R1 are set up for a      *
-* type X'05' call to an external function.                   *
+* Retrieve parameters. Pointers to the extended plist and    *
+* the tokenized plist are retrieved and used for a call      *
+* type X'05' invocation of an external function.             *
 *------------------------------------------------------------*
-         LR    R4,R0              Hold entry parameters
-         LR    R5,R1
+         LM    R4,R5,0(R1)        Fetch entry parameters
 *
 *------------------------------------------------------------*
 * Setup EXECCOMM subcommand environment                      *
 *------------------------------------------------------------*
          MVC   SBSL(SBSLLEN),SBSP Set MF=L pattern
          SUBCOM SET,NAME='EXECCOMM',ENTRY=EXECCOMM,                    *
-               UWORD=(R13),INTTYPE=ALL,KEY=USER,                       *
+               UWORD=(R13),INTTYPE=ALL,KEY=NUCLEUS,                    *
                MF=(E,SBSL)
 *
          LR    R0,R4              Reload entry parameters
          LR    R1,R5
          SVC   202                Call the function
-         DC    AL4(*)
+         DC    AL4(1)
 *
          LR    R3,R15             Hold the command return code
          MVC   SBCL(SBCLLEN),SBCP Set MF=L pattern
