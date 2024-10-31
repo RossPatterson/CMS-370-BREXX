@@ -1,8 +1,13 @@
-	BREXX CMS Change LOG
+BREXX CMS Change LOG
 ====================
 1.1.0 -
+I0080 - Make PARSE VERSION result conform to ANSI and TRL2 standards
       - Add tests for PARSE instruction
-	  - Enable tests in builds
+      - Enable tests in builds and fix them to work
+I0073 - Implement SIGNAL ON ERROR for positive non-zero return codes
+I0075 - Implement SIGNAL ON FAILURE
+      - Add tests for PARSE instruction
+      - Enable tests in builds
       - Improve the build process a bit.
 
 1.0.1 - 5 Jul 2022 (on VM/CE 1.1.2) 27 Oct 2024 (on GitHub)
