@@ -1,0 +1,19 @@
+BRXCOMP                                                          MAINTC command
+
+Use the BRXCOMP command to compile C programs that are part of the BREXX
+runtime library.
+
+The format of the BRXCOMP command is:
++----------+------------------------------------------------------------------+
+| BRXCOMP  | fn [KEEP]                                                        |
++----------+------------------------------------------------------------------+
+
+Usage Notes:
+
+1. Set up the proper minidisk search order with the BRXSRCH command before
+   using this command.
+
+2. The BRXCOMP produces an output TEXT file from the compilation on the A-disk.
+
+3. The KEEP operand causes the ASSEMBLE file from the compilation to be
+   retained on the A-disk, instead of being erased.

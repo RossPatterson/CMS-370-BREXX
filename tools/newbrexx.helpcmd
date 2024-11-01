@@ -1,0 +1,51 @@
+NEWBREXX                                                         MAINTC command
+
+Use the NEWBREXX command from the MAINT ID to install the latest versions of
+the GCC CMS runtime code and the BREXX system code for public use.
+
+The format of the NEWBREXX command is:
++----------+------------------------------------------------------------------+
+| NEWBREXX |                                                                  |
++----------+------------------------------------------------------------------+
+
+Usage Notes:
+
+1. NEWBREXX should be issued only on the MAINT user ID.
+
+2. MAINT must have the LNKNOPAS option in its CP Directory entry.
+
+3. NEWBREXX uses a control file on the MAINTC 191 disk.
+   Here is a sample of that file. The control file allows MAINTC
+   to define which GCC/BREXX files go onto which CMS System minidisks.
+
+*                                 Destination      Source MAINTC minidisk
+DISK                              MAINT    19E     191
+FILE       GCCLIB     TXTLIB
+FILE       GCCRES     TXTLIB
+FILE       GCCLIB     TEXT
+FILE       BREXX      TEXT
+*
+DISK                              MAINT    19E     393
+FILE       SYSPROFB   EXEC
+FILE       REXXTRY    EXEC
+*
+DISK                              GCCCMS   202     394
+FILE       *          H
+FILE       GCC        PARM
+*
+DISK                              GCCCMS   202     194
+FILE       GCCLIB     MACLIB
+
+
+4. After NEWBREXX completes, the MAINT 190 and 19E disks
+   will contain the updated runtime code. Issue the following
+   commands on MAINT to save the CMS System:
+
+   DEFINE STOR 16M
+   IPL 190 CLEAR
+   SAVESYS CMS
+
+5. If the GCC runtime was updated, save the GCC runtime saved segment:
+
+   LOAD GCCLIB ( CLEAR ORIGIN F20000
+   SAVESYS GCCLIB

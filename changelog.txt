@@ -1,5 +1,14 @@
 BREXX CMS Change LOG
 ====================
+1.0.1 - 5 Jul 2022 (on VM/CE 1.1.2) 27 Oct 2024 (on GitHub)
+      - Update build tools for GitHub changes
+      - Updated build process for VM/370 Community Edition 1.1.2
+      - Get TYPE=USER storage for SVC 202 plists
+      - Call external functions via SVC 202.
+      - Support RXLOCFN and RXUSERFN function packages.
+      - Load GCCLIB from DCSS if available.
+      - Add help files for BRX* EXEC tools.
+      - Upgrade GCCLIB to v1.0.1.
 
 1.0.0 - 15 April 2021
 F0049 - Version for VM/CE Build Process
