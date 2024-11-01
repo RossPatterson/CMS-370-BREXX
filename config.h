@@ -133,7 +133,7 @@
 #define PACKAGE_BUGREPORT "h390-vm@groups.io"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "VM/370 BREXX Interpreter"
+#define PACKAGE_NAME "VM/370 bREXX Interpreter"
 
 /* Define to the full name and version of this package. */
 #define PACKAGE_STRING "REXX-bREXX-2.1.9-CMS370-"CMS_VERSION
