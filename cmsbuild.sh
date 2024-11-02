@@ -152,7 +152,11 @@ herccontrol "/" -w "^Ready;"
 herccontrol "/logoff" -w "^VM/370 Online"
 
 # Test suite
-# herccontrol "/runtest_" -w "^Ready;"
+herccontrol "/logon maintc maintc" -w "^VM Community Edition"
+herccontrol "/" -w "^Ready;"
+herccontrol "/BRXSRCH" -w "^Ready;"
+herccontrol "/runtest_" -w "^Ready;"
+herccontrol "/logoff" -w "^VM/370 Online"
 
 # SHUTDOWN
 herccontrol "/logon operator operator" -w "RECONNECTED AT"

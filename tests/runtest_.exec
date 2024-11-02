@@ -3,6 +3,7 @@ parse arg interpreter
 if interpreter='' then interpreter='rexx'
 parse source source 1 system .
 parse version rexx_version
+say 'Rexx version' rexx_version 'on' system
 suffix = '.exec'
 if system='CMS' then
 do
@@ -50,6 +51,7 @@ interpreter ' lines_'||suffix
 interpreter ' max_'||suffix
 interpreter ' min_'||suffix
 interpreter ' overlay_'||suffix
+interpreter ' parse_'||suffix
 interpreter ' pos_'||suffix
 interpreter ' qualify_'||suffix
 interpreter ' queued_'||suffix
@@ -79,7 +81,7 @@ interpreter ' xrange_'||suffix
 interpreter ' x2b_'||suffix
 interpreter ' x2c_'||suffix
 interpreter ' x2d_'||suffix
-interpreter ' testexc'||suffix
+if system='CMS' then interpreter ' testexc'||suffix
 interpreter ' maths_'||suffix
 
 if system='CMS' then "CP SPOOL CONS STOP CLOSE"
