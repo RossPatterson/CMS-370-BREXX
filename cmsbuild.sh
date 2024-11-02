@@ -69,7 +69,6 @@ herccontrol "/yata -x -f READER -d b" -w "^Ready;"
 herccontrol "/COPYFILE * MACRO    B (RECFM F LRECL 80" -w "^Ready"
 herccontrol "/COPYFILE * COPY     B (RECFM F LRECL 80" -w "^Ready"
 herccontrol "/COPYFILE * ASSEMBLE B (RECFM F LRECL 80" -w "^Ready"
-#herccontrol "/COPYFILE * EXEC     B (RECFM F" -w "^Ready"
 herccontrol "/RENAME NEWBREXX TMPFTYPE B NEWBREXX CONTROL B" -w "^Ready"
 
 # Make source tape and vmarc
@@ -90,35 +89,14 @@ herccontrol "/vmarc pack * * b (pun notrace" -w "^Ready;"
 herccontrol "devinit 00d dummy" -w "^HHCPN098I"
 truncate -s-80 brexxsrc.vmarc
 
-# Put tools in the T drive
-herccontrol "/COPYFILE BRXASM EXEC B = = T (REPLACE" -w "^Ready"
-herccontrol "/ERASE BRXASM EXEC B" -w "^Ready"
+# Put tools on the T drive
+herccontrol "/EXPLOIT (BRXTOOLS) COPYFILE &FN &FT &FM = = T (REPLACE OLDDATE" -w "^Ready"
+herccontrol "/COPYFILE BRXTOOLS EXEC B = = A (REPLACE OLDDATE" -w "^Ready"
+herccontrol "/EXPLOIT (BRXTOOLS) ERASE &FN &FT &FM" -w "^Ready"
+herccontrol "/ERASE BRXTOOLS EXEC B" -w "^Ready"
 
-herccontrol "/COPYFILE BRXBUILD EXEC B = = T (REPLACE" -w "^Ready"
-herccontrol "/ERASE BRXBUILD EXEC B" -w "^Ready"
-
-herccontrol "/COPYFILE BRXCOMP EXEC B = = T (REPLACE" -w "^Ready"
-herccontrol "/ERASE BRXCOMP EXEC B" -w "^Ready"
-
-herccontrol "/COPYFILE BRXCOMPD EXEC B = = T (REPLACE" -w "^Ready"
-herccontrol "/ERASE BRXCOMPD EXEC B" -w "^Ready"
-
-herccontrol "/COPYFILE BRXGEN EXEC B = = T (REPLACE" -w "^Ready"
-herccontrol "/ERASE BRXGEN EXEC B" -w "^Ready"
-
-herccontrol "/COPYFILE BRXSRCH EXEC B = = T (REPLACE" -w "^Ready"
-herccontrol "/ERASE BRXSRCH EXEC B" -w "^Ready"
-
-herccontrol "/COPYFILE BRXSRCHD EXEC B = = T (REPLACE" -w "^Ready"
-herccontrol "/ERASE BRXSRCHD EXEC B" -w "^Ready"
-
-herccontrol "/COPYFILE BRXSRCHT EXEC B = = T (REPLACE" -w "^Ready"
-herccontrol "/ERASE BRXSRCHT EXEC B" -w "^Ready"
-
-herccontrol "/COPYFILE TOOLDISK MEMO B = = T (REPLACE" -w "^Ready"
-herccontrol "/ERASE TOOLDISK MEMO B" -w "^Ready"
-
-herccontrol "/COPYFILE NEWBREXX CONTROL B = = A (REPLACE" -w "^Ready"
+# Put our deployment control file on the A drive
+herccontrol "/COPYFILE NEWBREXX CONTROL B = = A (REPLACE OLDDATE" -w "^Ready"
 herccontrol "/ERASE NEWBREXX CONTROL B" -w "^Ready"
 
 herccontrol "/ipl cms" -w "^VM Community Edition"
