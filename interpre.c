@@ -100,6 +100,9 @@
 
 /*void ProcessInterrupt();*/
 
+/* ---------------- Local variables ------------------- */
+static int word_start, word_end;
+
 #define STACKTOP (context->interpre_RxStck)[(context->interpre_RxStckTop)]
 #define STACKP(i) (context->interpre_RxStck)[(context->interpre_RxStckTop)-(i)]
 
@@ -120,6 +123,7 @@
 # define DEBUGDISPLAYi(a, b)
 # define DEBUGDISPLAY2(a)
 #endif
+
 
 #define CHKERROR if ((context->interpre_RxStckTop)==STCK_SIZE-1) (context->lstring_Lerror)(ERR_STORAGE_EXHAUSTED,0)
 #define INCSTACK { (context->interpre_RxStckTop)++; CHKERROR; }
@@ -180,23 +184,27 @@ static void
 I_trigger_space(void) {
     Context *context = (Context *) CMSGetPG();
     /* normalise to 0 .. len-1 */
-    (context->interpre_DataStart) = (context->interpre_BreakEnd) - 1;
+    word_start--;
 
     /* skip leading spaces */
-    LSKIPBLANKS(*(context->interpre_ToParse), (context->interpre_DataStart));
+    LSKIPBLANKS(*(context->interpre_ToParse),word_start);
+    if (word_start >= (context->interpre_DataEnd))
+        word_start = (context->interpre_DataEnd) - 1;
 
-    /* find word */
-    (context->interpre_BreakStart) = (context->interpre_DataStart);
-    LSKIPWORD(*(context->interpre_ToParse), (context->interpre_BreakStart));
+    /* find end of word */
+    word_end = word_start;
+
+    LSKIPWORD(*(context->interpre_ToParse),word_end);
+    if (word_end >= (context->interpre_DataEnd))
+        word_end = (context->interpre_DataEnd) - 1;
+    (context->interpre_DataStart) = word_end + 1; /* Point past this word for the next word */
 
     /* skip trailing spaces */
-    (context->interpre_BreakEnd) = (context->interpre_BreakStart);
-    LSKIPBLANKS(*(context->interpre_ToParse), (context->interpre_BreakEnd));
 
     /* again in rexx strings 1..len */
     (context->interpre_DataStart)++;
-    (context->interpre_BreakStart)++;
-    (context->interpre_BreakEnd)++;
+    word_start++;
+    word_end++;
 } /* I_trigger_space */
 
 /* ------------- I_trigger_litteral -------------- */
@@ -1459,6 +1467,7 @@ RxInterpret(void) {
                 if (func->label == UNKNOWN_LABEL)
                     (context->lstring_Lerror)(ERR_UNEXISTENT_LABEL, 1,
                                               &(leaf->key));
+
                 /* jump */
                 (context->interpreRxcip) = (CIPTYPE *) (
                         (byte huge *) (context->interpreRxcodestart) +
@@ -1748,7 +1757,7 @@ RxInterpret(void) {
                 /* Do not remove from stack */
                 (context->interpre_ToParse) = STACKTOP;
                 L2STR((context->interpre_ToParse));
-                (context->interpre_DataStart) = (context->interpre_BreakStart) =
+                word_start = (context->interpre_DataStart) = (context->interpre_BreakStart) =
                 (context->interpre_BreakEnd) = 1;
                 (context->interpre_SourceEnd) =
                         LLEN(*(context->interpre_ToParse)) + 1;
@@ -1758,26 +1767,23 @@ RxInterpret(void) {
                 /* Parse to stack */
             case OP_PVAR:
                 DEBUGDISPLAY0("PVAR");
-                if ((context->interpre_BreakEnd) <=
-                    (context->interpre_DataStart))
-                    (context->interpre_DataEnd) = (context->interpre_SourceEnd);
-                else
-                    (context->interpre_DataEnd) =
-                            (context->interpre_BreakStart);
 
-                if ((context->interpre_DataEnd) !=
-                    (context->interpre_DataStart))
+                if (word_end>word_start)
                     _Lsubstr(
                             (context->interpre_RxStck)[(context
                                     ->interpre_RxStckTop)--],
                             (context->interpre_ToParse),
-                            (context->interpre_DataStart),
-                            (context->interpre_DataEnd) -
-                            (context->interpre_DataStart));
+                            word_start, word_end - word_start);
                 else {
                     LZEROSTR(*(STACKTOP));
                     (context->interpre_RxStckTop)--;
                 }
+                /* In case the next PVAR or PDOT is the last one in a WORDPARSE(data)
+                 * invocation, set the word pointers up to consume all the remaining data.
+                 * If there's a TR_SPACE before the next one, it will reset them.
+                 */
+                word_start = (context->interpre_DataStart);
+                word_end = (context->interpre_DataEnd);
                 if ((context->interpre__trace)) {
                     (context->interpre_RxStckTop)++;
                     TraceInstruction(*(context->interpreRxcip));
@@ -1797,23 +1803,19 @@ RxInterpret(void) {
                     (context->interpre_RxStckTop)++;
                     STACKTOP = &((context->interpre__tmpstr)[(context
                             ->interpre_RxStckTop)]);
-                    if ((context->interpre_BreakEnd) <=
-                        (context->interpre_DataStart))
-                        (context->interpre_DataEnd) =
-                                (context->interpre_SourceEnd);
-                    else
-                        (context->interpre_DataEnd) =
-                                (context->interpre_BreakStart);
-                    if ((context->interpre_DataEnd) !=
-                        (context->interpre_DataStart))
+                    if (word_end>word_start)
                         _Lsubstr(STACKTOP, (context->interpre_ToParse),
-                                 (context->interpre_DataStart),
-                                 (context->interpre_DataEnd) -
-                                 (context->interpre_DataStart));
+                                 word_start,word_end-word_start);
                     else LZEROSTR(*(STACKTOP));
                     TraceInstruction(*(context->interpreRxcip));
                     (context->interpre_RxStckTop)--; /* free space */
                 }
+                /* In case the next PVAR or PDOT is the last one in a WORDPARSE(data)
+                 * invocation, set the word pointers up to consume all the remaining data.
+                 * If there's a TR_SPACE before the next one, it will reset them.
+                 */
+                word_start = (context->interpre_DataStart);
+                word_end = (context->interpre_DataEnd);
                 (context->interpreRxcip)++;
                 goto main_loop;
 
@@ -1828,10 +1830,14 @@ RxInterpret(void) {
                 /* trigger a litteral from stck */
             case OP_TR_LIT:
                 DEBUGDISPLAY("TR_LIT");
-                (context->interpre_DataStart) = (context->interpre_BreakEnd);
+                word_start = (context->interpre_DataStart) = (context->interpre_BreakEnd);
                 I_trigger_litteral(
                         (context->interpre_RxStck)[(context
                                 ->interpre_RxStckTop)--]);
+                if ((context->interpre_BreakEnd)<=(context->interpre_DataStart))
+                    word_end = (context->interpre_DataEnd) = (context->interpre_SourceEnd);
+                else
+                    word_end = (context->interpre_DataEnd) = (context->interpre_BreakStart);
                 goto main_loop;
 
                 /* TR_ABS   */
@@ -1841,16 +1847,21 @@ RxInterpret(void) {
 /**
 //   L2INT(**A);
 **/
-                (context->interpre_DataStart) = (context->interpre_BreakEnd);
+                word_start = (context->interpre_DataStart) = (context->interpre_BreakEnd);
                 (context->interpre_BreakStart) = (size_t) LINT(
                         *((context->interpre_RxStck)[(context
                                 ->interpre_RxStckTop)--]));
+
 
                 /* check for boundaries */
                 (context->interpre_BreakStart) = RANGE(1,
                                                        (context->interpre_BreakStart),
                                                        (context->interpre_SourceEnd));
                 (context->interpre_BreakEnd) = (context->interpre_BreakStart);
+                if ((context->interpre_BreakEnd)<=(context->interpre_DataStart))
+                    word_end = (context->interpre_DataEnd) = (context->interpre_SourceEnd);
+                else
+                    word_end = (context->interpre_DataEnd) = (context->interpre_BreakStart);
                 goto main_loop;
 
                 /* TR_REL   */
@@ -1858,10 +1869,11 @@ RxInterpret(void) {
             case OP_TR_REL:
                 DEBUGDISPLAY("TR_REL");
 
+
 /**
 //   L2INT(**A);
 **/
-                (context->interpre_DataStart) = (context->interpre_BreakStart);
+                word_start = (context->interpre_DataStart) = (context->interpre_BreakStart);
                 (context->interpre_BreakStart) = (context->interpre_DataStart) +
                                                  (size_t) LINT(
                                                          *((context
@@ -1873,15 +1885,29 @@ RxInterpret(void) {
                                                        (context->interpre_BreakStart),
                                                        (context->interpre_SourceEnd));
                 (context->interpre_BreakEnd) = (context->interpre_BreakStart);
+                if ((context->interpre_BreakEnd)<=(context->interpre_DataStart))
+                    word_end = (context->interpre_DataEnd) = (context->interpre_SourceEnd);
+                else
+                    word_end = (context->interpre_DataEnd) = (context->interpre_BreakStart);
                 goto main_loop;
 
                 /* TR_END   */
                 /* trigger to END of data */
             case OP_TR_END:
                 DEBUGDISPLAY0("TR_END");
-                (context->interpre_DataStart) = (context->interpre_BreakEnd);
+                word_start = (context->interpre_DataStart) = (context->interpre_BreakEnd);
                 (context->interpre_BreakStart) = (context->interpre_SourceEnd);
                 (context->interpre_BreakEnd) = (context->interpre_SourceEnd);
+                if ((context->interpre_BreakEnd)<=(context->interpre_DataStart))
+                    word_end = (context->interpre_DataEnd) = (context->interpre_SourceEnd);
+                else
+                    word_end = (context->interpre_DataEnd) = (context->interpre_BreakStart);
+                /* In case the next PVAR or PDOT is the last one in a WORDPARSE(data)
+                 * invocation, set the word pointers up to consume all the remaining data.
+                 * If there's a TR_SPACE before the next one, it will reset them.
+                 */
+                word_start = (context->interpre_DataStart);
+                word_end = (context->interpre_DataEnd);
                 goto main_loop;
 
                 /* RX_QUEUE   */

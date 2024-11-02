@@ -78,17 +78,6 @@
 //
 */
 
-/* ------------ local defines ------------ */
-#ifndef ALIGN
-#define CODEFIXUPB(p,v) *(byte *)(LSTR(*(context->compileCompileCode)) + (p)) = (v)
-#define CODEFIXUP(p,v) *(word *)(LSTR(*(context->compileCompileCode)) + (p)) = (v)
-#define CLAUSESTEP sizeof(byte)
-#else
-#define CODEFIXUP(p, v) *(dword *)(LSTR(*(context->compileCompileCode)) + (p)) = (v)
-#define CODEFIXUPB(p, v) CODEFIXUP(p,v)
-#define CLAUSESTEP sizeof(dword)
-#endif
-
 /* ---- function prototypes ---- */
 int __CDECL C_expr(int);
 
