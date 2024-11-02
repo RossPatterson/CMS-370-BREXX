@@ -247,8 +247,18 @@ I_LoadOption(const PLstr value, const int opt) {
             Lscpy(value, AUTHOR);
             break;
 
-        case version_opt:
-            Lscpy(value, VERSIONSTR);
+        case version_opt: ; // Why does GCC demand this semi-colon?
+            /* We know that rexx.h:VERSIONSTR ends with "Mmm dd yyyy", and we
+               need it to be "dd Mmm yyyy". You can't do that in a #define,
+               so we do it here instead :-(
+             */
+            int vslen = strlen(VERSIONSTR);
+            char * versionstr = malloc(vslen+1);
+            strcpy(versionstr, VERSIONSTR);
+            strncpy(versionstr + vslen-8,  VERSIONSTR + vslen-11, 3); // "Mmm"
+            strncpy(versionstr + vslen-11, VERSIONSTR + vslen-7,  3); // "dd "
+            Lscpy(value, versionstr);
+            free(versionstr);
             break;
 
         case os_opt:
