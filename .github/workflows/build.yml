@@ -1,4 +1,4 @@
-name: Build GCCLIB
+name: Build BREXX
 
 on: [push]
 
@@ -48,7 +48,7 @@ jobs:
 
     - name: Upload Executable
       if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: BREXX
         path: ./exe
@@ -60,12 +60,11 @@ jobs:
     needs: [build-cms]
     runs-on: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v1
-
       - name: Get CMS binary
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: BREXX
+          path: BREXX
 
       - name: ZIP CMS binary
         run:
