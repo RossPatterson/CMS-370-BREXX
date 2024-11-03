@@ -3,12 +3,13 @@ parse arg interpreter
 if interpreter='' then interpreter='rexx'
 parse source source 1 system .
 parse version rexx_version
+say 'Rexx version' rexx_version
 suffix = '.exec'
 if system='CMS' then
 do
-suffix = ''
-interpreter = ''
-"CP SPOOL CONS * START"
+    suffix = ''
+    interpreter = ''
+    "CP SPOOL CONS * START"
 end
 interpreter ' abbrev_'||suffix
 interpreter ' abs_'||suffix
@@ -18,6 +19,7 @@ interpreter ' bitand_'||suffix
 interpreter ' bitor_'||suffix
 interpreter ' bitxor_'||suffix
 interpreter ' b2x_'||suffix
+interpreter ' call_'||suffix
 interpreter ' center_'||suffix
 interpreter ' changes_'||suffix
 interpreter ' charin_'||suffix
@@ -57,6 +59,7 @@ interpreter ' random_'||suffix
 interpreter ' reverse_'||suffix
 interpreter ' right_'||suffix
 interpreter ' sign_'||suffix
+interpreter ' signal_'||suffix
 interpreter ' sourcel_'||suffix
 interpreter ' space_'||suffix
 interpreter ' stream_'||suffix

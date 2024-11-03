@@ -1,0 +1,59 @@
+/* SIGNAL_ EXEC */
+say 'Look for SIGNAL OK'
+
+/* signal */
+signal t1a
+say 'failed in test 1'
+t1a:
+
+/* signal value var */
+t2v = 't2a'
+signal value t2v
+say 'failed in test 2'
+t2a:
+
+/* novalue */
+signal on novalue
+t3v
+say 'failed in test 3'
+novalue:
+
+/* named novalue */
+signal on novalue name t4a
+t4v
+say 'failed in test 4'
+t4a:
+
+/* signal sets sigl */
+/* Do not move this test around - it knows its line numbers! */
+signal t5a
+say 'failed in test 5'
+t5a:
+if sigl \== 29 then say 'failed in test 5'
+
+/* signal novalue sets sigl */
+/* Do not move this test around - it knows its line numbers! */
+signal on novalue name t6a
+t6v
+say 'failed in test 6'
+t6a:
+if sigl \== 37 then say 'failed in test 6'
+
+/* signal value sets sigl */
+/* Do not move this test around - it knows its line numbers! */
+t7v = 't7a'
+signal value t7v
+say 'failed in test 7'
+t7a:
+if sigl \== 45 then say 'failed in test 7'
+
+/* signal value expr */
+/* Do not move this test around - it knows its line numbers! */
+t8v = 't8'
+signal value t8v || 'a'
+say 'failed in test 8'
+t8a:
+if sigl \== 53 then say 'failed in test 8'
+
+say 'SIGNAL OK'
+exit
