@@ -188,11 +188,9 @@ TraceSet(PLstr trstr) {
         case 'E':
             (context->rexx_proc)[(context->rexx_rx_proc)].trace = error_trace;
             break;
-/*
-///  case 'F':
-///   (context->rexx_proc)[(context->rexx_rx_proc)].trace = ;
-///   break;
-*/
+        case 'F':
+            (context->rexx_proc)[(context->rexx_rx_proc)].trace = normal_trace;
+            break;
         case 'I':
             (context->rexx_proc)[(context->rexx_rx_proc)].trace =
                     intermediates_trace;

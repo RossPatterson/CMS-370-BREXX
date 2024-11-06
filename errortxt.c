@@ -167,8 +167,13 @@ const ErrorMsg errortext[] = {
 #endif
         {ERRNUM(24, 0), "Invalid TRACE request"},
 #ifndef WCE
+#ifdef __DEBUG__
         {ERRNUM(24, 1),
-         "TRACE request letter must be one of \"ACEFILNOR\"; found \"<value>\""},
+         "TRACE request letter must be one of \"ACDEFILNORS\"; found \"<value>\""},
+#else
+        {ERRNUM(24, 1),
+         "TRACE request letter must be one of \"ACEFILNORS\"; found \"<value>\""},
+#endif
 #endif
         {ERRNUM(25, 0), "Invalid sub-keyword found"},
 #ifndef WCE

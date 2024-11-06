@@ -1,7 +1,50 @@
 /* TRACE */
+parse arg sentinel retcode .
+if sentinel == '$$$' then exit retcode
+
+parse source . . my_name .
+
 say "Look for TRACE OK"
+
 /* These from the Rexx book. */
-say trace()
-say trace('O')
-/* say trace('?A') */
+if trace() \== 'N' then say 'failed in test 1'
+if trace('O') \== 'N' then say 'failed in test 2'
+if trace('A') \== 'O' then say 'failed in test 3'
+
+trace N
+say 'expecting a trace'
+my_name '$$$' '-99'
+if RC >=0 then say 'failed in test 4'
+else say 'was there one?'
+
+trace N
+say 'expecting no trace'
+my_name '$$$' '99'
+if RC <=0 then say 'failed in test 5'
+else say 'was there one?'
+
+trace F
+say 'expecting a trace'
+my_name '$$$' '-99'
+if RC >=0 then say 'failed in test 6'
+else say 'was there one?'
+
+trace F
+say 'expecting no trace'
+my_name '$$$' '99'
+if RC <=0 then say 'failed in test 7'
+else say 'was there one?'
+
+trace E
+say 'expecting no trace'
+my_name '$$$' '-99'
+if RC >=0 then say 'failed in test 8'
+else say 'was there one?'
+
+trace E
+say 'expecting a trace'
+my_name '$$$' '99'
+if RC <=0 then say 'failed in test 9'
+else say 'was there one?'
+
 say "TRACE OK"
