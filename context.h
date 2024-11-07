@@ -135,6 +135,7 @@ struct Context {
    byte lstring_l2u[256];
    byte lstring_u2l[256];
    LerrorFunc lstring_Lerror;
+   PLstr interpreoptions; /* OPTIONS word-list */
 
    /* ltime.c */
    double ltime_elapsed;

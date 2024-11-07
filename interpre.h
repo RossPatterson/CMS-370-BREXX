@@ -40,4 +40,5 @@ void __CDECL RxDoneInterpret(void);
 
 int __CDECL RxInterpret(void);
 
+int __CDECL CheckOption(char *);
 #endif

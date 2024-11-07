@@ -64,6 +64,7 @@ struct timeval_st {
 
 #include "lerror.h"
 #include "lstring.h"
+#include "ldefs.h"
 
 #include "rexx.h"
 #include "stack.h"
@@ -764,6 +765,9 @@ R_random() {
 /*      If data is specified, after the "old" value has been      */
 /*      retrieved, storage starting at address is overwritten     */
 /*      with data (the length argument has no effect on this).    */
+/*                                                                */
+/*      With OPTIONS STORAGE_STD set, address is a HEXADECIMAL    */
+/*      value.                                                    */
 /* -------------------------------------------------------------- */
 void __CDECL
 R_storage() {
@@ -795,7 +799,31 @@ R_storage() {
 #endif
         return;
     }
-    if (exist(1)) {      /* Argument is decimal and not hex */
+	if (exist(1) && CheckOption("STORAGE_STD")) {
+		adr = 0;
+		char *arg1 = LSTR(ARG1);
+		/* skip leading spaces */
+		for (i=0; ISSPACE(arg1[i]) && (i < LLEN(ARG1)); i++) ; 
+		/* find hexdigits */
+		for (; ISXDIGIT(arg1[i]) && (j < LLEN(ARG1)); i++) {
+			int digit = HEXVAL(arg1[i]);
+			adr = (adr * 16) + digit;
+		}
+		/* check trailing spaces */
+		for (; ISSPACE(arg1[i]) && (i < LLEN(ARG1)); i++) ; 
+        if (i != LLEN(ARG1))
+			(context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
+        if (adr < 0)
+            (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
+#if defined(__BORLANDC__) && !defined(__WIN32__) && !defined(WCE)
+        seg = (unsigned)((adr >> 4) & 0xFFFF);
+        ofs = (unsigned)(adr & 0x000F);
+        ptr = MK_FP(seg,ofs);
+#else
+        ptr = (void *) adr;
+#endif
+
+    } else if (exist(1)) {      /* Argument is decimal and not hex */
         adr = Lrdint(ARG1);
         if (adr < 0)
             (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
