@@ -85,6 +85,7 @@
 
 #include "lerror.h"
 #include "lstring.h"
+#include "options.h"
 
 #include "rexx.h"
 #include "stack.h"
@@ -463,10 +464,7 @@ I_StoreOption(const PLstr value, const int opt) {
             break;
 
         case options_opt:
-            if ((context->interpreoptions) != NULL)
-                LFREE((context->interpreoptions));
-            LINIT((context->interpreoptions));
-            Lscpy((context->interpreoptions), value)
+            ParseOptions(value);
             break;
 
         default:
@@ -941,20 +939,6 @@ I_ReturnProc(void) {
     else
         (context->interpre__trace) = TRUE;
 } /* I_ReturnProc */
-
-/* ---------------- I_CheckOption ----------- */
-/* return 1 if the specifed option was coded  */
-/* on the most-recent OPTIONS instruction.    */
-static int
-I_CheckOption(char *option) {
-    Context *context = (Context *) CMSGetPG();
-    if (pos = strstr((context->interpreoptions), option)) {
-        if ((strlen(option) == strlen((context->interpreoptions)+pos)) |
-            ((context->interpreoptions)+1 == ' '))
-            return 1;
-    }
-    return 0;
-} /* I_CheckOption */
 
 /* ------------ RxInitInterStr -------------- */
 void __CDECL

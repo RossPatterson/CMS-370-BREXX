@@ -128,6 +128,7 @@ struct Context {
    int interpre_no_user_fp;
    int interpre_no_loc_fp;
    int interpre_no_sys_fp;
+   OptList interpre_options; /* OPTIONS word-list */
 
    /* lstring.h */
    double lstring_lLastScannedNumber;
@@ -135,7 +136,6 @@ struct Context {
    byte lstring_l2u[256];
    byte lstring_u2l[256];
    LerrorFunc lstring_Lerror;
-   PLstr interpreoptions; /* OPTIONS word-list */
 
    /* ltime.c */
    double ltime_elapsed;
