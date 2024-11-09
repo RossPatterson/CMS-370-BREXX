@@ -77,6 +77,7 @@ Ldate(const PLstr datestr, char option) {
     static TCHAR *fmt = TEXT("%02d/%02d/%02d");
     static TCHAR *iso = TEXT("%4d%02d%02d");
     long length;
+    int year;
     const TCHAR *chptr;
     Context *context = (Context *) CMSGetPG();
 
@@ -100,6 +101,19 @@ Ldate(const PLstr datestr, char option) {
 #endif
 
     switch (option) {
+        case 'B':
+#ifndef WCE
+            year = tmdata->tm_year + 1900;
+            length = (year-1)*365 + (year-1)/4 - (year-1)/100 + (year-1)/400 +
+                tmdata->tm_yday; // + 1;
+            sprintf(LSTR(*datestr), "%ld", length);
+#else
+            length = (time.wYear)*365 + (time.wYear)/4 - (time.wYear)/100 +
+                (time.wYear)/400 + day_of_year(&time);
+            swprintf(buf, TEXT("%ld"), length);
+#endif
+            break;
+
         case 'C':
 #ifndef WCE
             length = tmdata->tm_yday + 1 +
