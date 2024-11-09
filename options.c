@@ -36,7 +36,7 @@ ParseOptions(const PLstr value) {
 int __CDECL
 CheckOption(char *value) {
     Context *context = (Context *) CMSGetPG();
-    
+
     for (i = 0; i < context->interpre_options->count; i++) {
         if (strcmp(context->interpre_options->list[i], value))
             return 1;

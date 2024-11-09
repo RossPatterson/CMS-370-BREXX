@@ -6,6 +6,7 @@
 #include "nextsymb.h"
 #include "dqueue.h"
 #include "lstring.h"
+#include "options.h"
 
 #ifndef __CONTEXT_H__
 #define __CONTEXT_H__
