@@ -105,7 +105,7 @@ Ldate(const PLstr datestr, char option) {
 #ifndef WCE
             year = tmdata->tm_year + 1900;
             length = (year-1)*365 + (year-1)/4 - (year-1)/100 + (year-1)/400 +
-                tmdata->tm_yday; // + 1;
+                tmdata->tm_yday;
             sprintf(LSTR(*datestr), "%ld", length);
 #else
             length = (time.wYear)*365 + (time.wYear)/4 - (time.wYear)/100 +
