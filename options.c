@@ -18,7 +18,7 @@ ParseOptions(const PLstr value) {
     L2STR(value);
     opt_count = context->interpre_options.count = Lwords(value);
     opt_list = context->interpre_options.list = MALLOC(opt_count * (sizeof(char *)), "OptList");
-    opt_ptr = context->interpre_options.words = MALLOC(LLEN(*value) + 1, , "OptList");
+    opt_ptr = context->interpre_options.words = MALLOC(LLEN(*value) + 1, "OptList");
     for (val_ptr = LSTR(*value), opt_index = 0, in_opt = FALSE;
             val_ptr < (LSTR(*value)+LLEN(*value)); val_ptr++) {
         if (ISSPACE(*val_ptr)) {
