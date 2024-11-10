@@ -1,0 +1,4 @@
+/* */
+trace i	
+arg exitcode .
+exit exitcode
