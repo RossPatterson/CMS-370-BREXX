@@ -1,5 +1,5 @@
-#ifndef__BREXX_OPTIONS_H__
-#define__BREXX_OPTIONS_H__
+#ifndef __BREXX_OPTIONS_H__
+#define __BREXX_OPTIONS_H__
 
 typedef struct OptList_st {
     int count;    /* Number of option words */
