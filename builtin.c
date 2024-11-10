@@ -778,6 +778,8 @@ R_storage() {
     unsigned seg,ofs;
 #endif
     size_t length = 1;
+    int i;
+
     Context *context = (Context *) CMSGetPG();
 
     if (ARGN > 3)
@@ -806,11 +808,11 @@ R_storage() {
             adr = Lrdint(ARG1);
         } else {
             adr = 0;
-            L2STR(ARG1);
-            for (i=0; i < LLEN(ARG1); i++) {
-                if (!ISXDIGIT(LSTR(ARG1)[i]))
+            get_s(1);
+            for (i=0; i < LLEN(*ARG1); i++) {
+                if (!ISXDIGIT(LSTR(*ARG1)[i]))
                     (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
-                adr = (adr * 16) + HEXVAL(LSTR(ARG1)[i]);
+                adr = (adr * 16) + HEXVAL(LSTR(*ARG1)[i]);
             }
         }
         if (adr < 0)
