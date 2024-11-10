@@ -1,5 +1,6 @@
 BREXX CMS Change LOG
 ====================
+I0087 - Add support for DATE(BASEDATE).
 
 1.0.0 - 15 April 2021
 F0049 - Version for VM/CE Build Process
