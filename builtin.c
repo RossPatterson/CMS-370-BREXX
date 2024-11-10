@@ -209,6 +209,9 @@ R_C(const int func) {
                 case error_trace:
                     LSTR(*ARGR)[i++] = 'E';
                     break;
+                case failure_trace:
+                    LSTR(*ARGR)[i++] = 'F';
+                    break;
                 case intermediates_trace:
                     LSTR(*ARGR)[i++] = 'I';
                     break;

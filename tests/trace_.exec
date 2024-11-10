@@ -10,41 +10,49 @@ say "Look for TRACE OK"
 if trace() \== 'N' then say 'failed in test 1'
 if trace('O') \== 'N' then say 'failed in test 2'
 if trace('A') \== 'O' then say 'failed in test 3'
+if trace('F') \== 'A' then say 'failed in test 4'
+if trace() \== 'F' then say 'failed in test 5'
 
 trace N
-say 'expecting a trace'
-my_name '$$$' '-99'
-if RC >=0 then say 'failed in test 4'
-else say 'was there one?'
-
-trace N
-say 'expecting no trace'
-my_name '$$$' '99'
-if RC <=0 then say 'failed in test 5'
-else say 'was there one?'
-
-trace F
+if trace() \== 'N' then say 'failed in test 6'
 say 'expecting a trace'
 my_name '$$$' '-99'
 if RC >=0 then say 'failed in test 6'
 else say 'was there one?'
 
-trace F
+trace N
+if trace() \== 'N' then say 'failed in test 7'
 say 'expecting no trace'
 my_name '$$$' '99'
 if RC <=0 then say 'failed in test 7'
 else say 'was there one?'
 
-trace E
-say 'expecting no trace'
+trace F
+if trace() \== 'F' then say 'failed in test 8'
+say 'expecting a trace'
 my_name '$$$' '-99'
 if RC >=0 then say 'failed in test 8'
 else say 'was there one?'
 
-trace E
-say 'expecting a trace'
+trace F
+if trace() \== 'F' then say 'failed in test 9'
+say 'expecting no trace'
 my_name '$$$' '99'
 if RC <=0 then say 'failed in test 9'
+else say 'was there one?'
+
+trace E
+if trace() \== 'E' then say 'failed in test 10'
+say 'expecting no trace'
+my_name '$$$' '-99'
+if RC >=0 then say 'failed in test 10'
+else say 'was there one?'
+
+trace E
+if trace() \== 'E' then say 'failed in test 11'
+say 'expecting a trace'
+my_name '$$$' '99'
+if RC <=0 then say 'failed in test 11'
 else say 'was there one?'
 
 say "TRACE OK"
