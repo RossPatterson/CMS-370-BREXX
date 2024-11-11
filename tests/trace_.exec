@@ -1,7 +1,7 @@
 /* TRACE */
 parse source system .
-if system = 'CMS' then exitrc = 'EXITRC_'
-else exitrc = 'exitrc_.exec'
+if system = 'CMS' then suffix = ''
+else suffix = '.exec'
 
 say "Look for TRACE OK"
 
@@ -12,46 +12,69 @@ if trace('A') \== 'O' then say 'failed in test 3'
 if trace('F') \== 'A' then say 'failed in test 4'
 if trace() \== 'F' then say 'failed in test 5'
 
+trace O
+
 trace N
-if trace() \== 'N' then say 'failed in test 6'; trace i
-say 'expecting a trace'
-exitrc '-99'
+if trace() \== 'N' then say 'failed in test 6'
+say 'test 6 expecting a trace'
+'exitneg_' || suffix
 if RC >=0 then say 'failed in test 6'
 else say 'was there one?'
 
 trace N
 if trace() \== 'N' then say 'failed in test 7'
-say 'expecting no trace'
-exitrc '99'
+say 'test 7 expecting no trace'
+'exitok_' || suffix
 if RC <=0 then say 'failed in test 7'
 else say 'was there one?'
 
-trace F
-if trace() \== 'F' then say 'failed in test 8'
-say 'expecting a trace'
-exitrc '-99'
-if RC >=0 then say 'failed in test 8'
+trace N
+if trace() \== 'N' then say 'failed in test 8'
+say 'test 8 expecting no trace'
+'exitpos_' || suffix
+if RC <=0 then say 'failed in test 8'
 else say 'was there one?'
 
 trace F
 if trace() \== 'F' then say 'failed in test 9'
-say 'expecting no trace'
-exitrc '99'
-if RC <=0 then say 'failed in test 9'
+say 'test 9 expecting a trace'
+'exitneg_' || suffix
+if RC >=0 then say 'failed in test 9'
 else say 'was there one?'
 
-trace E
-if trace() \== 'E' then say 'failed in test 10'
-say 'expecting no trace'
-exitrc '-99'
-if RC >=0 then say 'failed in test 10'
+trace F
+if trace() \== 'N' then say 'failed in test 10'
+say 'test 10 expecting no trace'
+'exitok_' || suffix
+if RC <=0 then say 'failed in test 10'
 else say 'was there one?'
 
-trace E
-if trace() \== 'E' then say 'failed in test 11'
-say 'expecting a trace'
-exitrc '99'
+trace F
+if trace() \== 'F' then say 'failed in test 11'
+say 'test 11 expecting no trace'
+'exitpos_' || suffix
 if RC <=0 then say 'failed in test 11'
+else say 'was there one?'
+
+trace E
+if trace() \== 'E' then say 'failed in test 12'
+say 'test 12 expecting a trace'
+'exitneg_' || suffix
+if RC >=0 then say 'failed in test 12'
+else say 'was there one?'
+
+trace E
+if trace() \== 'N' then say 'failed in test 13'
+say 'test 13 expecting no trace'
+'exitok_' || suffix
+if RC <=0 then say 'failed in test 13'
+else say 'was there one?'
+
+trace E
+if trace() \== 'E' then say 'failed in test 14'
+say 'test 14 expecting a trace'
+'exitpos_' || suffix
+if RC <=0 then say 'failed in test 14'
 else say 'was there one?'
 
 say "TRACE OK"
