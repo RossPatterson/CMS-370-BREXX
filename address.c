@@ -294,10 +294,10 @@ RxExecuteCmd(PLstr cmd, PLstr env) {
         if ( ((context->rexxrxReturnCode < 0) &&
               (context->rexx_proc[context->rexx_rx_proc].trace &
                     (failure_trace | normal_trace)
-             ) |
+             )) |
              ((context->rexxrxReturnCode > 0) &&
               (context->rexx_proc[context->rexx_rx_proc].trace & error_trace)
-             )  ) {
+             ) ) {
             TraceCurline(NULL, TRUE);
             fprintf(STDERR, "       +++ RC(%d) +++\n",
                     (context->rexxrxReturnCode));
