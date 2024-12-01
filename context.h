@@ -6,7 +6,6 @@
 #include "nextsymb.h"
 #include "dqueue.h"
 #include "lstring.h"
-#include "options.h"
 
 #ifndef __CONTEXT_H__
 #define __CONTEXT_H__
@@ -129,7 +128,7 @@ struct Context {
    int interpre_no_user_fp;
    int interpre_no_loc_fp;
    int interpre_no_sys_fp;
-   OptList interpre_options; /* OPTIONS word-list */
+   long interpre_options; /* OPTIONS flags */
 
    /* lstring.h */
    double lstring_lLastScannedNumber;

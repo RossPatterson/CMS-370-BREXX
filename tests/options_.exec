@@ -1,6 +1,7 @@
 /* */
 say "Look for OPTIONS OK"
 
+options noStorage_Decimal Storage_Decimal 'noStorage_Decimal'
 options asdf
 options qwer 1234
 options 'x y z' 7890 4**4

@@ -1,50 +1,59 @@
+#ifdef __CMS__
 #include <cmssys.h>
+#define HAS_CONTEXT
+#endif
 
 #include "lstring.h"
 #include "options.h"
-#include "context.h"
+
+#ifdef HAS_CONTEXT
+#  include "context.h"
+#  define CONTEXT(file, field) (context->file##field)
+#else
+#  define CONTEXT(file, field) field
+#endif
+
+typedef struct OptList_st {
+    char *name;
+    long flags;
+} OptList;
+OptList optlist[] = {
+    {"STORAGE_DECIMAL", OPT_STORAGE_DECIMAL},
+    {NULL, 0L}
+};
 
 /* ----------------- ParseOptions ------------------ */
 void __CDECL
 ParseOptions(const PLstr value) {
-    char *val_ptr, **opt_list, *opt_ptr;
-    int opt_count, opt_index, in_opt;
-
+    char *val_ptr, *opt_ptr, *val_end;
+    int i, j, opt_no, in_opt;
+    long word_count, word_num;
+    Lstr word;
+#ifdef HAS_CONTEXT
     Context *context = (Context *) CMSGetPG();
-    if ((context->interpre_options.list) != NULL)
-        FREE((context->interpre_options.list));
-    if ((context->interpre_options.words) != NULL)
-        FREE((context->interpre_options.words));
-    L2STR(value);
-    opt_count = context->interpre_options.count = Lwords(value);
-    opt_list = context->interpre_options.list = MALLOC(opt_count * (sizeof(char *)), "OptList");
-    opt_ptr = context->interpre_options.words = MALLOC(LLEN(*value) + 1, "OptList");
-    for (val_ptr = LSTR(*value), opt_index = 0, in_opt = FALSE;
-            val_ptr < (LSTR(*value)+LLEN(*value)); val_ptr++) {
-        if (ISSPACE(*val_ptr)) {
-            if (in_opt) {
-                *(opt_ptr++) = '\0';
-                in_opt = FALSE;
+#endif
+    LINITSTR(word);
+    CONTEXT(interpre_, options) = 0UL;
+    opt_ptr = LSTR(*value);
+    opt_no = FALSE;
+    word_count = Lwords(value);
+    for (word_num = 1L; word_num <= word_count; word_num++) {
+        Lword(&word, value, word_num);
+        LASCIIZ(word);
+        opt_ptr = LSTR(word);
+        if (opt_no = (opt_ptr[0] == 'N' && opt_ptr[1] == 'O')) {
+            opt_ptr += 2;
+        }
+        for (j = 0; optlist[j].name != NULL; j++) {
+            if (strcmp(optlist[j].name, opt_ptr) == 0) {
+                if (opt_no) {
+                    CONTEXT(interpre_, options) &= (0xffffffffffffffffUL - optlist[j].flags);
+                } else {
+                    CONTEXT(interpre_, options) |= optlist[j].flags;
+                }
+                break;
             }
-        } else {
-            if (!in_opt) {
-                in_opt = TRUE;
-                *(opt_list+(opt_index++)) = opt_ptr;
-            }
-            *(opt_ptr++) = *val_ptr;
         }
     }
+    LFREESTR(word);
 } /* ParseOptions */
-
-/* ----------------- CheckOption ------------------ */
-int __CDECL
-CheckOption(char *value) {
-    int i;
-
-    Context *context = (Context *) CMSGetPG();
-    for (i = 0; i < context->interpre_options.count; i++) {
-        if (strcmp(context->interpre_options.list[i], value))
-            return 1;
-    }
-    return 0;
-} /* CheckOption */

@@ -803,7 +803,7 @@ R_storage() {
         return;
     }
     if (exist(1)) {
-        if (CheckOption("STORAGE_DECIMAL")) {
+        if (CHECK_OPT(OPT_STORAGE_DECIMAL)) {
             /* Argument is decimal and not hex */
             adr = Lrdint(ARG1);
         } else {

@@ -1,17 +1,17 @@
 #ifndef __BREXX_OPTIONS_H__
 #define __BREXX_OPTIONS_H__
 
-typedef struct OptList_st {
-    int count;    /* Number of option words */
-    char **list;  /* List of option words */
-    char *words;  /* Word contents */
-} OptList;
+typedef enum opt_values {
+    OPT_STORAGE_DECIMAL = 1UL,
+} OptValues;
 
+
+#ifdef __CMS__
 #define ParseOptions _optprs
-#define CheckOption _optchk
+#endif
+
+#define CHECK_OPT(option) ((context->interpre_options) && (option))
 
 void __CDECL ParseOptions(const PLstr value);
-
-int __CDECL CheckOption(char *value);
 
 #endif
