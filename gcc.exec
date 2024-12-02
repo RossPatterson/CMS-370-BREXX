@@ -1,0 +1,278 @@
+*  Use GCC to compile a C program.
+&CONTROL OFF NOMSG
+&FT = C
+&FM = A
+&ASM = YES
+&ASMNAME = ASMAHL
+&CSECT = NO
+&KEEP = NO
+&LIB = PDPCLIB
+&PARM = GCC
+ 
+* Verify we have a file to compile.  First get the filename.
+&IF &INDEX = 0 &GOTO -Tell
+&IF &1 = ( &GOTO -Tell
+&FN = &1
+&ARGS &2 &3 &4 &5 &6 &7 &8 &9 &10 &11 &12 &13 &14 &15 &16 &17 &18 &19 &20
+ 
+* Now get the filetype.
+&IF &INDEX = 0 &GOTO -Compile
+&IF &1 = ( &GOTO -Parms
+&FT = &1
+&ARGS &2 &3 &4 &5 &6 &7 &8 &9 &10 &11 &12 &13 &14 &15 &16 &17 &18 &19 &20
+ 
+* And now the filemode.
+&IF &INDEX = 0 &GOTO -Compile
+&IF &1 = ( &GOTO -Parms
+&FM = &1
+&ARGS &2 &3 &4 &5 &6 &7 &8 &9 &10 &11 &12 &13 &14 &15 &16 &17 &18 &19 &20
+ 
+* Loop to check the options
+-Parms
+&IF &INDEX = 0 &GOTO -Compile
+&IF &1 NE ( &GOTO -BadArgs
+&LOOP -EndLoop &INDEX
+   &ARGS &2 &3 &4 &5 &6 &7 &8 &9 &10 &11 &12 &13 &14 &15 &16 &17 &18 &19 &20
+   &IF &INDEX = 0 &GOTO -Compile
+   * ASM option
+   &IF &1 NE ASM &GOTO -NxtOp1
+   &ASM = YES
+   &GOTO -EndLoop
+   -NxtOp1
+   * CMS option
+   &IF &1 NE CMS &GOTO -NxtOp2
+   &LIB = GCCLIB
+   &GOTO -EndLoop
+   -NxtOp2
+   * CSECT option
+   &IF &1 NE CSECT &GOTO -NxtOp3
+   &CSECT = YES
+   &GOTO -EndLoop
+   -NxtOp3
+   * KEEP option
+   &IF &1 NE KEEP &GOTO -NxtOp4
+   &KEEP = YES
+   &GOTO -EndLoop
+   -NxtOp4
+   * LIB option
+   &IF &1 NE LIB &GOTO -NxtOp5
+   &IF &INDEX = 1 &GOTO -NoLib
+   &LIB = &2
+   &ARGS &2 &3 &4 &5 &6 &7 &8 &9 &10 &11 &12 &13 &14 &15 &16 &17 &18 &19 &20
+   &GOTO -EndLoop
+   -NxtOp5
+   * NOASM option
+   &IF &1 NE NOASM &GOTO -NxtOp6
+   &ASM = NO
+   &GOTO -EndLoop
+   -NxtOp6
+   * NOCSECT option
+   &IF &1 NE NOCSECT &GOTO -NxtOp7
+   &CSECT = NO
+   &GOTO -EndLoop
+   -NxtOp7
+   * NOKEEP option
+   &IF &1 NE NOKEEP &GOTO -NxtOp8
+   &KEEP = NO
+   &GOTO -EndLoop
+   -NxtOp8
+   * OS option
+   &IF &1 NE OS &GOTO -NxtOp9
+   &LIB = PDPCLIB
+   &GOTO -EndLoop
+   -NxtOp9
+   * PARM option
+   &IF &1 NE PARM &GOTO -NxtOp10
+   &IF &INDEX = 1 &GOTO -NoParm
+   &PARM = &2
+   &ARGS &2 &3 &4 &5 &6 &7 &8 &9 &10 &11 &12 &13 &14 &15 &16 &17 &18 &19 &20
+   &GOTO -EndLoop
+   -NxtOp10
+   &GOTO -BadOpt
+   -EndLoop
+ 
+* Prepare to compile the program.
+-Compile
+STATE &FN &FT &FM
+&IF &RETCODE NE 0 &GOTO -NoFile
+ 
+* Access the disk containing the include (H) files.
+* OK, I know this is ugly, but what other choice have we?
+* Well, some day it would be great to put include files in a MACLIB...
+EXECUTIL FREEADDR 19E
+&READ VARS &VADDR
+EXECUTIL FREEMODE S
+&READ VARS &LETTER
+&IF &LIB = PDPCLIB CP DISCARD LINK GCCCMS 201 &VADDR RR
+&IF &LIB = GCCLIB  CP DISCARD LINK GCCCMS 202 &VADDR RR
+&STACK HT
+ACCESS &VADDR &LETTER
+&STACK RT
+ 
+QUERY MACLIB (LIFO
+&READ VARS &X &X &LIB1 &LIB2 &LIB3 &LIB4 &LIB5 &LIB6 &LIB7 &LIB8
+GLOBAL MACLIB &LIB DMSGPI CMSHRC CMSLIB OSMACRO TSOMAC
+&IF &RETCODE > 0 &GOTO -BadLib
+ 
+ERASE &FN WORK &FM
+FILEDEF SYSPRINT TERM (LRECL 80
+FILEDEF SYSPARM DISK &PARM PARM *
+FILEDEF OUT DISK &FN WORK &FM (LRECL 80 RECFM F
+FILEDEF SYSIN DISK &FN &FT &FM
+CHECK380
+&GCC = GCC380
+&IF &RETCODE = 370 &GCC = GCC370
+ 
+* At last we compile the program.
+&GCC
+&GCCRC = &RETCODE
+FILEDEF SYSPRINT CLEAR
+FILEDEF SYSPARM CLEAR
+FILEDEF OUT CLEAR
+FILEDEF SYSIN CLEAR
+&IF &GCCRC > 0 &TYPE Return code &GCCRC from GCC of &FN
+&IF &GCCRC > 4 &GOTO -Done
+ERASE &FN ASSEMBLE &FM
+ 
+* If specified, add a label to the otherwise blank CSECT statement.
+COPYFILE &FN WORK &FM = WORK1 = (OLDD REPL
+&IF &CSECT = NO &GOTO -Rename
+GCCCSECT &FN WORK &FM
+&RC = &RETCODE
+COPYFILE &FN WORK &FM = WORK2 = (OLDD REPL
+&IF &RC > 0 &GOTO -BadCsct
+RENAME &FN ASMFIX &FM = ASSEMBLE =
+ERASE  &FN WORK &FM
+&GOTO -Asm
+ 
+* Now assemble the output file.
+-Rename
+RENAME &FN WORK &FM = ASSEMBLE =
+-Asm
+&IF &ASM = NO &GOTO -Done
+&ASMNAME &FN (NOTERM
+&IF &RETCODE  > 0 &GOTO -BadAsm
+ 
+* Our work here is done.
+ERASE  &FN WORK1 &FM
+ERASE  &FN WORK2 &FM
+&GCCRC = 0
+ 
+-Done
+&IF &LIB1 NE NONE GLOBAL MACLIB &LIB1 &LIB2 &LIB3 &LIB4 &LIB5 &LIB6 &LIB7 &LIB8
+RELEASE &LETTER
+CP DISCARD DETACH &VADDR
+&IF &KEEP EQ YES &GOTO -NoClean
+   ERASE &FN ASSEMBLE &FM
+   ERASE &FN LISTING  &FM
+-NoClean
+&EXIT &GCCRC
+ 
+-BadArgs
+&TYPE Invalid args &1 &2 &3 &4 &5 &6 &7 &8 &9
+&EXIT 24
+ 
+-BadAsm
+&GCCRC = &RETCODE
+&TYPE Return code &GCCRC from &ASMNAME of &FN
+&GOTO -Done
+ 
+-BadCsct
+&GCCRC = &RETCODE
+&TYPE Error &GCCRC adding CSECT label.
+&GOTO -Done
+ 
+-BadLib
+&TYPE Library &LIB MACLIB not found.
+&GCCRC = 24
+&GOTO -Done
+ 
+-BadOpt
+&TYPE Invalid option &1
+&EXIT 24
+ 
+-NoFile
+&TYPE Source file &FN &FT &FM not found.
+&EXIT 28
+ 
+-NoLib
+&TYPE Missing filename after 'LIB' option.
+&EXIT 24
+ 
+-NoParm
+&TYPE Missing filename after 'PARM' option.
+&EXIT 24
+ 
+-Tell
+&BEGTYPE
+Use GCC EXEC to compile and assemble a C program.  Then use the LOAD and START
+commands to run the program:
+   gcc hello
+   global txtlib pdpclib   ...to use PDPCLIB for system services (see below)
+      or
+   global txtlib gcclib    ...to use GCCLIB for system services (see below)
+   load hello
+   start
+The format of the GCC command is:
+   GCC [fn [ft [fm]]] [( [options]
+ 
+   Options:
+   ASM|NOASM   CSECT|NOCSECT   KEEP|NOKEEP   LIB fn   OS|CMS PARM fn
+ 
+where:
+ 
+fn ft fm specifies the C program file to compile.  'ft' defaults to 'C' and
+         'fm' defaults to 'A'.
+ 
+ASM|NOASM
+         specifies whether the ASSEMBLE output file from the C compiler is to
+         be assembled or not.  ASM is the default.
+ 
+CSECT|NOCSECT
+         specifies that the blank CSECT statement produced by GCC is to be
+         given a label. NOCSECT is the default.  CSECT is required only when
+         building a library of C routines.
+ 
+KEEP|NOKEEP
+         specifies whether or not the assembler output files from the C
+         compiler are to be kept or erased.  NOKEEP is the default.
+ 
+LIB fn   specifies the runtime library with which the program is to be
+         compiled.  GCC will link and access the appropriate disk containing
+         the C header files.  Two runtime libraries are available:
+ 
+         GCCLIB  uses only "native" CMS functions for system services.  Using
+                 this library it is possible to write programs that may be
+                 loaded into resident memory as extensions of the CMS nucleus.
+                 For example, you can open CMS files directly by name.
+ 
+                 Ensure GCCLIB is in your list of GLOBAL TXTLIBs to run your
+                 compiled progam.
+ 
+         PDPCLIB uses simulated OS functions for system services, just like
+                 FORTRAN or PL/I.  For example, you must use the FILEDEF
+                 command to identify CMS files to your program.
+ 
+                 Ensure PDPCLIB is in your list of GLOBAL TXTLIBs to run your
+                 compiled progam.
+ 
+         LIB PDPCLIB is the default.
+ 
+OS|CMS   OS is shorthand for LIB PDPCLIB.  CMS is shorthand for LIB GCCLIB.
+ 
+PARM fn  specifies a file of type PARM containg arguments to pass to GCC.  By
+         default 'GCC PARM *' is used.
+ 
+For more information type HELP GCC.
+ 
+Next is displayed the current GCC version, then parameters that can be placed
+in a PARM file.
+ 
+&ENDTYPE
+FILEDEF SYSPRINT TERM (LRECL 80
+CHECK380
+&GCC = GCC
+&IF &RETCODE = 370 &GCC = GCC370
+&GCC
+FILEDEF SYSPRINT CLEAR
+&EXIT 100
