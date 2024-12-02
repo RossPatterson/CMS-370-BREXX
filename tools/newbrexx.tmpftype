@@ -27,3 +27,4 @@ FILE       GCCLIB     HELPCMD2
 DISK                              MAINT    19D     393
 FILE       REXX       HELPCMD
 FILE       REXX       HELPCMD2
+FILE       *          HELPREXX

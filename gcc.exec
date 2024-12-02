@@ -154,6 +154,8 @@ RENAME &FN WORK &FM = ASSEMBLE =
 &IF &RETCODE  > 0 &GOTO -BadAsm
  
 * Our work here is done.
+ERASE  &FN WORK1 &FM
+ERASE  &FN WORK2 &FM
 &GCCRC = 0
  
 -Done
