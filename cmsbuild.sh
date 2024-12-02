@@ -65,11 +65,25 @@ herccontrol -w "HHCRD012I" -f $mark
 herccontrol "/" -w "RDR FILE"
 herccontrol "/yata -x -f READER -d b" -w "^Ready;"
 
+# Get help files
+yata -c -d help -f archive.yata
+herccontrol -m >tmp; read mark <tmp; rm tmp
+echo "USERID  MAINTC\n:READ  ARCHIVE  YATA    " > tmp
+cat archive.yata >> tmp
+netcat -q 0 localhost 3505 < tmp
+rm tmp
+herccontrol -w "HHCRD012I" -f $mark
+herccontrol "/" -w "RDR FILE"
+herccontrol "/yata -x -f READER -d b" -w "^Ready;"
+
 # Fix Source Files
 herccontrol "/COPYFILE * MACRO    B (RECFM F LRECL 80" -w "^Ready"
 herccontrol "/COPYFILE * COPY     B (RECFM F LRECL 80" -w "^Ready"
 herccontrol "/COPYFILE * ASSEMBLE B (RECFM F LRECL 80" -w "^Ready"
 herccontrol "/RENAME NEWBREXX TMPFTYPE B NEWBREXX CONTROL B" -w "^Ready"
+
+# Make the BRXHELP VMARC file
+herccontrol "/EXPLOIT (BRXHELP) VMARC PACK &FN &FT B BRXHELP VMARC B (APPEND NOTRACE" -w "^Ready;"
 
 # Make source tape and vmarc
 herccontrol "/cp disc" -w "^VM/370 Online"
