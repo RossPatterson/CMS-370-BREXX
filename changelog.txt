@@ -1,6 +1,7 @@
 BREXX CMS Change LOG
 ====================
 1.1.0 - 
+      - Add HELPREXX files.
 I0087 - Add support for DATE(BASEDATE).
 I0081 - STORAGE() built-in function incorrectly expects a decimal address. VM/SP says hex
       - Add support for OPTIONS instruction.
