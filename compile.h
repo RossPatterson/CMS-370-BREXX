@@ -96,6 +96,7 @@ enum options_type {
  ,set_signal_opt  /* signal condition */
  ,set_signal_name_opt /* signal name cond */
  ,unset_signal_opt /* signal condition */
+ ,options_opt /* options list */
 };
 
 enum expr_type {

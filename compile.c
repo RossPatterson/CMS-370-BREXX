@@ -123,6 +123,8 @@ static void C_leave(void);
 
 static void C_lower(void);
 
+static void C_options(void);
+
 static void C_nop(void);
 
 static void C_numeric(void);
@@ -171,6 +173,7 @@ statements_list[] = {
         {"LOWER",     C_lower},
         {"NOP",       C_nop},
         {"NUMERIC",   C_numeric},
+        {"OPTIONS",   C_options},
         {"OTHERWISE", C_error},
         {"PARSE",     C_parse},
         {"PROCEDURE", C_error},
@@ -1252,6 +1255,19 @@ C_numeric(void) {
         (context->lstring_Lerror)(ERR_INV_SUBKEYWORD, 15,
                                   &(context->nextsymbsymbolstr));
 } /* C_numeric */
+
+/* -------------------------------------------------------------- */
+/*  OPTIONS expr                                                  */
+/*   o  Save the uppercased words in the expression for later     */
+/*      possible use.                                             */
+/* -------------------------------------------------------------- */
+static void
+C_options(void) {
+    C_expr(exp_normal);
+    _CodeAddByte(OP_UPPER);
+    _CodeAddByte(OP_STOREOPT);
+    _CodeAddByte(options_opt);
+} /* C_options */
 
 /* -------------------------------------------------------------- */
 /*  PARSE   [UPPER]  + ARG               | [template] ;           */

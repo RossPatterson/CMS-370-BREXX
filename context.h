@@ -128,6 +128,7 @@ struct Context {
    int interpre_no_user_fp;
    int interpre_no_loc_fp;
    int interpre_no_sys_fp;
+   long interpre_options; /* OPTIONS flags */
 
    /* lstring.h */
    double lstring_lLastScannedNumber;

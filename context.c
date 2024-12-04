@@ -32,6 +32,7 @@ void InitContext() {
     context->interpre_no_user_fp = 0;
     context->interpre_no_loc_fp = 0;
     context->interpre_no_sys_fp = 0;
+    context->interpre_options = 0UL;
 
     context->rawstdin = fopen("CONSOLE", "rb");
 }

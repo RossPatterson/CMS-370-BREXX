@@ -85,6 +85,7 @@
 
 #include "lerror.h"
 #include "lstring.h"
+#include "options.h"
 
 #include "rexx.h"
 #include "stack.h"
@@ -478,6 +479,10 @@ I_StoreOption(const PLstr value, const int opt) {
                 default:
                     (context->lstring_Lerror)(ERR_INTERPRETER_FAILURE, 0);
             }
+            break;
+
+        case options_opt:
+            ParseOptions(value);
             break;
 
         default:

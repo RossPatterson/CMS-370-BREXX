@@ -1,6 +1,7 @@
 BREXX CMS Change LOG
 ====================
 1.1.0 - 
+      - Add support for OPTIONS instruction.
 I0085 - Fix TRACE N output and support TRACE F.
 I0080 - SIGNAL doesn't set SIGL
       - Make PARSE correctly parse words between triggers (s390guy/vm370 Issue 61 and vlachoudis/brexx Issue 8)
