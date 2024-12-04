@@ -9,6 +9,8 @@ I0085 - Fix TRACE N output and support TRACE F.
 I0080 - SIGNAL doesn't set SIGL
       - Make PARSE correctly parse words between triggers (s390guy/vm370 Issue 61 and vlachoudis/brexx Issue 8)
 I0078 - Make PARSE VERSION result conform to ANSI and TRL2 standards
+I0075 - Implement SIGNAL ON FAILURE
+I0073 - Fix SIGNAL ON ERROR for positive return codes
       - Add tests for PARSE instruction
       - Enable tests in builds
       - Repair and improve builder scripts
