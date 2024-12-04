@@ -1,0 +1,54 @@
+/* CALL_ EXEC */
+say 'Look for CALL OK'
+
+if tc1() \== 1 then say 'test #1 failed'
+if tc2() \== 1 then say 'test #2 failed'
+if tc3() \== 1 then say 'test #3 failed'
+if tc4() \== 1 then say 'test #4 failed'
+
+say 'CALL OK'
+exit
+
+/* argument check */
+tc1: ;
+call tc1a 'a', 'B', c, 1, 2.3
+return result
+tc1a: ;
+if arg(1) \== 'a' then return 0
+if arg(2) \== 'B' then return 0
+if arg(3) \== 'C' then return 0
+if arg(4) \== '1' then return 0
+if arg(5) \== '2.3' then return 0
+return 1
+
+/* call sets sigl */
+/* Do not move this test around - it knows its line numbers! */
+tc2: ;
+call tc2a
+return (result == 27)
+tc2a: procedure expose sigl
+return sigl
+
+/* call sets sigl deep calls */
+/* Do not move this test around - it knows its line numbers! */
+tc3: ;
+call tc3a
+return (result \== 0)
+tc3a: procedure expose sigl
+if sigl \== 35 then return 0
+call tc3b
+if result \== 0 then return result
+return (sigl == 35)
+tc3b: procedure expose sigl
+return (sigl == 39)
+
+/* call passing sigl as arg */
+/* Do not move this test around - it knows its line numbers! */
+tc4: ;
+call tc4a
+return result
+tc4a: procedure expose sigl
+call tc4b sigl
+return result
+tc4b: procedure
+return (arg(1) == 48)
