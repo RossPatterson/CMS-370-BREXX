@@ -3,6 +3,7 @@
 
 typedef enum opt_values {
     OPT_NONE = 0UL,
+    OPT_STORAGE_DECIMAL = 1UL,
 } OptValues;
 
 

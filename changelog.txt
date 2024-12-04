@@ -1,6 +1,7 @@
 BREXX CMS Change LOG
 ====================
 1.1.0 - 
+I0081 - STORAGE() built-in function incorrectly expects a decimal address. VM/SP says hex
       - Add support for OPTIONS instruction.
 I0085 - Fix TRACE N output and support TRACE F.
 I0080 - SIGNAL doesn't set SIGL

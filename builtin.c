@@ -64,6 +64,8 @@ struct timeval_st {
 
 #include "lerror.h"
 #include "lstring.h"
+#include "ldefs.h"
+#include "options.h"
 
 #include "rexx.h"
 #include "stack.h"
@@ -760,13 +762,16 @@ R_random() {
 /* -------------------------------------------------------------- */
 /*  STORAGE((address(,(length)(,data))))                          */
 /*      returns the current virtual machine size expressed as a   */
-/*      DECIMAL string if no arguments are specified.             */
+/*      hexadecimal string if no arguments are specified.         */
 /*      Otherwise, returns length bytes from the user's memory    */
 /*      starting at address.  The length is in decimal;           */
-/*      the default is 1 byte.  The address is a DECIMAL number.  */
+/*     the default is 1 byte. The address is a hexadecimal number.*/
 /*      If data is specified, after the "old" value has been      */
 /*      retrieved, storage starting at address is overwritten     */
 /*      with data (the length argument has no effect on this).    */
+/*                                                                */
+/*      With OPTIONS STORAGE_DECIMAL set, the address is a        */
+/*      decimal value.                                            */
 /* -------------------------------------------------------------- */
 void __CDECL
 R_storage() {
@@ -776,6 +781,8 @@ R_storage() {
     unsigned seg,ofs;
 #endif
     size_t length = 1;
+    int i;
+
     Context *context = (Context *) CMSGetPG();
 
     if (ARGN > 3)
@@ -798,8 +805,19 @@ R_storage() {
 #endif
         return;
     }
-    if (exist(1)) {      /* Argument is decimal and not hex */
-        adr = Lrdint(ARG1);
+    if (exist(1)) {
+        if (CHECK_OPT(OPT_STORAGE_DECIMAL)) {
+            /* Argument is decimal and not hex */
+            adr = Lrdint(ARG1);
+        } else {
+            adr = 0;
+            get_s(1);
+            for (i=0; i < LLEN(*ARG1); i++) {
+                if (!ISXDIGIT(LSTR(*ARG1)[i]))
+                    (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
+                adr = (adr * 16) + HEXVAL(LSTR(*ARG1)[i]);
+            }
+        }
         if (adr < 0)
             (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
 #if defined(__BORLANDC__) && !defined(__WIN32__) && !defined(WCE)
