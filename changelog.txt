@@ -1,6 +1,7 @@
 BREXX CMS Change LOG
 ====================
 1.1.0 - 
+      - Add HELPREXX files.
       - Make PARSE correctly parse words between triggers (s390guy/vm370 Issue 61 and vlachoudis/brexx Issue 8)
 I0078 - Make PARSE VERSION result conform to ANSI and TRL2 standards
       - Add tests for PARSE instruction
