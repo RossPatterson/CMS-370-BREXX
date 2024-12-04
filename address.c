@@ -289,10 +289,15 @@ RxExecuteCmd(PLstr cmd, PLstr env) {
     RxSetSpecialVar(RCVAR,
                     (context->rexxrxReturnCode)); // set the returncode variable
     if (((context->rexxrxReturnCode) != 0) &&
-        !((context->rexx_proc)[(context->rexx_rx_proc)].trace &
-          off_trace)) {       // do the right thing for tracing
-        if ((context->rexx_proc)[(context->rexx_rx_proc)].trace &
-            (error_trace | normal_trace)) {
+        !((context->rexx_proc)[(context->rexx_rx_proc)].trace & off_trace)) {
+        // do the right thing for tracing
+        if ( ((context->rexxrxReturnCode < 0) &&
+              (context->rexx_proc[context->rexx_rx_proc].trace &
+                    (failure_trace | normal_trace)
+             )) |
+             ((context->rexxrxReturnCode > 0) &&
+              (context->rexx_proc[context->rexx_rx_proc].trace & error_trace)
+             ) ) {
             TraceCurline(NULL, TRUE);
             fprintf(STDERR, "       +++ RC(%d) +++\n",
                     (context->rexxrxReturnCode));
@@ -345,7 +350,7 @@ RxExecuteCmd(PLstr cmd, PLstr env) {
     if ((context->rexxrxReturnCode) &&
         !((context->rexx_proc)[(context->rexx_rx_proc)].trace & off_trace)) {
         if ((context->rexx_proc)[(context->rexx_rx_proc)].trace &
-            (error_trace | normal_trace)) {
+            (error_trace | failure_trace | normal_trace)) {
             TraceCurline(NULL, TRUE);
             fprintf(STDERR, "       +++ RC(%d) +++\n",
                     (context->rexxrxReturnCode));

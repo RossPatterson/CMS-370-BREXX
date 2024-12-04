@@ -103,12 +103,14 @@ herccontrol "/ipl cms" -w "^VM Community Edition"
 herccontrol "/ACCESS (NOPROF" -w "^Ready;"
 herccontrol "/SET LDRTBLS 64" -w "^Ready;"
 herccontrol "/PROFILE" -w "^Ready;"
+herccontrol "/set emsg on" -w "^Ready;"
 
 herccontrol "/BRXBUILD" -w "^Ready;" -t 240
 herccontrol "/ipl cms" -w "^VM Community Edition"
 herccontrol "/ACCESS (NOPROF" -w "^Ready;"
 herccontrol "/SET LDRTBLS 64" -w "^Ready;"
 herccontrol "/PROFILE" -w "^Ready;"
+herccontrol "/set emsg on" -w "^Ready;"
 
 herccontrol "/BRXSRCH" -w "^Ready;"
 herccontrol "/BRXGEN" -w "^Ready;"

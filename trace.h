@@ -37,7 +37,8 @@ enum tracetype {
     normal_trace = BIT5,
     off_trace = BIT6,
     results_trace = BIT7,
-    scan_trace = BIT8
+    scan_trace = BIT8,
+	failure_trace = BIT9
 };
 
 #define AIR_TRACE  ( all_trace | intermediates_trace | results_trace )

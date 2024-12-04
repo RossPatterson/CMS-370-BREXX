@@ -1714,6 +1714,8 @@ C_signal(void) {
 /*      C   (Commands) trace all commands.                        */
 /*      E   (Error) trace commands with non-zero return codes     */
 /*          after execution.                                      */
+/*      F   (Failure) trace commands with negative return codes   */
+/*          after execution (same as N).                          */
 /*      I   (Intermediates) trace intermediates evaluation        */
 /*          results and name substitutions also.                  */
 /*      L   (Labels) trace only labels.                           */

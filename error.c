@@ -185,7 +185,7 @@ Rerror(const int errno, const int subno, ...) {
             (context->lstring_lNumericDigits) =
                     (context->rexx_proc)[(context->rexx_rx_proc)].digits;
             if ((context->rexx_proc)[(context->rexx_rx_proc)].trace &
-                (normal_trace | off_trace | error_trace))
+                (normal_trace | off_trace | error_trace | failure_trace))
                 (context->interpre__trace) = FALSE;
             else
                 (context->interpre__trace) = TRUE;

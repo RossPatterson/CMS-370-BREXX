@@ -328,7 +328,7 @@ I_StoreOption(const PLstr value, const int opt) {
         case trace_opt:
             TraceSet(value);
             if ((context->rexx_proc)[(context->rexx_rx_proc)].trace &
-                (normal_trace | off_trace | error_trace))
+                (normal_trace | off_trace | error_trace | failure_trace))
                 (context->interpre__trace) = FALSE;
             else
                 (context->interpre__trace) = TRUE;
@@ -819,7 +819,7 @@ I_ReturnProc(void) {
     (context->lstring_lNumericDigits) =
             (context->rexx_proc)[(context->rexx_rx_proc)].digits;
     if ((context->rexx_proc)[(context->rexx_rx_proc)].trace &
-        (normal_trace | off_trace | error_trace))
+        (normal_trace | off_trace | error_trace | failure_trace))
         (context->interpre__trace) = FALSE;
     else
         (context->interpre__trace) = TRUE;
@@ -893,7 +893,7 @@ RxDoneInterStr(void) {
     if ((context->rexx_proc)[(context->rexx_rx_proc)].calltype ==
         CT_INTERACTIVE) {
         if ((context->rexx_proc)[(context->rexx_rx_proc)].trace &
-            (normal_trace | off_trace | error_trace))
+            (normal_trace | off_trace | error_trace | failure_trace))
             (context->interpre__trace) = FALSE;
         else
             (context->interpre__trace) = TRUE;
@@ -1018,7 +1018,7 @@ RxInterpret(void) {
             (context->interpre_RxStckTop);
 
     if ((context->rexx_proc)[(context->rexx_rx_proc)].trace &
-        (normal_trace | off_trace | error_trace))
+        (normal_trace | off_trace | error_trace | failure_trace))
         (context->interpre__trace) = FALSE;
     else
         (context->interpre__trace) = TRUE;
@@ -2295,7 +2295,7 @@ RxInterpret(void) {
         (context->lstring_lNumericDigits) =
                 (context->rexx_proc)[(context->rexx_rx_proc)].digits;
         if ((context->rexx_proc)[(context->rexx_rx_proc)].trace &
-            (normal_trace | off_trace | error_trace))
+            (normal_trace | off_trace | error_trace | failure_trace))
             (context->interpre__trace) = FALSE;
         else
             (context->interpre__trace) = TRUE;
