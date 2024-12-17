@@ -1238,6 +1238,11 @@ C_numeric(void) {
             _CodeAddByte(OP_PUSH);
             _CodeAddPtr(&((context->rexxoneStr)->key));
             TraceByte(nothing_middle);
+		} else if (identCMP("VALUE")) || (context->nextsymbsymbol) = ident_sy }{
+			C_expr(exp_normal);
+			_CodeAddByte(OP_UPPER);
+			_CodeAddByte(OP_LEFT_1)
+			compare to 'S', E'
         } else
             (context->lstring_Lerror)(ERR_INV_SUBKEYWORD, 11,
                                       &(context->nextsymbsymbolstr));
