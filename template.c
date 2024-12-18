@@ -155,7 +155,7 @@ C_template(void) {
                     /* trigger space */
                     trigger = TRUE;
                     _CodeAddByte(OP_TR_SPACE);
-                    /* do not go to next (context->nextsymbsymbol) */
+                    /* do not go to next symbol */
                 } else {
                     if ((context->nextsymbsymbol) == ident_sy)
                         target_ptr = SYMBOLADD2LITS;

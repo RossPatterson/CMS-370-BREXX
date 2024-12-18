@@ -115,7 +115,7 @@ InitNextsymbol(PLstr str) {
 
 /* --------------------------------------------------------------- */
 /*            P A R S E   next  B A S I C   S Y M B O L            */
-/*  Return the next basic (context->nextsymbsymbol) and advance the input stream      */
+/*  Return the next basic symbol and advance the input stream      */
 /* --------------------------------------------------------------- */
 void __CDECL
 nextsymbol(void) {
@@ -641,7 +641,7 @@ identifier(int isnumber) {
 } /* identifier */
 
 /* --------------------------------------------------------------- */
-/*  extract a literal (context->nextsymbsymbol)                                       */
+/*  extract a literal symbol                                       */
 /* --------------------------------------------------------------- */
 static void
 literal(void) {

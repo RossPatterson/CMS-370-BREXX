@@ -492,7 +492,7 @@ C_function(void) {
     _CodeAddByte(lastarg); /* arguments */
     _CodeAddByte(realarg); /* real args */
     _CodeAddWord(existarg); /* which exist */
-    _CodeAddWord(line); /* (context->nextsymbsymbol) line */
+    _CodeAddWord(line); /* symbol line */
     _CodeAddByte(CT_FUNCTION); /* call type */
     TraceByte(function_middle);
 } /* C_function */

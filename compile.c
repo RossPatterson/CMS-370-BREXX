@@ -544,7 +544,7 @@ _AddLabel(int type, size_t offset) {
 } /* _AddLabel */
 
 /* -------------------------------------------------------------- */
-/* C_error,  reports an error, when an illegal (context->nextsymbsymbol) is found.   */
+/* C_error,  reports an error, when an illegal symbol is found.   */
 /* -------------------------------------------------------------- */
 static void
 C_error(void) {
@@ -561,7 +561,7 @@ C_error(void) {
 } /* C_error */
 
 /* -------------------------------------------------------------- */
-/*  ADDRESS [<(context->nextsymbsymbol) | string> [expr]] ;                          */
+/*  ADDRESS [<symbol | string> [expr]] ;                          */
 /*      redirect commands or a single command to a new            */
 /*      environment. ADDRESS VALUE expr may be used               */
 /*      for an evaluated enviroment name.                         */
@@ -632,7 +632,7 @@ C_arg(void) {
 } /* C_arg */
 
 /* -------------------------------------------------------------- */
-/*  CALL    [(context->nextsymbsymbol) | string] [<expr>] [,<expr>]... ;             */
+/*  CALL    [symbol | string] [<expr>] [,<expr>]... ;             */
 /*      call an internal routine, an external routine or program, */
 /*      or a built-in function. Depending on the type of          */
 /*      routine called, the variable RESULT contains the result   */
@@ -706,7 +706,7 @@ C_call(void) {
     _CodeAddByte(lastarg); /* arguments */
     _CodeAddByte(realarg); /* real args */
     _CodeAddWord(existarg); /* which exist */
-    _CodeAddWord(line); /* (context->nextsymbsymbol) line */
+    _CodeAddWord(line); /* symbol line */
     _CodeAddByte(CT_PROCEDURE); /* call type */
     TraceByte(nothing_middle);
 
@@ -719,7 +719,7 @@ C_call(void) {
 /*            [FOR exprf]] | [ FOREVER | exprr ]                  */
 /*          [UNTIL expru | WHILE exprw] ;                         */
 /*          [instr]... ;                                          */
-/*  END [(context->nextsymbsymbol)] ;                                                */
+/*  END [symbol] ;                                                */
 /*      group instructions together with optional repetition and  */
 /*      condition. NAME is stepped from EXPRI to EXPRT in         */
 /*      steps of EXPRB, for a maximum of EXPRF iterations.        */
@@ -1093,7 +1093,7 @@ C_interpret(void) {
 } /* C_interpret */
 
 /* -------------------------------------------------------------- */
-/*  ITERATE   [name|num] ;                                        */
+/*  ITERATE   [name] ;                                            */
 /*      start next iteration of the innermost repetitive loop     */
 /*      (or loop with control variable name).                     */
 /* -------------------------------------------------------------- */
@@ -1136,7 +1136,7 @@ C_iterate(void) {
 } /* C_iterate */
 
 /* -------------------------------------------------------------- */
-/*  LEAVE     [name|num] ;                                        */
+/*  LEAVE     [name] ;                                            */
 /*      terminate innermost loop (or loop with control            */
 /*      variable name).                                           */
 /* -------------------------------------------------------------- */
@@ -1709,7 +1709,8 @@ C_signal(void) {
 /*        + +   +      + + +                   + +                */
 /*        | | ? | ?... | | | All               | |;               */
 /*  TRACE | |   | !... | | | Commands          | |                */
-/*        | |   +      + | | Errors            | |                */
+/*        | |   +      + | | Debug             | |                */
+/*        | |              | Errors            | |                */
 /*        | |              | Failure           | |                */
 /*        | |   +      + | | Intermediates     | |                */
 /*        | | ! | ?... | | | Labels            | |                */
@@ -1732,6 +1733,7 @@ C_signal(void) {
 /*      according to first character or OPTION:                   */
 /*                                                                */
 /*      A   (All) trace all clauses.                              */
+/*      D   (Debug) turn the internal debugger on or off.         */
 /*      C   (Commands) trace all commands.                        */
 /*      E   (Error) trace commands with non-zero return codes     */
 /*          after execution.                                      */
@@ -1938,7 +1940,7 @@ RxInitCompile(RxFile *rxf, PLstr src) {
     (context->compileCompileCode) = (context->rexx_code);
     (context->compileCompileRxFile) = rxf;
 
-    /* Initialise (context->compile_Loop) Queue for LEAVE & ITERATE jmp points */
+    /* Initialise Loop Queue for LEAVE & ITERATE jmp points */
     DQINIT((context->compile_Loop));
 
     /* Initialize code string */
@@ -1958,7 +1960,7 @@ RxInitCompile(RxFile *rxf, PLstr src) {
     /* initialise nesting */
     (context->compileCompileNesting) = 0;
 
-    /* Initialise next (context->nextsymbsymbol) */
+    /* Initialise next symbol */
     if ((context->compile_str_interpreted)) InitNextsymbol(src);
     else InitNextsymbol(&(rxf->file));
 

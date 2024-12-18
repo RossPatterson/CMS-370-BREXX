@@ -269,7 +269,7 @@ R_C(const int func) {
 }  /* R_C */
 
 /* -------------------------------------------------------------- */
-/*  VARDUMP(((context->nextsymbsymbol))(,'Depth'|'Hex'|'X'))                         */
+/*  VARDUMP((symbol)(,'Depth'|'Hex'|'X'))                         */
 /*      returns the binary tree in the format                     */
 /*      var = "value"  <cr>                                       */
 /*      if depth is specified (only the fist char is significant) */
@@ -330,8 +330,8 @@ R_oSoS() {
 } /* R_oSoS */
 
 /* -------------------------------------------------------------- */
-/*  ADDR((context->nextsymbsymbol)[,[option][,[pool]]])                              */
-/*  Returns the normalised address of the variable '(context->nextsymbsymbol)'       */
+/*  ADDR(symbol[,[option][,[pool]]])                              */
+/*  Returns the normalised address of the variable 'symbol'       */
 /*  in the pool 'pool' (if exist)                                 */
 /*  Option can be:                                                */
 /* 'Data' (default) the address of variables data           */
