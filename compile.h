@@ -86,6 +86,7 @@ enum options_type {
  ,digits_opt  /* numeric digits */
  ,fuzz_opt  /* fuzz digits  */
  ,form_opt  /* numeric form  */
+ ,form_value_opt  /* numeric form value */
  ,author_opt  /* author string */
  ,version_opt  /* version string */
  ,os_opt   /* OS string  */

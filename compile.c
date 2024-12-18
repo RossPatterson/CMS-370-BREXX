@@ -1211,7 +1211,7 @@ C_nop(void) {
 
 /* -------------------------------------------------------------- */
 /*  NUMERIC   DIGITS [expr]  |                                    */
-/*            FORM   [SCIENTIFIC | ENGINEERING] |                 */
+/*            FORM   [SCIENTIFIC | ENGINEERING | [VALUE] expr]    */
 /*            FUZZ   [expr]  ;                                    */
 /*   o  DIGITS, carry out arithmetic operations to EXPR           */
 /*      significant digits.                                       */
@@ -1221,6 +1221,7 @@ C_nop(void) {
 /* -------------------------------------------------------------- */
 static void
 C_numeric(void) {
+    int opt;
     Context *context = (Context *) CMSGetPG();
     if (identCMP("DIGITS")) {
         nextsymbol();
@@ -1228,6 +1229,7 @@ C_numeric(void) {
         _CodeAddByte(OP_STOREOPT);
         _CodeAddByte(digits_opt);
     } else if (identCMP("FORM")) {
+        opt = form_opt;
         nextsymbol();
         if ((context->nextsymbsymbol) == semicolon_sy ||
             identCMP("SCIENTIFIC")) {
@@ -1240,9 +1242,7 @@ C_numeric(void) {
             TraceByte(nothing_middle);
 		} else if (identCMP("VALUE")) || (context->nextsymbsymbol) = ident_sy }{
 			C_expr(exp_normal);
-			_CodeAddByte(OP_UPPER);
-			_CodeAddByte(OP_LEFT_1)
-			compare to 'S', E'
+            opt = form_value_opt;
         } else
             (context->lstring_Lerror)(ERR_INV_SUBKEYWORD, 11,
                                       &(context->nextsymbsymbolstr));
@@ -1250,7 +1250,7 @@ C_numeric(void) {
         if ((context->nextsymbsymbol) != semicolon_sy) nextsymbol();
 
         _CodeAddByte(OP_STOREOPT);
-        _CodeAddByte(form_opt);
+        _CodeAddByte(opt);
     } else if (identCMP("FUZZ")) {
         nextsymbol();
         C_expr(exp_normal);
