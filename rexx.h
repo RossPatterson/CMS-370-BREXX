@@ -219,7 +219,7 @@ int __CDECL RxRegFunction(char *name, void (__CDECL *func)(int), int opt);
 
 void __CDECL RxHaltTrap(int);
 
-void __CDECL RxSignalCondition(int);
+void __CDECL RxSignalCondition(int, char *vname);
 
 #if !defined (__CMS__) && !defined(__MVS__)
 

@@ -164,6 +164,10 @@ R_O(const int func) {
 } /* R_O */
 
 /* -------------------------------------------------------------- */
+/*  CONDITION((option))  return info about currebt condition      */
+/*  Options C=Condition, D=Description, I=Instruction (default)   */
+/*          S=State.  MVS also allows X=???.                      */
+/* -------------------------------------------------------------- */
 /*  DATE((option))                                                */
 /* -------------------------------------------------------------- */
 /*  TIME((option))                                                */
@@ -181,6 +185,7 @@ R_C(const int func) {
     DQueueElem *qe;
     Context *context = (Context *) CMSGetPG();
 
+    if (func == f_condition) option = 'I'; // defaulr
     if (ARGN > 1)
         (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
     if (exist(1)) {
@@ -189,6 +194,32 @@ R_C(const int func) {
     }
 
     switch (func) {
+        case f_condition:
+            switch (option) {
+                case 'C':
+                    Lscpy(ARGR, (context->interpre_SignalCondition));
+                    break;
+                case 'D':
+                    Lscpy(ARGR, (context->interpre_SignalDescription));
+                    if ((LLEN(*ARGR) == 0) |
+                            (strstr((context->interpre_SignalDescription), "Line ") != 0)
+                        Lscpy(ARGR, SignalLine);
+                    break;
+                case 'I':
+                    /* TODO: When CALL ON works, this needs to change. */
+                    Lscpy(ARGR, "SIGNAL");
+                    break;
+                case 'S':
+                    /* TODO: Wrong!  After SIGNAL, should be "OFF". */
+                    /* TODO: When CALL ON works, "DELAY" is possible too. */
+                    Lscpy(ARGR, "ON");
+                    break;
+                 /* case 'X': Lscpy(ARGR, SignalLine); break; */
+                default:
+                    (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
+            }
+            break;
+
         case f_date:
             Ldate(ARGR, option);
             break;

@@ -886,7 +886,7 @@ RxInitInterStr() {
                 (context->rexx_proc)[(context->rexx_rx_proc)].scope;
 
         RxSetSpecialVar(RCVAR, (context->rexxrxReturnCode));
-        RxSignalCondition(SC_SYNTAX);
+        RxSignalCondition(SC_SYNTAX, "");
     }
 } /* RxInitInterStr */
 
@@ -1290,12 +1290,12 @@ RxInterpret(void) {
                                 (context->rexx_proc)[(context->rexx_rx_proc)]
                                         .condition &
                                 SC_NOVALUE)
-                                RxSignalCondition(SC_NOVALUE);
+                                RxSignalCondition(SC_NOVALUE, LSTR(litleaf->key));
                         } else {
                             if ((context->rexx_proc)[(context->rexx_rx_proc)]
                                         .condition &
                                 SC_NOVALUE)
-                                RxSignalCondition(SC_NOVALUE);
+                                RxSignalCondition(SC_NOVALUE, LSTR(litleaf->key));
                             STACKTOP = &(litleaf->key);
                         }
                     }

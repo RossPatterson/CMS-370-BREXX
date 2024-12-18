@@ -129,7 +129,18 @@ TraceCurline(RxFile **rxf, int print) {
             ch++;
         }
         fputc('\n', STDERR);
-    }
+    } else {
+        int i;
+        sprintf((context->interpre_SignalLine), "Line %d *-* ", line);
+        i = strlen((context->interpre_SignalLine));
+        while (*ch && ch < chend && i < 64) {
+            if (*ch == '\n') break;
+            (context->interpre_SignalLine)[i] = *ch;
+            ch++;
+            i++;
+        }
+        (context->interpre_SignalLine)[i] = 0;
+   }
 #else
     if (print) {
      int i;

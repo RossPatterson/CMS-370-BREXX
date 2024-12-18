@@ -52,13 +52,13 @@ RxHaltTrap(int cnd) {
     if ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_HALT) {
         /* Reset HI */
         CMSSetFlag(HALTFLAG, 0);
-        RxSignalCondition(SC_HALT);
+        RxSignalCondition(SC_HALT, "");
     } else (context->lstring_Lerror)(ERR_PROG_INTERRUPT, 0);
 } /* RxHaltTrap */
 
 /* ---------------- RxSignalCondition -------------- */
 void __CDECL
-RxSignalCondition(int cnd) {
+RxSignalCondition(int cnd, char *desc) {
     PBinLeaf leaf;
     RxFunc *func;
     PLstr cndstr;
@@ -68,23 +68,30 @@ RxSignalCondition(int cnd) {
     switch (cnd) {
         case SC_ERROR:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_error;
+            strcpy((context->interpre_SignalCondition), "ERROR");
             break;
         case SC_FAILURE:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_failure;
+            strcpy((context->interpre_SignalCondition), "FAILURE");
             break;
         case SC_HALT:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_halt;
+            strcpy((context->interpre_SignalCondition), "HALT");
             break;
         case SC_NOVALUE:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_novalue;
+            strcpy((context->interpre_SignalCondition), "NOVALUE");
             break;
         case SC_NOTREADY:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_notready;
+            strcpy((context->interpre_SignalCondition), "NOTREADY");
             break;
         case SC_SYNTAX:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_syntax;
+            strcpy((context->interpre_SignalCondition), "SYNTAX");
             break;
     }
+    strncpy((context->interpre_SignalDescription), desc, sizeof (context->interpre_SignalDescription));
     leaf = BinFind(&(context->rexx_labels), cndstr);
     if (leaf == NULL || ((RxFunc *) (leaf->value))->label == UNKNOWN_LABEL) {
         if (cnd == SC_SYNTAX) /* disable the error handling */
@@ -113,7 +120,7 @@ Rerror(const int errno, const int subno, ...) {
     if ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_SYNTAX) {
         RxSetSpecialVar(RCVAR, errno);
         if ((context->nextsymbsymbolptr) == NULL) /* we are in intepret */
-            RxSignalCondition(SC_SYNTAX);
+            RxSignalCondition(SC_SYNTAX, SignalLine);
         else {   /* we are in compile */
             (context->rexxrxReturnCode) = errno;
             longjmp((context->rexx_error_trap), JMP_ERROR);
