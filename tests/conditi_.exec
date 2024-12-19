@@ -1,5 +1,105 @@
 /* CONDITION */
-say "Look for CONDITION OK"
-say "condition() not Implemented"
-/* say condition() */
-say "CONDITION OK"
+parse source system .
+if system = 'CMS' then suffix = ''
+else suffix = '.exec'
+
+say 'Look for CONDITION OK'
+
+/* condition without signal */
+if condition('C') \== '' then say 'failed in test 1'
+if condition('D') \== '' then say 'failed in test 2'
+if condition('I') \== '' then say 'failed in test 3'
+if condition('S') \== '' then say 'failed in test 4'
+if condition() \== condition('I') then say 'failed in test 5'
+
+/* novalue signaled */
+signal on novalue name t6a
+t6v
+say 'failed in test 6'
+signal t6z
+t6a:
+if condition('C') \== 'NOVALUE' then say 'failed in test 6'
+if condition('D') \== 'T6V' then say 'failed in test 7'
+if condition('I') \== 'SIGNAL' then say 'failed in test 8'
+if condition('S') \== 'OFF' then say 'failed in test 9'
+if condition() \== condition('I') then say 'failed in test 10'
+t6z:
+signal off novalue
+
+/* syntax signaled */
+signal on syntax name t11a
+t11v = t11b()
+say 'failed in test 11'
+signal t11z
+t11a:
+if condition('C') \== 'SYNTAX' then say 'failed in test 12'
+if condition('D') \== 'Error 44.1: No data returned from function "T11A"' then say 'failed in test 13'
+if condition('I') \== 'SIGNAL' then say 'failed in test 14'
+if condition('S') \== 'OFF' then say 'failed in test 15'
+if condition() \== condition('I') then say 'failed in test 16'
+t11z:
+signal off syntax
+
+/* error signaled */
+signal on error name t17a
+'exitpos_' || suffix
+say 'failed in test 17'
+signal t17z
+t17a:
+if condition('C') \== 'ERROR' then say 'failed in test 18'
+if condition('D') \== 'exitpos_.exec' then say 'failed in test 19'
+if condition('I') \== 'SIGNAL' then say 'failed in test 20'
+if condition('S') \== 'OFF' then say 'failed in test 21'
+if condition() \== condition('I') then say 'failed in test 22'
+t17z:
+signal off error
+
+/* failure signaled */
+signal on failure name t23a
+'exitneg_' || suffix
+say 'failed in test 23'
+signal t23z
+t23a:
+if condition('C') \== 'FAILURE' then say 'failed in test 24'
+if condition('D') \== 'exitneg_.exec' then say 'failed in test 25'
+if condition('I') \== 'SIGNAL' then say 'failed in test 26'
+if condition('S') \== 'OFF' then say 'failed in test 27'
+if condition() \== condition('I') then say 'failed in test 28'
+t23z:
+signal off failure
+
+/* error called */
+call on error name t29a
+t29v = 0
+'exitpos_' || suffix
+if t29v = 0 then say 'failed in test 29'
+signal t29z
+t29a:
+t29v = 1
+if condition('C') \== 'ERROR' then say 'failed in test 30'
+if condition('D') \== 'exitpos_.exec' then say 'failed in test 31'
+if condition('I') \== 'CALL' then say 'failed in test 32'
+if condition('S') \== 'DELAY' then say 'failed in test 33'
+if condition() \== condition('I') then say 'failed in test 34'
+return
+t29z:
+signal off error
+
+/* failure called */
+call on failure name t35a
+t35v = 0
+'exitneg_' || suffix
+if t35v = 0 then say 'failed in test 35'
+signal t35z
+t35a:
+t35v = 1
+if condition('C') \== 'FAILURE' then say 'failed in test 36'
+if condition('D') \== 'exitneg_.exec' then say 'failed in test 37'
+if condition('I') \== 'CALL' then say 'failed in test 38'
+if condition('S') \== 'DELAY' then say 'failed in test 39'
+if condition() \== condition('I') then say 'failed in test 40'
+return
+t35z:
+signal off failure
+
+say 'CONDITION OK'
