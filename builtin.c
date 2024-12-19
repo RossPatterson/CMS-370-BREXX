@@ -185,7 +185,8 @@ R_C(const int func) {
     DQueueElem *qe;
     Context *context = (Context *) CMSGetPG();
 
-    if (func == f_condition) option = 'I'; // defaulr
+    if (func == f_condition)
+        option = 'I'; // default
     if (ARGN > 1)
         (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
     if (exist(1)) {
