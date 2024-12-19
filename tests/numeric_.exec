@@ -1,0 +1,32 @@
+/* NUMERIC */
+parse source system .
+if system = 'CMS' then suffix = ''
+else suffix = '.exec'
+
+say 'Look for NUMERIC OK'
+
+/* Valid instructions */
+signal on syntax name t1a
+numeric digits
+numeric digits 3
+numeric form
+numeric form engineering
+numeric form scientific
+numeric form value 'engineering'
+t1v='scientific'; numeric form value t1v
+numeric fuzz
+numeric fuzz 2
+signal t1z
+t1a:
+say 'failed in test 1 at line' sigl':' sourceline(sigl)
+t1z:
+
+/* Valid functions */
+numeric digits 4
+if digits() \== '4' then say 'failed in test 2'
+numeric form engineering
+if form() \== 'ENGINEERING' then say 'failed in test 3'
+numeric fuzz 3
+if fuzz() \== '3' then say 'failed in test 4'
+
+say 'NUMERIC OK'

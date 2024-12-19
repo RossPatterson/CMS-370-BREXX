@@ -376,7 +376,6 @@ I_StoreOption(const PLstr value, const int opt) {
                 (context->rexx_proc)[(context->rexx_rx_proc)].form = 0;
             else
                 (context->lstring_Lerror)(ERR_INVALID_RESULT, 3, value);
-            }
             break;
 
         case form_opt:
