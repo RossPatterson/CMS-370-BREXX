@@ -201,8 +201,8 @@ R_C(const int func) {
                     break;
                 case 'D':
                     Lscpy(ARGR, (context->interpre_SignalDescription));
-                    if ((LLEN(*ARGR) == 0) |
-                            (strstr((context->interpre_SignalDescription), "Line ") != 0)
+                    if ((LLEN(*ARGR) == 0) ||
+                            (strstr((context->interpre_SignalDescription), "Line ") != 0))
                         Lscpy(ARGR, SignalLine);
                     break;
                 case 'I':
