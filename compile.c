@@ -1240,7 +1240,7 @@ C_numeric(void) {
             _CodeAddByte(OP_PUSH);
             _CodeAddPtr(&((context->rexxoneStr)->key));
             TraceByte(nothing_middle);
-		} else if (identCMP("VALUE") || ((context->nextsymbsymbol) = ident_sy) {
+		} else if (identCMP("VALUE") || ((context->nextsymbsymbol) = ident_sy)) {
 			C_expr(exp_normal);
             opt = form_value_opt;
         } else
