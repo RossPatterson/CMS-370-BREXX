@@ -203,7 +203,7 @@ R_C(const int func) {
                     Lscpy(ARGR, (context->interpre_SignalDescription));
                     if ((LLEN(*ARGR) == 0) ||
                             (strstr((context->interpre_SignalDescription), "Line ") != 0))
-                        Lscpy(ARGR, SignalLine);
+                        Lscpy(ARGR, (context->interpre_SignalLine));
                     break;
                 case 'I':
                     /* TODO: When CALL ON works, this needs to change. */
