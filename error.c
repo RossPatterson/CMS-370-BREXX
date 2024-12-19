@@ -120,7 +120,7 @@ Rerror(const int errno, const int subno, ...) {
     if ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_SYNTAX) {
         RxSetSpecialVar(RCVAR, errno);
         if ((context->nextsymbsymbolptr) == NULL) /* we are in intepret */
-            RxSignalCondition(SC_SYNTAX, SignalLine);
+            RxSignalCondition(SC_SYNTAX, (context->interpre_SignalLine));
         else {   /* we are in compile */
             (context->rexxrxReturnCode) = errno;
             longjmp((context->rexx_error_trap), JMP_ERROR);
