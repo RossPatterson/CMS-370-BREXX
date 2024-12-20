@@ -47,7 +47,7 @@ say 'failed in test 17'
 signal t17z
 t17a:
 if condition('C') \== 'ERROR' then say 'failed in test 18'
-if condition('D') \== 'exitpos_.exec' then say 'failed in test 19'
+if Translate(condition('D')) \== Translate('exitpos_' || suffix) then say 'failed in test 19'
 if condition('I') \== 'SIGNAL' then say 'failed in test 20'
 if condition('S') \== 'OFF' then say 'failed in test 21'
 if condition() \== condition('I') then say 'failed in test 22'
@@ -61,7 +61,7 @@ say 'failed in test 23'
 signal t23z
 t23a:
 if condition('C') \== 'FAILURE' then say 'failed in test 24'
-if condition('D') \== 'exitneg_.exec' then say 'failed in test 25'
+if Translate(condition('D')) \== Translate('exitneg_' || suffix) then say 'failed in test 25'
 if condition('I') \== 'SIGNAL' then say 'failed in test 26'
 if condition('S') \== 'OFF' then say 'failed in test 27'
 if condition() \== condition('I') then say 'failed in test 28'
@@ -77,7 +77,7 @@ signal t29z
 t29a:
 t29v = 1
 if condition('C') \== 'ERROR' then say 'failed in test 30'
-if condition('D') \== 'exitpos_.exec' then say 'failed in test 31'
+if Translate(condition('D')) \== Translate('exitpos_' || suffix) then say 'failed in test 31'
 if condition('I') \== 'CALL' then say 'failed in test 32'
 if condition('S') \== 'DELAY' then say 'failed in test 33'
 if condition() \== condition('I') then say 'failed in test 34'
@@ -94,7 +94,7 @@ signal t35z
 t35a:
 t35v = 1
 if condition('C') \== 'FAILURE' then say 'failed in test 36'
-if condition('D') \== 'exitneg_.exec' then say 'failed in test 37'
+if Translate(condition('D')) \== Translate('exitneg_' || suffix) then say 'failed in test 37'
 if condition('I') \== 'CALL' then say 'failed in test 38'
 if condition('S') \== 'DELAY' then say 'failed in test 39'
 if condition() \== condition('I') then say 'failed in test 40'

@@ -196,6 +196,7 @@ R_C(const int func) {
 
     switch (func) {
         case f_condition:
+            Lscpy(ARGR, "");
             switch (option) {
                 case 'C':
                     Lscpy(ARGR, (context->interpre_SignalCondition));
@@ -207,13 +208,28 @@ R_C(const int func) {
                         Lscpy(ARGR, (context->interpre_SignalLine));
                     break;
                 case 'I':
-                    /* TODO: When CALL ON works, this needs to change. */
-                    Lscpy(ARGR, "SIGNAL");
+                    /* TODO: When CALL ON works, "CALL" is possible too. */
+                    if (strlen((context->interpre_SignalCondition)) > 0)
+                        Lscpy(ARGR, "SIGNAL");
                     break;
                 case 'S':
-                    /* TODO: Wrong!  After SIGNAL, should be "OFF". */
+                    switch ((context->interpre_SignalCondition)[0]) {
+                        case 'E': i = SC_ERROR; break;
+                        case 'F': i = SC_FAILURE; break;
+                        case 'H': i = SC_HALT; break;
+                        case 'N':
+                            i = (context->interpre_SignalCondition)[2] == 'V' ?
+                                SC_NOVALUE : SC_NOTREADY;
+                            break;
+                        case 'S': i = SC_SYNTAX; break;
+                        default: i = 0;
+                    }
                     /* TODO: When CALL ON works, "DELAY" is possible too. */
-                    Lscpy(ARGR, "ON");
+                    if (i != 0)
+                        Lscpy(ARGR,
+                            ((context->rexx_proc)[(context->rexx_rx_proc)].condition & i)
+                            ? "ON" : "OFF"
+                        );
                     break;
                  /* case 'X': Lscpy(ARGR, SignalLine); break; */
                 default:
