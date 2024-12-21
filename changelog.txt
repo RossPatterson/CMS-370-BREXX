@@ -1,6 +1,7 @@
 BREXX CMS Change LOG
 ====================
 1.1.0 -
+I0094 - Implement NUMERIC FORM VALUE.
 I0092 - Add support for CONDITION().
       - Add HELPREXX files.
 I0087 - Add support for DATE(BASEDATE).

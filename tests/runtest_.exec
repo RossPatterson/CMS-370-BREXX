@@ -52,6 +52,7 @@ interpreter ' lines_'||suffix
 interpreter ' max_'||suffix
 interpreter ' min_'||suffix
 interpreter ' overlay_'||suffix
+interpreter ' numeric_'||suffix
 interpreter ' parse_'||suffix
 interpreter ' pos_'||suffix
 interpreter ' qualify_'||suffix

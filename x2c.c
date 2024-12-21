@@ -51,7 +51,7 @@ Lx2c(const PLstr to, const PLstr from) {
             LZEROSTR(*to);  /* Free memory */
             LFREESTR(*to);
             (context->lstring_Lerror)(ERR_INVALID_HEX_CONST, 0);
-            /* (context->lstring_Lerror) does not return */
+            /* Lerror does not return */
             return;
         }
 
