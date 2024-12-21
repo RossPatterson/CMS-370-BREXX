@@ -113,27 +113,38 @@ herccontrol "/ERASE BRXTOOLS EXEC B" -w "^Ready"
 herccontrol "/COPYFILE NEWBREXX CONTROL B = = A (REPLACE OLDDATE" -w "^Ready"
 herccontrol "/ERASE NEWBREXX CONTROL B" -w "^Ready"
 
+# Compile the code
 herccontrol "/ipl cms" -w "^VM Community Edition"
 herccontrol "/ACCESS (NOPROF" -w "^Ready;"
 herccontrol "/SET LDRTBLS 64" -w "^Ready;"
 herccontrol "/PROFILE" -w "^Ready;"
 herccontrol "/set emsg on" -w "^Ready;"
-
 herccontrol "/BRXBUILD" -w "^Ready;" -t 240
+
+# Make debug binary file
 herccontrol "/ipl cms" -w "^VM Community Edition"
 herccontrol "/ACCESS (NOPROF" -w "^Ready;"
 herccontrol "/SET LDRTBLS 64" -w "^Ready;"
 herccontrol "/PROFILE" -w "^Ready;"
 herccontrol "/set emsg on" -w "^Ready;"
+herccontrol "/BRXSRCHD" -w "^Ready;"
+herccontrol "/BRXGEN" -w "^Ready;"
+herccontrol "/RENAME BREXX * A BREXXD = =" -w "^Ready;"
 
+# Make normal binary file
+herccontrol "/ipl cms" -w "^VM Community Edition"
+herccontrol "/ACCESS (NOPROF" -w "^Ready;"
+herccontrol "/SET LDRTBLS 64" -w "^Ready;"
+herccontrol "/PROFILE" -w "^Ready;"
+herccontrol "/set emsg on" -w "^Ready;"
 herccontrol "/BRXSRCH" -w "^Ready;"
 herccontrol "/BRXGEN" -w "^Ready;"
+
+# Make binary tape and vmarc
 herccontrol "/ipl cms" -w "^VM Community Edition"
 herccontrol "/ACCESS (NOPROF" -w "^Ready;"
 herccontrol "/SET LDRTBLS 64" -w "^Ready;"
 herccontrol "/PROFILE" -w "^Ready;"
-
-# Make binary tape and vmarc
 herccontrol "/cp disc" -w "^VM/370 Online"
 herccontrol "/logon operator operator" -w "RECONNECTED AT"
 hetinit -n -d brexxbin.aws

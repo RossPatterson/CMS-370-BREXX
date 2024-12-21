@@ -1240,12 +1240,14 @@ C_numeric(void) {
             _CodeAddByte(OP_PUSH);
             _CodeAddPtr(&((context->rexxoneStr)->key));
             TraceByte(nothing_middle);
-        } else if (identCMP("VALUE") || ((context->nextsymbsymbol) = ident_sy)) {
+        } else if (identCMP("VALUE")) {
+            nextsymbol();
             C_expr(exp_normal);
             opt = form_value_opt;
-        } else
-            (context->lstring_Lerror)(ERR_INV_SUBKEYWORD, 11,
-                                      &(context->nextsymbsymbolstr));
+        } else {
+            C_expr(exp_normal);
+            opt = form_value_opt;
+        }
 
         if ((context->nextsymbsymbol) != semicolon_sy) nextsymbol();
 

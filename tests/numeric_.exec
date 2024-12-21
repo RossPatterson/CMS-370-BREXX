@@ -14,6 +14,8 @@ numeric form engineering
 numeric form scientific
 numeric form value 'engineering'
 t1v='scientific'; numeric form value t1v
+numeric form value 'engin' || 'eering'
+numeric form 'scientific'
 numeric fuzz
 numeric fuzz 2
 signal t1z
