@@ -91,6 +91,7 @@
 enum functions {
     f_abbrev, f_addr, f_address, f_arg,
     f_bitand, f_bitor, f_bitxor, f_compare,
+    f_condition,
     f_copies, f_center,
     f_close,
     f_c2d,

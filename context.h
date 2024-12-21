@@ -129,6 +129,9 @@ struct Context {
    int interpre_no_loc_fp;
    int interpre_no_sys_fp;
    long interpre_options; /* OPTIONS flags */
+   char interpre_SignalCondition[9];
+   char interpre_SignalDescription[64];
+   char interpre_SignalLine[64];
 
    /* lstring.h */
    double lstring_lLastScannedNumber;

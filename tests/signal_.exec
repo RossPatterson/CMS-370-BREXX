@@ -55,5 +55,13 @@ say 'failed in test 8'
 t8a:
 if sigl \== 53 then say 'failed in test 8'
 
+/* signal disables trap */
+signal on novalue name t9a
+t9x = t9v
+say 'failed in test 9.1'
+t9a:
+if sigl == 60 then t9x = t9v
+else say 'failed in test 9.2'
+
 say 'SIGNAL OK'
 exit

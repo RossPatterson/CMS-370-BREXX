@@ -164,6 +164,10 @@ R_O(const int func) {
 } /* R_O */
 
 /* -------------------------------------------------------------- */
+/*  CONDITION((option))  return info about currebt condition      */
+/*  Options C=Condition, D=Description, I=Instruction (default)   */
+/*          S=State.  MVS also allows X=???.                      */
+/* -------------------------------------------------------------- */
 /*  DATE((option))                                                */
 /* -------------------------------------------------------------- */
 /*  TIME((option))                                                */
@@ -181,6 +185,8 @@ R_C(const int func) {
     DQueueElem *qe;
     Context *context = (Context *) CMSGetPG();
 
+    if (func == f_condition)
+        option = 'I'; // default
     if (ARGN > 1)
         (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
     if (exist(1)) {
@@ -189,6 +195,48 @@ R_C(const int func) {
     }
 
     switch (func) {
+        case f_condition:
+            Lscpy(ARGR, "");
+            switch (option) {
+                case 'C':
+                    Lscpy(ARGR, (context->interpre_SignalCondition));
+                    break;
+                case 'D':
+                    Lscpy(ARGR, (context->interpre_SignalDescription));
+                    if ((LLEN(*ARGR) == 0) ||
+                            (strstr((context->interpre_SignalDescription), "Line ") != 0))
+                        Lscpy(ARGR, (context->interpre_SignalLine));
+                    break;
+                case 'I':
+                    /* TODO: When CALL ON works, "CALL" is possible too. */
+                    if (strlen((context->interpre_SignalCondition)) > 0)
+                        Lscpy(ARGR, "SIGNAL");
+                    break;
+                case 'S':
+                    switch ((context->interpre_SignalCondition)[0]) {
+                        case 'E': i = SC_ERROR; break;
+                        case 'F': i = SC_FAILURE; break;
+                        case 'H': i = SC_HALT; break;
+                        case 'N':
+                            i = (context->interpre_SignalCondition)[2] == 'V' ?
+                                SC_NOVALUE : SC_NOTREADY;
+                            break;
+                        case 'S': i = SC_SYNTAX; break;
+                        default: i = 0;
+                    }
+                    /* TODO: When CALL ON works, "DELAY" is possible too. */
+                    if (i != 0)
+                        Lscpy(ARGR,
+                            ((context->rexx_proc)[(context->rexx_rx_proc)].condition & i)
+                            ? "ON" : "OFF"
+                        );
+                    break;
+                 /* case 'X': Lscpy(ARGR, SignalLine); break; */
+                default:
+                    (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
+            }
+            break;
+
         case f_date:
             Ldate(ARGR, option);
             break;

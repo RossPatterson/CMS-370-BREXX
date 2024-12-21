@@ -307,10 +307,10 @@ RxExecuteCmd(PLstr cmd, PLstr env) {
     }
     if (((context->rexxrxReturnCode) < 0) &&
          ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_FAILURE))
-            RxSignalCondition(SC_FAILURE);
+            RxSignalCondition(SC_FAILURE, LSTR(* cmd));
     if (((context->rexxrxReturnCode) != 0) &&
          ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_ERROR))
-            RxSignalCondition(SC_ERROR);
+            RxSignalCondition(SC_ERROR, LSTR(* cmd));
 #elif defined(__MVS__)
     (context->rexxrxReturnCode) = system(LSTR(* cmd));
 #else
@@ -358,7 +358,7 @@ RxExecuteCmd(PLstr cmd, PLstr env) {
                 TraceInteractive(FALSE);
         }
         if ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_ERROR)
-            RxSignalCondition(SC_ERROR);
+            RxSignalCondition(SC_ERROR, cmd);
     }
 #else
     size_t len;

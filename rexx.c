@@ -286,7 +286,7 @@ _LoadRexxLibrary(RxFile *rxf, PLstr libname) {
     (context->interpreRxcip) = (CIPTYPE *) (
             (byte huge *) (context->interpreRxcodestart) + ip);
 
-    if ((context->rexxrxReturnCode)) RxSignalCondition(SC_SYNTAX);
+    if ((context->rexxrxReturnCode)) RxSignalCondition(SC_SYNTAX, "");
     return 0;
 } /* _LoadRexxLibrary */
 

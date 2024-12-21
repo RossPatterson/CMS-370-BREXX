@@ -52,39 +52,53 @@ RxHaltTrap(int cnd) {
     if ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_HALT) {
         /* Reset HI */
         CMSSetFlag(HALTFLAG, 0);
-        RxSignalCondition(SC_HALT);
+        RxSignalCondition(SC_HALT, "");
     } else (context->lstring_Lerror)(ERR_PROG_INTERRUPT, 0);
 } /* RxHaltTrap */
 
 /* ---------------- RxSignalCondition -------------- */
 void __CDECL
-RxSignalCondition(int cnd) {
+RxSignalCondition(int cnd, char *desc) {
     PBinLeaf leaf;
     RxFunc *func;
     PLstr cndstr;
     Context *context = (Context *) CMSGetPG();
 
-/*///////// first we need to terminate all the interpret strings */
+/* Get the trap label, set the CONDITION() type, and disable the trap. */
+/* TODO: When CALL ON is working correctly, delay the trap, don't disable it. */
     switch (cnd) {
         case SC_ERROR:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_error;
+            strcpy((context->interpre_SignalCondition), "ERROR");
+            (context->rexx_proc)[(context->rexx_rx_proc)].condition &= ~SC_ERROR;
             break;
         case SC_FAILURE:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_failure;
+            strcpy((context->interpre_SignalCondition), "FAILURE");
+            (context->rexx_proc)[(context->rexx_rx_proc)].condition &= ~SC_FAILURE;
             break;
         case SC_HALT:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_halt;
+            strcpy((context->interpre_SignalCondition), "HALT");
+            (context->rexx_proc)[(context->rexx_rx_proc)].condition &= ~SC_HALT;
             break;
         case SC_NOVALUE:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_novalue;
+            strcpy((context->interpre_SignalCondition), "NOVALUE");
+            (context->rexx_proc)[(context->rexx_rx_proc)].condition &= ~SC_NOVALUE;
             break;
         case SC_NOTREADY:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_notready;
+            strcpy((context->interpre_SignalCondition), "NOTREADY");
+            (context->rexx_proc)[(context->rexx_rx_proc)].condition &= ~SC_NOTREADY;
             break;
         case SC_SYNTAX:
             cndstr = (context->rexx_proc)[(context->rexx_rx_proc)].lbl_syntax;
+            strcpy((context->interpre_SignalCondition), "SYNTAX");
+            (context->rexx_proc)[(context->rexx_rx_proc)].condition &= ~SC_SYNTAX;
             break;
     }
+    strncpy((context->interpre_SignalDescription), desc, sizeof (context->interpre_SignalDescription));
     leaf = BinFind(&(context->rexx_labels), cndstr);
     if (leaf == NULL || ((RxFunc *) (leaf->value))->label == UNKNOWN_LABEL) {
         if (cnd == SC_SYNTAX) /* disable the error handling */
@@ -113,7 +127,7 @@ Rerror(const int errno, const int subno, ...) {
     if ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_SYNTAX) {
         RxSetSpecialVar(RCVAR, errno);
         if ((context->nextsymbsymbolptr) == NULL) /* we are in intepret */
-            RxSignalCondition(SC_SYNTAX);
+            RxSignalCondition(SC_SYNTAX, (context->interpre_SignalLine));
         else {   /* we are in compile */
             (context->rexxrxReturnCode) = errno;
             longjmp((context->rexx_error_trap), JMP_ERROR);

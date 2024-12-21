@@ -220,6 +220,9 @@ TBltFunc
         {"CMSFLAG", VM_O, f_cmsflag},
 #endif
         {"COMPARE", R_compare, f_compare},
+#ifdef __CMS__
+        {"CONDITION", R_C, f_condition},
+#endif
         {"COPIES", R_copies, f_copies},
 #ifndef __CMS__
         {"COS", R_math, f_cos},
