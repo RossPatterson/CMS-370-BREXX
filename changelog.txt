@@ -1,6 +1,8 @@
 BREXX CMS Change LOG
 ====================
 1.1.0 -
+      - Raise Rexx level to 3.45.
+I0095 - SIGNAL ON isn't turned off after trapping.
 I0094 - Implement NUMERIC FORM VALUE.
 I0092 - Add support for CONDITION().
       - Add HELPREXX files.

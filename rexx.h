@@ -71,7 +71,7 @@
 /* See comment and usage in interpre.c:I_LoadOption at "case version_opt"
    re: __DATE__ in next line.
 */
-#define VERSIONSTR PACKAGE_STRING " 3.40 " __DATE__
+#define VERSIONSTR PACKAGE_STRING " 3.45 " __DATE__
 
 #define AUTHOR  "Vasilis.Vlachoudis@cern.ch"
 #define REGAPPKEY TEXT("Software\\Marmita\\BRexx")
