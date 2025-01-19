@@ -1,6 +1,6 @@
-BREXX CMS Change LOG
+bREXX CMS Change LOG
 ====================
-1.1.0 -
+1.1.0 - 19 Jan 2025
       - Raise Rexx level to 3.45.
 I0095 - SIGNAL ON isn't turned off after trapping.
 I0094 - Implement NUMERIC FORM VALUE.
