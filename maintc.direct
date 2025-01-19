@@ -1,0 +1,36 @@
+USER MAINTC MAINTC 15M 16M G
+ OPTION ECMODE
+ IPL CMS
+ CONSOLE 009 3215
+ SPOOL 00C 2540 READER A
+ SPOOL 00D 2540 PUNCH A
+ SPOOL 00E 1403 A
+ LINK MAINT 190 190 RR
+ LINK MAINT 19D 19D RR
+ LINK MAINT 19E 19E RR
+*        cuu type adr num volser mode readpw   writepw  multpw
+*        Work disk and build target
+ MDISK   191 3350 101 050 GCCBRX MR   ALL      WRITE    MULT
+*
+*        GCCLIB object TEXT files
+ MDISK   194 3350 201 050 GCCBRX MR   ALL      WRITE    MULT
+*        GCCLIB source code files
+ MDISK   394 3350 151 050 GCCBRX MR   ALL      WRITE    MULT
+*
+*        PDPCLIB object TEXT files
+ MDISK   195 3350 501 050 GCCBRX MR   ALL      WRITE    MULT
+*        PDPCLIB source code build specifications
+ MDISK   295 3350 551 001 GCCBRX MR   ALL      WRITE    MULT
+*        PDPCLIB source code files (copy of GCCCMS 691)
+ MDISK   395 3350 251 050 GCCBRX MR   ALL      WRITE    MULT
+*
+*        BREXX object TEXT files (compiled without DEBUG)
+ MDISK   193 3350 351 050 GCCBRX MR   ALL      WRITE    MULT
+*        BREXX object TEXT files (compiled with DEBUG)
+ MDISK   293 3350 051 050 GCCBRX MR   ALL      WRITE    MULT
+*        BREXX source code files
+ MDISK   393 3350 301 050 GCCBRX MR   ALL      WRITE    MULT
+*        BREXX spare disk for possible future use.
+ MDISK   493 3350 401 050 GCCBRX MR   ALL      WRITE    MULT
+*        Tools disk for MAINTC
+ MDISK   19C 3350 451 050 GCCBRX MR   ALL      WRITE    MULT
