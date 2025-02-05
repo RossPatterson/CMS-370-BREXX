@@ -20,116 +20,116 @@ If you're running VM/370 under the Hercules S/370 emulator, you can add the `gcc
 Note that if you already have GCCLIB for CMS and bREXX installed on your VM/370 system (e.g., you're running a turnkey system, or you've previously installed bREXX this way), you probably already have a GCCBRX DASD volume and the associated directory statements in place.  Assuming you haven't modified any minidisks on the GCCBRX volume, you can replace it with the one from the new release.
 
 1. Download the pre-built release `BREXX.zip` file from the location above to the machine where you run Hercules.
-1. Unzip `BREXX.zip`.
-1. Copy the `gccbrx.cckd` file to the folder where you keep your emulated DASD files.
-1. Log on to `MAINT` on VM.
-1. Upload the `maintc.direct` file to VM, add it to your `USER DIRECT` file, and install the updated directory (but see the VM/CE and SixPack note above).
-1. Upload the `newbrexx.exec` file to `MAINT` on VM (typically to the `MAINT 5E5` disk) as `NEWBREXX EXEC`.
-1. Re-save the `GCCLIB` saved segment:
-   1. `DEFINE STORAGE 16M`
-   1. `IPL CMS`
-   1. `ACCESS (NOPROF`
-   1. `GCCSEG F20000 GCCLIB`
-   1. Results: `GCCSEG COMPLETE`.
-1. Run `NEWBREXX` to install all the bREXX files (including some on the Y-disk).
-1. Re-save the CMS saved systemt to update the shared Y-stat:
-   1. `DEFINE STORAGE 16M`
-   1. `IPL 190 CLEAR`
-   1. `SAVESYS CMS`
-   1. Results: `SYSTEM SAVED`.
+2. Unzip `BREXX.zip`.
+3. Copy the `gccbrx.cckd` file to the folder where you keep your emulated DASD files.
+4. Log on to `MAINT` on VM.
+5. Upload the `maintc.direct` file to VM, add it to your `USER DIRECT` file, and install the updated directory (but see the VM/CE and SixPack note above).
+6. Upload the `newbrexx.exec` file to `MAINT` on VM (typically to the `MAINT 5E5` disk) as `NEWBREXX EXEC`.
+7. Re-save the `GCCLIB` saved segment:
+   a. `DEFINE STORAGE 16M`
+   b. `IPL CMS`
+   c. `ACCESS (NOPROF`
+   d. `GCCSEG F20000 GCCLIB`
+   e. Results: `GCCSEG COMPLETE`.
+8. Run `NEWBREXX` to install all the bREXX files (including some on the Y-disk).
+9. Re-save the CMS saved systemt to update the shared Y-stat:
+   a. `DEFINE STORAGE 16M`
+   b. `IPL 190 CLEAR`
+   c. `SAVESYS CMS`
+   d. Results: `SYSTEM SAVED`.
 
 ## Install pre-built via VMARC.
 
 1. Download the pre-built release `BREXX.zip` file from the location above to the machine where you run Hercules.
-1. Unzip `BREXX.zip`.
-1. Log on to `MAINT` on VM.
-1. Upload `brexxbin.vmarc` to VM in binary, fixed format, record length 80 as `BREXXBIN VMARC`.
-1. Extract the pre-built bREXX file: `VMARC UNPK BREXXBIN VMARC A BREXX TEXT A (OLDDATE`.
-1. Move the `BREXX TEXT` file to the Y-disk:
-   1. `ACCESS 19E Y`
-   1. `COPY BREXX TEXT A = = Y (OLDD REPLACE'.
-   1. `ACCESS 19E Y/S`
-1. Upload `brexxsrc.vmarc` to VM in binary, fixed format, record length 80 as `BREXXSRC VMARC`.
-1. Extract the archive of `HELP` files: `VMARC UNPK BREXXSRC VMARC A BRXHELP VMARC A (OLDDATE`.
-1. Extract the `HELP` files: `VMARC UNPK BRXHELP VMARC A * * A (OLDDATE`.
-1. Move the `* HELPREXX` files to the `HELP` disk (typically `MAINT 19D`).
-1. Merge the `HELP HELPTASK` file into the HELP HELPTASK` file on the `HELP` disk.
-1. Re-save the CMS saved systemt to update the shared Y-stat:
-   1. `DEFINE STORAGE 16M`
-   1. `IPL 190 CLEAR`
-   1. `SAVESYS CMS`
-   1. Results: `SYSTEM SAVED`.
+2. Unzip `BREXX.zip`.
+3. Log on to `MAINT` on VM.
+4. Upload `brexxbin.vmarc` to VM in binary, fixed format, record length 80 as `BREXXBIN VMARC`.
+5. Extract the pre-built bREXX file: `VMARC UNPK BREXXBIN VMARC A BREXX TEXT A (OLDDATE`.
+6. Move the `BREXX TEXT` file to the Y-disk:
+   a. `ACCESS 19E Y`
+   b. `COPY BREXX TEXT A = = Y (OLDD REPLACE'.
+   c. `ACCESS 19E Y/S`
+7. Upload `brexxsrc.vmarc` to VM in binary, fixed format, record length 80 as `BREXXSRC VMARC`.
+8. Extract the archive of `HELP` files: `VMARC UNPK BREXXSRC VMARC A BRXHELP VMARC A (OLDDATE`.
+9. Extract the `HELP` files: `VMARC UNPK BRXHELP VMARC A * * A (OLDDATE`.
+10. Move the `* HELPREXX` files to the `HELP` disk (typically `MAINT 19D`).
+11. Merge the `HELP HELPTASK` file into the HELP HELPTASK` file on the `HELP` disk.
+12. Re-save the CMS saved systemt to update the shared Y-stat:
+   a. `DEFINE STORAGE 16M`
+   b. `IPL 190 CLEAR`
+   c. `SAVESYS CMS`
+   d. Results: `SYSTEM SAVED`.
 
 ## Install pre-built via AWSTAPE.
 
 1. Download the pre-built release `BREXX.zip` file from the location above to the machine where you run Hercules.
-1. Unzip `BREXX.zip`.
-1. Log on to `MAINT` on VM.
-1. At the Hercules console, attach the binary tape:
-   1. `devinit 480` _unzip_dir_`/brexxbin.aws`.
-   1. `/ATTACH 480 TO MAINT AS 181`
-1. At the Hercules console, attach the source tape:
-   1. `devinit 481` _unzip_dir_`/brexxsrc.aws`.
-   1. `/ATTACH 481 TO MAINT AS 182`
-1. Load the pre-built bREXX file: `TAPE LOAD BREXX TEXT A`.
-1. Move the `BREXX TEXT` file to the Y-disk:
-   1. `ACCESS 19E Y`
-   1. `COPY BREXX TEXT A = = Y (OLDD REPLACE'.
-   1. `ACCESS 19E Y/S`
-1. Load the archive of `HELP` files: `TAPE LOAD BRXHELP VMARC A (TAP2`.
-1. Detach the tape drives: `DETACH 181-182`.
-1. Extract the `HELP` files: `VMARC UNPK BRXHELP VMARC A * * A (OLDDATE`.
-1. Move the `* HELPREXX` files to the `HELP` disk (typically `MAINT 19D`).
-1. Merge the `HELP HELPTASK` file into the HELP HELPTASK` file on the `HELP` disk.
-1. Detach the tape drives: `DETACH 181-182`.
-1. Re-save the CMS saved systemt to update the shared Y-stat:
-   1. `DEFINE STORAGE 16M`
-   1. `IPL 190 CLEAR`
-   1. `SAVESYS CMS`
-   1. Results: `SYSTEM SAVED`.
+2. Unzip `BREXX.zip`.
+3. Log on to `MAINT` on VM.
+4. At the Hercules console, attach the binary tape:
+   a. `devinit 480` _unzip_dir_`/brexxbin.aws`.
+   b. `/ATTACH 480 TO MAINT AS 181`
+5. At the Hercules console, attach the source tape:
+   a. `devinit 481` _unzip_dir_`/brexxsrc.aws`.
+   b. `/ATTACH 481 TO MAINT AS 182`
+6. Load the pre-built bREXX file: `TAPE LOAD BREXX TEXT A`.
+7. Move the `BREXX TEXT` file to the Y-disk:
+   a. `ACCESS 19E Y`
+   b. `COPY BREXX TEXT A = = Y (OLDD REPLACE'.
+   c. `ACCESS 19E Y/S`
+8. Load the archive of `HELP` files: `TAPE LOAD BRXHELP VMARC A (TAP2`.
+9. Detach the tape drives: `DETACH 181-182`.
+10. Extract the `HELP` files: `VMARC UNPK BRXHELP VMARC A * * A (OLDDATE`.
+11. Move the `* HELPREXX` files to the `HELP` disk (typically `MAINT 19D`).
+12. Merge the `HELP HELPTASK` file into the HELP HELPTASK` file on the `HELP` disk.
+13. Detach the tape drives: `DETACH 181-182`.
+14. Re-save the CMS saved systemt to update the shared Y-stat:
+   a. `DEFINE STORAGE 16M`
+   b. `IPL 190 CLEAR`
+   c. `SAVESYS CMS`
+   d. Results: `SYSTEM SAVED`.
 
 ## Install from source via VMARC.
 
 1. Download the pre-built release `BREXX.zip` file from the location above to the machine where you run Hercules.
-1. Unzip `BREXX.zip`.
-1. Log on to `MAINTC` on VM.
-1. Upload `brexxbin.vmarc` to `MAINTC 191` in binary, fixed format, record length 80 as `BREXXBIN VMARC`.
-1. Upload `brexxsrc.vmarc` to `MAINTC 191` in binary, fixed format, record length 80 as `BREXXSRC` VMARC`.
-1. Extract the loader exec: `VMARC UNPK BREXXSRC VMARC A BRXLOAD EXEC A (OLDDATE`.
-1. Run the loader exec: `BRXLOAD VMARC`
-1. Compile bREXX from source: `BRXBUILD`
-1. Build the bREXX file: `BRXGEN`
-1. Log on to `MAINT` on VM.
-1. Run `NEWBREXX` to install all the bREXX files (including some on the Y-disk).
-1. Re-save the CMS saved systemt to update the shared Y-stat:
-   1. `DEFINE STORAGE 16M`
-   1. `IPL 190 CLEAR`
-   1. `SAVESYS CMS`
-   1. Results: `SYSTEM SAVED`.
+2. Unzip `BREXX.zip`.
+3. Log on to `MAINTC` on VM.
+4. Upload `brexxbin.vmarc` to `MAINTC 191` in binary, fixed format, record length 80 as `BREXXBIN VMARC`.
+5. Upload `brexxsrc.vmarc` to `MAINTC 191` in binary, fixed format, record length 80 as `BREXXSRC` VMARC`.
+6. Extract the loader exec: `VMARC UNPK BREXXSRC VMARC A BRXLOAD EXEC A (OLDDATE`.
+7. Run the loader exec: `BRXLOAD VMARC`
+8. Compile bREXX from source: `BRXBUILD`
+9. Build the bREXX file: `BRXGEN`
+10. Log on to `MAINT` on VM.
+11. Run `NEWBREXX` to install all the bREXX files (including some on the Y-disk).
+12. Re-save the CMS saved systemt to update the shared Y-stat:
+   a. `DEFINE STORAGE 16M`
+   b. `IPL 190 CLEAR`
+   c. `SAVESYS CMS`
+   d. Results: `SYSTEM SAVED`.
 
 ## Install from source via AWSTAPE.
 
 1. Download the pre-built release `BREXX.zip` file from the location above to the machine where you run Hercules.
-1. Unzip `BREXX.zip`.
-1. Log on to `MAINTC` on VM.
-1. At the Hercules console, attach the source tape:
-   1. `devinit 480` _unzip_dir_`/brexxsrc.aws`.
-   1. `/ATTACH 480 TO MAINTC AS 181`
-1. Extract the loader exec: `TAPE LOAD BRXLOAD EXEC A`.
-1. Rewind the tape: `TAPE REW`.
-1. Run the loader exec: `BRXLOAD TAPE`
-1. When prompted to, at the Hercules console, attach the binary tape:
-   1. `devinit 480` _unzip_dir_`/brexxbin.aws`.
-1. Detach the tape drive: `DETACH 181`.
-1. Compile bREXX from source: `BRXBUILD`
-1. Build the bREXX file: `BRXGEN`
-1. Log on to `MAINT` on VM.
-1. Run `NEWBREXX` to install all the bREXX files (including some on the Y-disk).
-1. Re-save the CMS saved systemt to update the shared Y-stat:
-   1. `DEFINE STORAGE 16M`
-   1. `IPL 190 CLEAR`
-   1. `SAVESYS CMS`
-   1. Results: `SYSTEM SAVED`.
+2. Unzip `BREXX.zip`.
+3. Log on to `MAINTC` on VM.
+4. At the Hercules console, attach the source tape:
+   a. `devinit 480` _unzip_dir_`/brexxsrc.aws`.
+   b. `/ATTACH 480 TO MAINTC AS 181`
+5. Extract the loader exec: `TAPE LOAD BRXLOAD EXEC A`.
+6. Rewind the tape: `TAPE REW`.
+7. Run the loader exec: `BRXLOAD TAPE`
+8. When prompted to, at the Hercules console, attach the binary tape:
+   a. `devinit 480` _unzip_dir_`/brexxbin.aws`.
+9. Detach the tape drive: `DETACH 181`.
+10. Compile bREXX from source: `BRXBUILD`
+11. Build the bREXX file: `BRXGEN`
+12. Log on to `MAINT` on VM.
+13. Run `NEWBREXX` to install all the bREXX files (including some on the Y-disk).
+14. Re-save the CMS saved systemt to update the shared Y-stat:
+   a. `DEFINE STORAGE 16M`
+   b. `IPL 190 CLEAR`
+   c. `SAVESYS CMS`
+   d. Results: `SYSTEM SAVED`.
 
 # License
 
