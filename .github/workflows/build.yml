@@ -43,6 +43,8 @@ jobs:
         cp /opt/hercules/vm370/io/README.md exe
         cp /opt/hercules/vm370/io/changelog.txt exe
         cp /opt/hercules/vm370/gccbrx.cckd exe
+        cp /opt/hercules/vm370/io/maintc.direct exe
+        cp /opt/hercules/vm370/io/tools/newbrexx.exec exe
         chmod -R ugo+r exe
       shell: bash
 
