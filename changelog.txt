@@ -1,5 +1,10 @@
 bREXX CMS Change LOG
 ====================
+1.1.0a- 6 Feb 2025
+      - Fix packaging errors.  There are NO bREXX changes in this level.
+      - Incorporate HELP spelling fixes from https://github.com/s390guy/vm370/pull/125.
+      - Document DATATYPE(..., 'T').
+
 1.1.0 - 19 Jan 2025
       - Raise Rexx level to 3.45.
 I0095 - SIGNAL ON isn't turned off after trapping.
