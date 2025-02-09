@@ -191,7 +191,5 @@ Vlachoudis subsequently re-released it under version 2 of the GNU Public
 License (see [vlachoudis/brexx on GitHub](https://github.com/vlachoudis/brexx)).
 
 Several other programmers ported Vlachoudis's GPL'ed version of bREXX to
-VM/370, and dedicated their work to the public domain (see
-[LICENSE](https://github.com/RossPatterson/CMS-370-BREXX/tree/master/LICENSE)
-and
-[waiverform.txt](https://github.com/RossPatterson/CMS-370-BREXX/tree/master/waiverform.txt).
+VM/370, and dedicated their work to the public domain (see [LICENSE](LICENSE)
+and [waiverform.txt](waiverform.txt).

@@ -1,11 +1,11 @@
-BRXSRCH                                                          MAINTC command
+BRXSRCHT                                                         MAINTC command
 
-Use the BRXSRCH command to setup a minidisk search order to build and
-modify the bREXX interpretor.
+Use the BRXSRCHT command to setup a minidisk search order to build and
+modify a test version of the bREXX code.
 
-The format of the BRXSRCH command is:
+The format of the BRXSRCHT command is:
 +----------+------------------------------------------------------------------+
-| BRXSRCH  |                                                                  |
+| BRXSRCHT |                                                                  |
 +----------+------------------------------------------------------------------+
 
 Usage Notes:
@@ -13,7 +13,8 @@ Usage Notes:
 1. The minidisk search order after issuing this command is:
 
    MNT191  191  A    R/W     Work disk where compiled code is created
-   MNT194  193  E/A  R/O     TEXT files for the compiled bREXX code
+   MNT493  493  B/A  R/O     Files for test bREXX version
+   MNT193  193  E/A  R/O     TEXT files for the compiled bREXX code
    MNT393  393  F/A  R/O     bREXX source code
    MNT394  394  G/A  R/O     GCC H files for CMS specific runtime
    MNT194  194  H/A  R/O     GCCLIB MACLIB for compiled bREXX code

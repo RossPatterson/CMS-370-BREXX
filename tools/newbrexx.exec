@@ -1,6 +1,6 @@
 &CONTROL OFF
 * Install a new version of the GCC CMS runtime library and the
-* BREXX interpretor on production disks after updates are made
+* bREXX interpretor on production disks after updates are made
 * from MAINTC.
 *
 * Assumptions:
@@ -163,25 +163,33 @@ SAVESYS CMS
 ********************************************************************
 * Format of NEWBREXX CONTROL file                                  *
 ********************************************************************
-*                                 Destination      Source MAINTC disk
-DISK                              MAINT    190     191
-FILE       GCCLIB     MACLIB
+*                                 Destination      Source MAINTC minidisk
+DISK                              MAINT    19E     191
 FILE       GCCLIB     TXTLIB
-FILE       GCCLIB     MACLIB
-FILE       GCCRES     MACLIB
+FILE       GCCRES     TXTLIB
 FILE       GCCLIB     TEXT
 FILE       BREXX      TEXT
+*
+DISK                              MAINT    19E     393
+FILE       SYSPROFB   EXEC
+FILE       REXXTRY    EXEC
+*
+DISK                              MAINT    19E     19C
+FILE       YATA       MODULE
+*
 DISK                              GCCCMS   202     394
- 
 FILE       *          H
-FILE       GCCLIB     MACLIB
 FILE       GCC        PARM
-DISK                              MAINT    19D     393
+*
+DISK                              GCCCMS   202     194
+FILE       GCCLIB     MACLIB
+*
+DISK                              MAINT    19D     394
 FILE       GCCLIB     MEMO
 FILE       GCCLIB     HELPCMD
 FILE       GCCLIB     HELPCMD2
+*
+DISK                              MAINT    19D     393
 FILE       REXX       HELPCMD
 FILE       REXX       HELPCMD2
- 
-DISK                              MAINT    19E     393
-FILE       REXXTRY    EXEC
+FILE       *          HELPREXX

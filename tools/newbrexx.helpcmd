@@ -1,7 +1,7 @@
 NEWBREXX                                                         MAINTC command
 
 Use the NEWBREXX command from the MAINT ID to install the latest versions of
-the GCC CMS runtime code and the BREXX system code for public use.
+the GCC CMS runtime code and the bREXX system code for public use.
 
 The format of the NEWBREXX command is:
 +----------+------------------------------------------------------------------+
@@ -16,7 +16,7 @@ Usage Notes:
 
 3. NEWBREXX uses a control file on the MAINTC 191 disk.
    Here is a sample of that file. The control file allows MAINTC
-   to define which GCC/BREXX files go onto which CMS System minidisks.
+   to define which GCC/bREXX files go onto which CMS System minidisks.
 
 *                                 Destination      Source MAINTC minidisk
 DISK                              MAINT    19E     191
@@ -29,12 +29,25 @@ DISK                              MAINT    19E     393
 FILE       SYSPROFB   EXEC
 FILE       REXXTRY    EXEC
 *
+DISK                              MAINT    19E     19C
+FILE       YATA       MODULE
+*
 DISK                              GCCCMS   202     394
 FILE       *          H
 FILE       GCC        PARM
 *
 DISK                              GCCCMS   202     194
 FILE       GCCLIB     MACLIB
+*
+DISK                              MAINT    19D     394
+FILE       GCCLIB     MEMO
+FILE       GCCLIB     HELPCMD
+FILE       GCCLIB     HELPCMD2
+*
+DISK                              MAINT    19D     393
+FILE       REXX       HELPCMD
+FILE       REXX       HELPCMD2
+FILE       *          HELPREXX
 
 
 4. After NEWBREXX completes, the MAINT 190 and 19E disks
