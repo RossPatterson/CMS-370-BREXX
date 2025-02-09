@@ -1,5 +1,11 @@
 /* DATATYPE */
 say "Look for DATATYPE OK"
+parse upper version name .
+select
+	when Left(name, 5) = 'BREXX' then is_brexx = 1
+	when Left(name, 10) = 'REXX-BREXX' then is_brexx = 1
+	otherwise is_brexx = 0
+end
 /* These from the Rexx book. */
 if datatype(' 12 ') \== 'NUM' then say 'failed in test 1 '
 if datatype('') \== 'CHAR' then say 'failed in test 2 '
@@ -83,4 +89,8 @@ if datatype('0E-1','w') \== '1' then say 'failed in test 77 '
 if datatype('0E0','w') \== '1' then say 'failed in test 78 '
 if datatype('0E1','w') \== '1' then say 'failed in test 79 '
 if datatype('0E2','w') \== '1' then say 'failed in test 80 '
+/* These from doc/implemen.html */
+if is_brexx & datatype(2, 'T') \== 'STRING' then say 'failed in test 81'
+if is_brexx & datatype(2+0.0, 'T') \== 'REAL' then say 'failed in test 82'
+if is_brexx & datatype(2+0, 'T') \== 'INTEGER' then say 'failed in test 83'
 say "DATATYPE OK"

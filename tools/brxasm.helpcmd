@@ -1,6 +1,6 @@
 BRXASM                                                           MAINTC command
 
-Use the BRXASM command to compile any BREXX assembler language source file.
+Use the BRXASM command to compile any bREXX assembler language source file.
 
 The format of the BRXASM command is:
 +----------+------------------------------------------------------------------+

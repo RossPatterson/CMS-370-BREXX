@@ -1,6 +1,6 @@
 BRXCOMP                                                          MAINTC command
 
-Use the BRXCOMP command to compile C programs that are part of the BREXX
+Use the BRXCOMP command to compile C programs that are part of the bREXX
 runtime library.
 
 The format of the BRXCOMP command is:

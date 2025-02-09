@@ -1,0 +1,195 @@
+&CONTROL OFF
+* Install a new version of the GCC CMS runtime library and the
+* bREXX interpretor on production disks after updates are made
+* from MAINTC.
+*
+* Assumptions:
+*    Designed to be run only from MAINT.
+*    MAINT must have the LNKNOPAS option.
+*
+* The process is driven by a control file. See the sample at the
+* end of this EXEC.
+*
+* Source disk for the file copying has MAINTC virtual address &SDISK.
+* It is linked as address &SVADDR and accessed at filemode &SMODE.
+*
+* Target disk for the file copying has owner name &TUSER and
+* owner virtual address &TDISK. If the target disk owner is
+* MAINT, then &TVADDR is set to NONE, since no LINK is performed.
+* It is linked as address &TVADDR and accessed at filemode &TMODE.
+ 
+* Find free virtual address and filemode for source disk
+  EXECUTIL FREEADDR 19E
+  &READ VARS &SVADDR
+  EXECUTIL FREEMODE S
+  &READ VARS &SMODE
+* No target disk address and filemode yet
+  &TUSER = NONE
+  &TDISK = NONE
+  &TVADDR = NONE
+  &TMODE = NONE
+ 
+**************************************************************
+* Access MAINTC 191 as source disk for a list of files to copy
+  &SDISK = 191
+  CP DISCARD LINK MAINTC &SDISK &SVADDR RR
+  &STACK HT
+  ACCESS &SVADDR &SMODE
+  &STACK RT
+  &TYPE ** LINK MAINTC &SDISK &SVADDR RR
+  &TYPE ** ACCESS &SVADDR &SMODE
+ 
+* Read the control file into the stack
+  DESBUF
+  EXECUTIL READ NEWBREXX CONTROL &SMODE 1 *
+  &STACK EOF
+* Set target disk for the first time through
+  &TDISK = NONE
+ 
+* Main loop to process the control file records
+-LOOP1
+  &READ VARS &VERB &PARM1 &PARM2 &PARM3
+  &IF .&VERB EQ .   &GOTO -LOOP1
+  &IF &VERB EQ *    &GOTO -LOOP1
+  &IF &VERB EQ DISK &GOTO -NEWDISK
+  &IF &VERB EQ FILE &GOTO -COPYFILE
+  &IF &VERB EQ EOF &GOTO -THEEND
+  &TYPE UNKNOWN FILE RECORD TYPE: &VERB
+  &GOTO -LOOP1
+ 
+***********************************************************
+* ACCESS the source minidisk named on the DISK record.
+*            If source disk is unchanged skip the ACCESS.
+-NEWDISK
+  &IF &SDISK EQ &PARM3 &GOTO -NOACC1
+*             Else release old and access new MAINTC source disk
+      &STACK HT
+      RELEASE &SMODE
+      &STACK RT
+      CP DISCARD DETACH &SVADDR
+      &SDISK = &PARM3
+      CP DISCARD LINK MAINTC &SDISK &SVADDR RR
+      &STACK HT
+      ACCESS &SVADDR &SMODE
+      &STACK RT
+&TYPE ** LINK MAINTC &SDISK &SVADDR RR
+&TYPE ** ACCESS &SVADDR &SMODE
+-NOACC1
+ 
+***********************************************************
+*             Switch to new target disk
+  &IF &TMODE = NONE &GOTO -NOREL2
+  &IF &TMODE = Y    &GOTO -NOREL2
+      &STACK HT
+      RELEASE &TMODE
+      &STACK RT
+      &IF &TVADDR EQ NONE  &GOTO -NOREL2
+          CP DISCARD DETACH &TVADDR
+-NOREL2
+  &TUSER = &PARM1
+  &TDISK = &PARM2
+ 
+* Reserve a target disk filemode position
+ 
+*                       Special processing for MAINT 19E
+  &IF &TUSER EQ MAINT &IF &TDISK EQ 19E &GOTO -YDISK
+  &IF &TMODE = Y &TMODE = NONE
+ 
+  &IF &TMODE NE NONE &GOTO -HAVMODE
+      EXECUTIL FREEMODE S
+      &READ VARS &TMODE
+-HAVMODE
+ 
+*             If target is a MAINT disk, skip LINK
+  &IF &TUSER EQ MAINT &GOTO -SKIPLNK
+      &IF &TVADDR NE NONE &GOTO -TLINK
+          EXECUTIL FREEADDR 19E
+          &READ VARS &TVADDR
+      -TLINK
+      CP DISCARD LINK &TUSER &TDISK &TVADDR MR
+      &STACK HT
+      ACCESS &TVADDR &TMODE
+      &STACK RT
+&TYPE ** LINK &TUSER &TDISK &TVADDR MR
+&TYPE ** ACCESS &TVADDR &TMODE
+      &GOTO -LOOP1
+-SKIPLNK
+      &STACK HT
+      ACCESS &TDISK &TMODE
+      &STACK RT
+&TYPE ** ACCESS &TDISK &TMODE
+      &GOTO -LOOP1
+ 
+* Here if the target is MAINT 19E. It must remain at that mode
+* but why?
+-YDISK
+      &STACK HT
+      ACCESS 19E Y
+      &STACK RT
+      &TMODE = Y
+      &GOTO -LOOP1
+ 
+* Copy the next file named in the control file
+-COPYFILE
+  &MODE2 = &CONCAT &TMODE 2
+  &TYPE ** COPYFILE &PARM1 &PARM2 &SMODE = = &MODE2 ( OLDDATE REP TYPE
+  COPYFILE &PARM1 &PARM2 &SMODE = = &MODE2 ( OLDDATE REP TYPE
+  &IF &RETCODE NE 0 &TYPE ERROR &RETCODE COPYING &PARM1 &PARM2 &SMODE
+  &IF &RETCODE NE 0 &TYPE TO &PARM1 &PARM2 &MODE2
+  Q DISK &TMODE
+  &GOTO -LOOP1
+ 
+* Last record has been processed
+-THEEND
+  DESBUF
+  &STACK HT
+  RELEASE &SMODE
+  RELEASE &TMODE
+  &STACK RT
+  CP DISCARD DETACH &SVADDR
+  &IF &TUSER EQ MAINT &GOTO -NODETACH
+  CP DISCARD DETACH &TVADDR
+ -NODETACH
+ &BEGTYPE
+***********************************************************
+Please immediately re-save the CMS system.
+Issue the following commands:
+DEFINE STOR 16M
+IPL 190 CLEAR
+SAVESYS CMS
+&END
+&EXIT 0
+ 
+********************************************************************
+* Format of NEWBREXX CONTROL file                                  *
+********************************************************************
+*                                 Destination      Source MAINTC minidisk
+DISK                              MAINT    19E     191
+FILE       GCCLIB     TXTLIB
+FILE       GCCRES     TXTLIB
+FILE       GCCLIB     TEXT
+FILE       BREXX      TEXT
+*
+DISK                              MAINT    19E     393
+FILE       SYSPROFB   EXEC
+FILE       REXXTRY    EXEC
+*
+DISK                              MAINT    19E     19C
+FILE       YATA       MODULE
+*
+DISK                              GCCCMS   202     394
+FILE       *          H
+FILE       GCC        PARM
+*
+DISK                              GCCCMS   202     194
+FILE       GCCLIB     MACLIB
+*
+DISK                              MAINT    19D     394
+FILE       GCCLIB     MEMO
+FILE       GCCLIB     HELPCMD
+FILE       GCCLIB     HELPCMD2
+*
+DISK                              MAINT    19D     393
+FILE       REXX       HELPCMD
+FILE       REXX       HELPCMD2
+FILE       *          HELPREXX

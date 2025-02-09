@@ -1,8 +1,8 @@
 BRXSRCHD                                                         MAINTC command
 
-Use the BRXSRCHD command to setup a minidisk search order to build and
-modify a CMS "debug" version of the GCC runtime library code. The debug
-version contains tracing and extra runtime messages for debugging.
+Use the BRXSRCH command to setup a minidisk search order to build and
+modify a CMS "debug" version of the bREXX interpretor. The debug version
+contains tracing and extra runtime messages for debugging.
 
 The format of the BRXSRCHD command is:
 +----------+------------------------------------------------------------------+
@@ -14,5 +14,8 @@ Usage Notes:
 1. The minidisk search order after issuing this command is:
 
    MNT191  191  A    R/W     Work disk where compiled code is created
-   MNT194  194  E/A  R/O     TEXT files for the compiled runtime library code
-   MNT394  394  F/A  R/O     Runtime library source code
+   MNT293  293  E/A  R/O     TEXT files for the compiled debug bREXX code
+   MNT193  193  F/A  R/O     TEXT files for the compiled bREXX code
+   MNT393  393  G/A  R/O     bREXX source code
+   MNT394  394  H/A  R/O     GCC H files for CMS specific runtime
+   MNT194  194  I/A  R/O     GCCLIB MACLIB for compiled bREXX code

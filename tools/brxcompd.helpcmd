@@ -1,6 +1,6 @@
 BRXCOMPD                                                         MAINTC command
 
-Use the BRXCOMPD command to compile C programs that are part of the BREXX
+Use the BRXCOMPD command to compile C programs that are part of the bREXX
 runtime library. The files are compiled with imbedded debug and trace code.
 
 The format of the BRXCOMPD command is:
