@@ -1,6 +1,6 @@
 bREXX CMS Change LOG
 ====================
-I0096 - Trace I for DROP is garbage
+I0096 - Trace I for DROP is garbage (already fixed upstream).
 
 1.1.1 - 9 Feb 2025
       - Fix packaging errors.  There are NO changes to bREXX itself in this minor release.
