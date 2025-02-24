@@ -1,6 +1,7 @@
 bREXX CMS Change LOG
 ====================
-1.1.1 - 9 Feb 2025
+1.1.1 - 24 Feb 2025
+      - Upgrade starting GCCBRX DASD to VM/CE 1.2 (instead of bREXX 1.0.0).
       - Fix packaging errors.  There are NO changes to bREXX itself in this minor release.
       - Incorporate HELP spelling fixes from https://github.com/s390guy/vm370/pull/125.
       - Document DATATYPE(..., 'T').
