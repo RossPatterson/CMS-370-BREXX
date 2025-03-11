@@ -34,6 +34,7 @@ HOSTCMD  CSECT                                                          00020000
 *------------------------------------------------------------*
          USING  LSTR,R4           Command line                          00350000
          L      R1,LSTRPSTR       Address of command line               00360000
+		 LR     R6,R1             Save for later.
          L      R0,LSTRLEN        Length of command line                00370000
          DROP   R4                                                      00380000
 *                                                                       00390000
@@ -121,7 +122,7 @@ CHKSUBCM DS    0H                                                       01090000
 * string. The third word points past the last argument.      *
 *------------------------------------------------------------*
          MVC   EPLIST(16),NUCPLIST Copy EPLIST from ASCANN              01200000
-         MVC   EPLIST+4(4),EPLIST Adjust second word of EP              01210000
+         ST    R6,EPLIST+4        Args are entire command string.
          ST    R1,EPLIST          Adjust first word                     01220000
          LA    R0,EPLIST           and extended plist                   01230000
          ICM   R1,B'1000',=X'02'  Subcommand call                       01240000
