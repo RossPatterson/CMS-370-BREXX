@@ -76,7 +76,7 @@ the one from the new release.
 5. Extract the pre-built bREXX file: `VMARC UNPK BREXXBIN VMARC A BREXX TEXT A (OLDDATE`.
 6. Move the `BREXX TEXT` file to the Y-disk:
    1. `ACCESS 19E Y`
-   2. `COPY BREXX TEXT A = = Y (OLDD REPLACE'.
+   2. `COPY BREXX TEXT A = = Y (OLDD REPLACE`
    3. `ACCESS 19E Y/S`
 7. Upload `brexxsrc.vmarc` to VM in binary, fixed format, record length 80 as
    `BREXXSRC VMARC`.
@@ -106,7 +106,7 @@ the one from the new release.
 6. Load the pre-built bREXX file: `TAPE LOAD BREXX TEXT A`.
 7. Move the `BREXX TEXT` file to the Y-disk:
    1. `ACCESS 19E Y`
-   2. `COPY BREXX TEXT A = = Y (OLDD REPLACE'.
+   2. `COPY BREXX TEXT A = = Y (OLDD REPLACE`
    3. `ACCESS 19E Y/S`
 8. Load the archive of `HELP` files: `TAPE LOAD BRXHELP VMARC A (TAP2`.
 9. Detach the tape drives: `DETACH 181-182`.
