@@ -116,8 +116,8 @@ Ldate(const PLstr datestr, char option) {
 
         case 'C':
 #ifndef WCE
-            length = tmdata->tm_yday + 1 +
-                     (long) (((double) tmdata->tm_year - 1) * 365.25) + 365;
+            length = tmdata->tm_yday + 2 +
+                     (long) (((double) (tmdata->tm_year % 100 - 1)) * 365.25) + 365;
             sprintf(LSTR(*datestr), "%ld", length);
 #else
             length = day_of_year(&time) +
