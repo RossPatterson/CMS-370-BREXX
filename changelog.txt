@@ -1,5 +1,7 @@
 bREXX CMS Change LOG
 ====================
+I0102 - ADDRESS instruction without operands doesn't swap environments.
+
 1.1.1 - 24 Feb 2025
       - Upgrade starting GCCBRX DASD to VM/CE 1.2 (instead of bREXX 1.0.0).
       - Fix packaging errors.  There are NO changes to bREXX itself in this minor release.

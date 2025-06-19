@@ -256,7 +256,7 @@ I_LoadOption(const PLstr value, const int opt) {
             Lscpy(value, AUTHOR);
             break;
 
-        case version_opt: ; // Why does GCC demand this semi-colon?
+        case version_opt: ;
             /* We know that rexx.h:VERSIONSTR ends with "Mmm dd yyyy", and we
                need it to be "dd Mmm yyyy". You can't do that in a #define,
                so we do it here instead :-(
@@ -317,13 +317,24 @@ I_StoreOption(const PLstr value, const int opt) {
     Context *context = (Context *) CMSGetPG();
 
     switch (opt) {
-        case environment_opt:
-            if (LLEN(*value) > 250)
+        case environment_opt: ;
+            PLstr temp_env;
+            if (!value && LLEN(*value) > 250)
                 (context->lstring_Lerror)(ERR_ENVIRON_TOO_LONG, 1, value);
+            temp_env = (context->rexx_proc)[(context->rexx_rx_proc)].env_alt;
+            if ((context->rexx_proc)[(context->rexx_rx_proc)].env_alt ==
+                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env_alt)
+                    LPMALLOC((context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
+            Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env_alt,
+                (context->rexx_proc)[(context->rexx_rx_proc)].env);
             if ((context->rexx_proc)[(context->rexx_rx_proc)].env ==
                 (context->rexx_proc)[(context->rexx_rx_proc) - 1].env) LPMALLOC(
                     (context->rexx_proc)[(context->rexx_rx_proc)].env);
-            Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env, value);
+            if (value) {
+                Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env, value);
+            } else
+                Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env, temp_env);
+            if (temp_env) LPFREE(temp_env);
             break;
 
         case trace_opt:
