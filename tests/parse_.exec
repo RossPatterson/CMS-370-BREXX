@@ -293,5 +293,6 @@
 /* Issue 101 */
    parse source s
    if words(s) \== 5 then say 'failed in test 31, s=/' || s || '/'
+   if word(s, 5) \== default_address then say 'failed in test 31, default_address=/' || default_address || '/, s=/' || s || '/'
 
 say 'PARSE OK'
