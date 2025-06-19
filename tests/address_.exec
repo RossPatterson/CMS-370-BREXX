@@ -1,3 +1,19 @@
-/* Address() Test */
-say "Look for 'OS Name'"
-say address()
+/* ADDRESS() and ADDRESS */
+say 'Testing ADDRESS ...'
+parse source system .
+select
+    when system = 'CMS' then default = 'CMS'
+    when system = 'UNIX' then default = 'SYSTEM'
+    when system = 'WIN64' then default = 'SYSTEM'
+    otherwise say 'test 1 undefined'
+end
+if address() \== default then say 'failed in test 1'
+address 'aaa'
+if address() \== 'aaa' then say 'failed in test 2'
+address 'bbb'
+if address() \== 'bbb' then say 'failed in test 3'
+address
+if address() \== 'aaa' then say 'failed in test 4'
+address
+if address() \== 'bbb' then say 'failed in test 5'
+say 'ADDRESS done'
