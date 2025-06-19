@@ -290,4 +290,8 @@
    if string \== 'look for' then say 'failed in test 30, string=/' || string || '/'
    if rest \== '1 10' then say 'failed in test 30, rest=/' || rest || '/'
 
+/* Issue 101 */
+   parse source s
+   if words(s) \== 5 then say 'failed in test 31, s=/' || s || '/'
+
 say 'PARSE OK'

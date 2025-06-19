@@ -256,7 +256,7 @@ I_LoadOption(const PLstr value, const int opt) {
             Lscpy(value, AUTHOR);
             break;
 
-        case version_opt: ; // Why does GCC demand this semi-colon?
+        case version_opt: ;
             /* We know that rexx.h:VERSIONSTR ends with "Mmm dd yyyy", and we
                need it to be "dd Mmm yyyy". You can't do that in a #define,
                so we do it here instead :-(
@@ -296,6 +296,9 @@ I_LoadOption(const PLstr value, const int opt) {
             break;
 
         case shell_opt:
+#ifdef CMS
+            Lstrcpy(value, (context->rexx_proc)[(context->rexx_rx_proc)].env);
+#else
 #ifndef WCE
             ch = getenv(SHELL);
             if (ch)
@@ -303,6 +306,7 @@ I_LoadOption(const PLstr value, const int opt) {
             else
 #endif
             LZEROSTR(*value);
+#endif
             break;
 
         default:
