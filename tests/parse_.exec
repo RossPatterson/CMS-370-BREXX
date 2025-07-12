@@ -293,7 +293,7 @@
 /* Issue 100 */
    parse source s
    if words(s) \== 6 then say 'failed in test 31, s=/' || s || '/'
-   if subword(s, 3, 3) \== 'parse_ exec *' then say 'failed in test 31, s=/' || s || '/'
+   if subword(s, 3, 3) \== 'parse_ exec *' then say 'failed in test 32, s=/' || s || '/'
 
 exit 0
 say 'PARSE OK'
