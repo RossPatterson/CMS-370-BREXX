@@ -335,15 +335,28 @@ static void
 I_StoreOption(const PLstr value, const int opt) {
     long l;
     Context *context = (Context *) CMSGetPG();
+    PLstr new_env;
 
     switch (opt) {
         case environment_opt:
-            if (LLEN(*value) > 250)
+            if (value && LLEN(*value) > 250)
                 (context->lstring_Lerror)(ERR_ENVIRON_TOO_LONG, 1, value);
+            LPMALLOC(new_env);
+            if (value) {
+                Lstrcpy(new_env, value);
+            } else {
+                Lstrcpy(new_env, (context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
+            }
+            if ((context->rexx_proc)[(context->rexx_rx_proc)].env_alt ==
+                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env_alt)
+                    LPMALLOC((context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
+            Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env_alt,
+                (context->rexx_proc)[(context->rexx_rx_proc)].env);
             if ((context->rexx_proc)[(context->rexx_rx_proc)].env ==
                 (context->rexx_proc)[(context->rexx_rx_proc) - 1].env) LPMALLOC(
                     (context->rexx_proc)[(context->rexx_rx_proc)].env);
-            Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env, value);
+            Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env, new_env);
+            LPFREE(new_env);
             break;
 
         case trace_opt:
@@ -950,6 +963,9 @@ RxDoneInterStr(void) {
         Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc) - 1].env,
                 (context->rexx_proc)[(context->rexx_rx_proc)].env);
         LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env);
+        Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc) - 1].env_alt,
+                (context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
+        LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
     }
 
     /* --- load previous data and exit ---- */

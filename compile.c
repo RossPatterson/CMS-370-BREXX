@@ -571,8 +571,9 @@ C_address(void) {
     Context *context = (Context *) CMSGetPG();
 
     if ((context->nextsymbsymbol) == semicolon_sy) {
+        /* Use the most-recent inactive enviroment. */
         _CodeAddByte(OP_PUSH);
-        _CodeAddPtr((context->rexxsystemStr));
+        _CodeAddByte(0);
         TraceByte(other_middle);
         _CodeAddByte(OP_STOREOPT);
         _CodeAddByte(environment_opt);

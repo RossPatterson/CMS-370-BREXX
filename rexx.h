@@ -173,7 +173,8 @@ struct trxproc {
     size_t stacktop; /* stack after args */
     Scope scope;  /* Variables  */
     Args arg;  /* stck pos of args */
-    PLstr env;  /* environment  */
+    PLstr env;  /* environment */
+    PLstr env_alt;  /* alternate environment */
     int digits;  /* numeric digits */
     int fuzz;  /* numeric fuzz  */
     int form;  /* numeric form  */

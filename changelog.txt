@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0102 - ADDRESS instruction without operands doesn't swap environments.
 I0101 - PARSE SOURCE is missing the "prefix" value
 I0100 - PARSE SOURCE fileid differs from VM/SP
 I0096 - Trace I for DROP is garbage (already fixed upstream).
