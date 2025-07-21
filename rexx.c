@@ -248,13 +248,20 @@ int __CDECL
 RxFileLoad(RxFile *rxf) {
     FILEP f;
     char filename[21];
+    char *cp;
 
     /* Convert to ASCIIZ */
     L2STR(&(rxf->name));
     LASCIIZ(rxf->name);
 
-    /* File Name */
-    sprintf(filename, "%.8s EXEC *", LSTR(rxf->name));
+    /* "fn.ft.fm" -> "fn ft fm" */
+    memset(filename, ' ', sizeof(filename));
+    strcpy(filename, LSTR(rxf->name));
+    if ((cp = strchr(filename, '.')) == NULL) return FALSE;
+    *cp = ' ';
+    if ((cp = strchr(cp+1, '.')) == NULL) return FALSE;
+    *cp = ' ';
+    if (strchr(cp+1, '.') != NULL) return FALSE;
 
     if ((f = FOPEN(filename, "r")) == NULL) return FALSE;
     Lread(f, &(rxf->file), LREADFILE);
@@ -347,6 +354,9 @@ RxRun(char *filename, PLstr programstr,
         return (context->rexxrxReturnCode);
 
     /* ====== first load the file ====== */
+#ifdef __CMS__
+    strcat(filename, ".EXEC.*");
+#endif
     if (filename) {
         (context->rexxrxFileList) = RxFileAlloc(filename);
 
