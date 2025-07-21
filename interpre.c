@@ -233,6 +233,7 @@ I_LoadOption(const PLstr value, const int opt) {
     char *ch;
 #endif
     Context *context = (Context *) CMSGetPG();
+    RxFile *rxf;
 
     switch (opt) {
         case environment_opt:
@@ -256,7 +257,7 @@ I_LoadOption(const PLstr value, const int opt) {
             Lscpy(value, AUTHOR);
             break;
 
-        case version_opt: ; // Why does GCC demand this semi-colon?
+        case version_opt: ;
             /* We know that rexx.h:VERSIONSTR ends with "Mmm dd yyyy", and we
                need it to be "dd Mmm yyyy". You can't do that in a #define,
                so we do it here instead :-(
@@ -288,7 +289,22 @@ I_LoadOption(const PLstr value, const int opt) {
             break;
 
         case filename_opt:
-            Lstrcpy(value, &((context->compileCompileClause)[0].fptr)->name);
+            rxf = (context->compileCompileClause)[0].fptr;
+#ifdef CMS
+            char *cp;
+            char filename[21];
+            memset(filename, ' ', sizeof(filename));
+            /* Convert to ASCIIZ */
+            L2STR(&(rxf->name));
+            LASCIIZ(rxf->name);
+            /* "fn.ft.fm" -> "fn ft fm" */
+            strcpy(filename, LSTR(rxf->name));
+            if ((cp = strchr(filename, '.')) != NULL) *cp = ' ';
+            if ((cp = strchr(cp+1, '.')) != NULL) *cp = ' ';
+            Lscpy(value, filename);
+#else
+            Lstrcpy(value, &(rxf->name));
+#endif
             break;
 
         case prgname_opt:
