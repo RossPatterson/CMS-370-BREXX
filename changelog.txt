@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0101 - PARSE SOURCE is missing the "prefix" value
 I0100 - PARSE SOURCE fileid differs from VM/SP
 
 1.1.1 - 24 Feb 2025

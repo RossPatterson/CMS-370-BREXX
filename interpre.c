@@ -312,6 +312,9 @@ I_LoadOption(const PLstr value, const int opt) {
             break;
 
         case shell_opt:
+#ifdef CMS
+            Lstrcpy(value, (context->rexx_proc)[(context->rexx_rx_proc)].env);
+#else
 #ifndef WCE
             ch = getenv(SHELL);
             if (ch)
@@ -319,6 +322,7 @@ I_LoadOption(const PLstr value, const int opt) {
             else
 #endif
             LZEROSTR(*value);
+#endif
             break;
 
         default:

@@ -1,3 +1,12 @@
+/* PARSE */
+parse source system .
+select
+    when system = 'CMS' then default_address = 'CMS'
+    when system = 'UNIX' then default_address = 'SYSTEM'
+    when system = 'WIN64' then default_address = 'SYSTEM'
+    otherwise say 'system=' || system 'is unknown.'
+end
+
 /* https://github.com/vlachoudis/brexx/issues/8 #1 */
     Parse value '(inval1 inval2) outval' with '(' in1 in2 ')' out
     if in1 \== 'inval1' then say 'failed in test 1, in1=/' || in1 || '/'
@@ -294,5 +303,10 @@
    parse source s
    if words(s) \== 6 then say 'failed in test 31, s=/' || s || '/'
    if subword(s, 3, 3) \== 'parse_ EXEC *' then say 'failed in test 32, s=/' || s || '/'
+
+/* Issue 101 */
+   parse source s
+   if words(s) \== 5 then say 'failed in test 33, s=/' || s || '/'
+   if word(s, 5) \== default_address then say 'failed in test 34, default_address=/' || default_address || '/, s=/' || s || '/'
 
 say 'PARSE OK'
