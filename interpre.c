@@ -1381,7 +1381,8 @@ RxInterpret(void) {
                         RxVarDel((context->interpre_VarScope), litleaf, leaf);
                 }
                 inf->id = NO_CACHE;
-                goto chk4trace;
+                (context->interpreRxcip)++;
+                goto main_loop;
 
                 /* indirect drop, from stack */
                 /* asssume that is UPPER case tmp */

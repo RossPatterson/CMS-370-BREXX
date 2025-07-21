@@ -2,6 +2,7 @@ bREXX CMS Change LOG
 ====================
 I0101 - PARSE SOURCE is missing the "prefix" value
 I0100 - PARSE SOURCE fileid differs from VM/SP
+I0096 - Trace I for DROP is garbage (already fixed upstream).
 
 1.1.1 - 24 Feb 2025
       - Upgrade starting GCCBRX DASD to VM/CE 1.2 (instead of bREXX 1.0.0).
