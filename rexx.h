@@ -174,9 +174,7 @@ struct trxproc {
     Scope scope;  /* Variables  */
     Args arg;  /* stck pos of args */
     PLstr env;  /* environment */
-#ifdef CMS
     PLstr env_alt;  /* alternate environment */
-#endif
     int digits;  /* numeric digits */
     int fuzz;  /* numeric fuzz  */
     int form;  /* numeric form  */
