@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0088 - GitHub build occasionally fails to compile CHANGEST C.
 I0102 - ADDRESS instruction without operands doesn't swap environments.
 I0101 - PARSE SOURCE is missing the "prefix" value
 I0100 - PARSE SOURCE fileid differs from VM/SP
