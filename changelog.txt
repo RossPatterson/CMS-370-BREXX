@@ -1,5 +1,6 @@
 BREXX CMS Change LOG
 ====================
+I0088 - GitHub build occasionally fails to compile CHANGEST C.
       - Add support for OPTIONS instruction.
 
 1.0.0 - 15 April 2021
