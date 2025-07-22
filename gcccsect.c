@@ -26,7 +26,7 @@ int rc;
 int recnum;
 
 if (argc != 4) {
-   CMSconsoleWrite("Usage is GCCCSECT fn ft fm\x15", CMS_EDIT);
+   CMSconsoleWrite("Usage is GCCCSECT fn ft fm\n", CMS_EDIT);
    return 24;
    }
 
@@ -44,12 +44,12 @@ memcpy(&writeFileid[8], "ASMFIX  ", 8);
 // Open the input and output files.
 rc = CMSfileOpen(readFileid, buffer, RECLEN, 'V', 1, 1, &readFscb);
 if (rc != 0) {
-   CMSconsoleWrite("Unable to open input file.\x15", CMS_EDIT);
+   CMSconsoleWrite("Unable to open input file.\n", CMS_EDIT);
    return rc;
    }
 rc = CMSfileOpen(writeFileid, buffer, RECLEN, 'F', 1, 1, &writeFscb);
 if (!(rc == 0 || rc == 28)) {
-   CMSconsoleWrite("Unable to open output file.\x15", CMS_EDIT);
+   CMSconsoleWrite("Unable to open output file.\n", CMS_EDIT);
    return rc;
    }
 
@@ -70,13 +70,13 @@ while (rc == 0) {                                                           // l
    rc = CMSfileWrite(&writeFscb, recnum, RECLEN);             // write the record to the output file
    recnum = 0;
    if (rc > 0) {
-      CMSconsoleWrite("Error writing output file.\x15", CMS_EDIT);
+      CMSconsoleWrite("Error writing output file.\n", CMS_EDIT);
       break;
       }
    rc = CMSfileRead(&readFscb, 0, &bytesRead);
    }
 if (rc == 12) rc = 0;                                 // rc of 12 means end of file, and all is well
-else CMSconsoleWrite("Error reading input file.\x15", CMS_EDIT);
+else CMSconsoleWrite("Error reading input file.\n", CMS_EDIT);
 CMSfileClose(&readFscb);
 CMSfileClose(&writeFscb);
 return rc;
