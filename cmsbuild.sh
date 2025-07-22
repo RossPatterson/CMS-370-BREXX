@@ -73,8 +73,6 @@ herccontrol "/RENAME NEWBREXX TMPFTYPE B NEWBREXX CONTROL B" -w "^Ready"
 
 # TEMPORARY!  Build GCCCSECT MODULE, until a new VM/CE release ships our version.
 herccontrol "/MKGCCCS" -w "^Ready;"
-herccontrol "/ERASE GCCCSECT TEXT" -w "^Ready;"
-herccontrol "/ERASE GCCCSECT MAp" -w "^Ready;"
 
 # Make source tape and vmarc
 herccontrol "/cp disc" -w "^VM/370 Online"
