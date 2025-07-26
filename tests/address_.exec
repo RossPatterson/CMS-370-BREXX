@@ -1,5 +1,5 @@
 /* ADDRESS() and ADDRESS */
-say 'Testing ADDRESS ...'
+say 'Testing ADDRESS function ...'
 parse source system .
 select
     when system = 'CMS' then default = 'CMS'
@@ -16,4 +16,9 @@ address
 if address() \== 'aaa' then say 'failed in test 4'
 address
 if address() \== 'bbb' then say 'failed in test 5'
+say 'Testing ADDRESS statement ...'
+if system = 'CMS' then Do
+    ''
+    if rc \= 0 then say 'failed in test 6, RC=' rc
+end
 say 'ADDRESS done'
