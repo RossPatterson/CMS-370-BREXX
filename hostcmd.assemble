@@ -126,10 +126,10 @@ CHKSUBCM DS    0H                                                       01090000
          MVC   EPLIST(16),NUCPLIST Copy EPLIST from ASCANN              01200000
          CLC   =C'CMS ',ENVNAME   Is it the CMS subcom?
          BNE   NOTCMSSC           No, skip this test
-         CLC   MYEPLIST+4(4),MYEPLIST+8  Empty command?
+         CLC   EPLIST+4(4),EPLIST+8  Empty command?
          BE    NULLCMD            Yes, return w/ RC=0.
 NOTCMSSC DS    0H
-         MVC   MYEPLIST+4(4),MYEPLIST Adjust second word of EP
+         MVC   EPLIST+4(4),EPLIST Adjust second word of EP
          ST    R1,EPLIST          Adjust first word                     01220000
          LA    R0,EPLIST           and extended plist                   01230000
          ICM   R1,B'1000',=X'02'  Subcommand call                       01240000
