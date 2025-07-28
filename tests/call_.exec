@@ -6,6 +6,23 @@ if tc2() \== 1 then say 'test #2 failed'
 if tc3() \== 1 then say 'test #3 failed'
 if tc4() \== 1 then say 'test #4 failed'
 
+/* Issue 90 */
+signal on syntax name tc5b
+call nolbl
+say 'test #5A failed'
+signal tc5c
+tc5b:
+if rc \== 43 then say 'test #5B failed.  RC =' rc
+tc5c:
+signal on syntax name tc5d
+call nosuchlabel
+say 'test #5C failed'
+signal tc5d
+tc5d:
+if rc \== 43 then say 'test #5D failed.  RC =' rc
+tc5d:
+signal off syntax
+
 say 'CALL OK'
 exit
 
