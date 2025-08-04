@@ -65,14 +65,13 @@ HOSTCMD  CSECT                                                          00020000
 *
 BADARG   DS    0H
          SPKA  0(R2)              Enable
-         SSM   =X'FF'             User key 
+         SSM   =X'FF'             User key
          B     ENVUNKN            Go back with error RC.
 *
 NULLCMD1 DS    0H
          SPKA  0(R2)              Enable
-         SSM   =X'FF'             User key 
-         SR    R3,R3
-         B     GOBACK
+         SSM   =X'FF'             User key
+         B     NULLCMD2
 *
 UPTRANS  TR    0(*-*,R4),0(R15)                                         00620000
 *------------------------------------------------------------*
@@ -138,11 +137,6 @@ CHKSUBCM DS    0H                                                       01090000
 * string. The third word points past the last argument.      *
 *------------------------------------------------------------*
          MVC   EPLIST(16),NUCPLIST Copy EPLIST from ASCANN              01200000
-         CLC   =C'CMS ',ENVNAME   Is it the CMS subcom?
-         BNE   NOTCMSSC           No, skip this test
-         CLC   EPLIST+4(4),EPLIST+8  Empty command?
-         BE    NULLCMD2           Yes, return w/ RC=0.
-NOTCMSSC DS    0H
          MVC   EPLIST+4(4),EPLIST Adjust second word of EP
          ST    R1,EPLIST          Adjust first word                     01220000
          LA    R0,EPLIST           and extended plist                   01230000
@@ -154,7 +148,7 @@ NOTCMSSC DS    0H
 NULLCMD2 DS    0H
          SR    R3,R3
          B     GOBACK
-*                                                                       01280000
+*
 ENVUNKN  DS    0H                                                       01300000
          L     R15,=F'-3'                                               01310000
 GOBACK   DS    0H                                                       01320000
