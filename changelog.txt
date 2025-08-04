@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0090 - Calling a function that doesn't exist aborts Rexx with the error message "DLMALLOC PANIC LINE 3503".
 I0098 - CMS crashes processing ADDRESS CMS ''.
 I0088 - GitHub build occasionally fails to compile CHANGEST C.
 I0102 - ADDRESS instruction without operands doesn't swap environments.
