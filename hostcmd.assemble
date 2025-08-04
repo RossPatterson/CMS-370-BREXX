@@ -35,7 +35,6 @@ HOSTCMD  CSECT                                                          00020000
          USING  LSTR,R4           Command line                          00350000
          L      R1,LSTRPSTR       Address of command line               00360000
          L      R0,LSTRLEN        Length of command line                00370000
-         DROP   R4                                                      00380000
 *                                                                       00390000
          IPK    ,                                                       00400000
          SPKA   0                 Key 0                                 00410000
@@ -44,6 +43,10 @@ HOSTCMD  CSECT                                                          00020000
          BALR   R14,R15              and extended plist                 00440000
          LTR    R15,R15                                                 00450000
          BNZ    BADARG                                                  00460000
+         CLC   0(8,R1),FENCE      Empty command?
+         BE    NULLCMD1           Yes, return w/ RC=0.
+         CLC   0(16,R1),EXECFNC   Empty command?
+         BE    NULLCMD1           Yes, return w/ RC=0.
 *                                                                       00470000
          L     R15,NUCUPPER       Standard uppercase table              00480000
          LR    R4,R1              Tokenized plist pointer               00490000
@@ -59,6 +62,17 @@ HOSTCMD  CSECT                                                          00020000
          SPKA   0(R2)             Enable                                00590000
          SSM    =X'FF'            User key                              00600000
          B     SETENVNM           Go set environment name               00610000
+*
+BADARG   DS    0H
+         SPKA  0(R2)              Enable
+         SSM   =X'FF'             User key
+         B     ENVUNKN            Go back with error RC.
+*
+NULLCMD1 DS    0H
+         SPKA  0(R2)              Enable
+         SSM   =X'FF'             User key
+         B     NULLCMD2
+*
 UPTRANS  TR    0(*-*,R4),0(R15)                                         00620000
 *------------------------------------------------------------*
 * Create an 8 byte uppercase version of the environment name *
@@ -66,7 +80,7 @@ UPTRANS  TR    0(*-*,R4),0(R15)                                         00620000
 SETENVNM DS     0H                                                      00660000
          USING  LSTR,R5           Environment name                      00670000
          MVC    ENVNAME,=CL8'COMMAND' Assume standard env.              00680000
-         MVC    ENVNAME+8(8),=8X'FF'  CMS command fence                 00690000
+         MVC    ENVNAME+8(8),FENCE  CMS command fence                   00690000
          L      R2,LSTRPSTR       Address of environment name           00700000
          L      R3,LSTRLEN        Length of environment name            00710000
          LTR    R3,R3             Null string is                        00720000
@@ -95,6 +109,8 @@ ENVSET   DS     0H                                                      00840000
 *------------------------------------------------------------*          00960000
          CLC   ENVNAME,=CL8'COMMAND' Standard environment?              00970000
          BNE   CHKSUBCM           Try subcommand environments           00980000
+         CLC   CMNDLIST(8),FENCE  Empty command?
+         BE    NULLCMD2           Yes, return w/ RC=0.
          LA    R1,CMNDLIST                                              00990000
          LA    R0,NUCPLIST        Point to contructed EPLIST            01000000
          ICM   R1,B'1000',=X'01'                                        01010000
@@ -121,15 +137,18 @@ CHKSUBCM DS    0H                                                       01090000
 * string. The third word points past the last argument.      *
 *------------------------------------------------------------*
          MVC   EPLIST(16),NUCPLIST Copy EPLIST from ASCANN              01200000
-         MVC   EPLIST+4(4),EPLIST Adjust second word of EP              01210000
+         MVC   EPLIST+4(4),EPLIST Adjust second word of EP
          ST    R1,EPLIST          Adjust first word                     01220000
          LA    R0,EPLIST           and extended plist                   01230000
          ICM   R1,B'1000',=X'02'  Subcommand call                       01240000
          SVC   202                Call the subcommand                   01250000
          DC    AL4(1)                                                   01260000
          B     GOBACK             Pass back the return code             01270000
-*                                                                       01280000
-BADARG   DS    0H                                                       01290000
+*
+NULLCMD2 DS    0H
+         SR    R3,R3
+         B     GOBACK
+*
 ENVUNKN  DS    0H                                                       01300000
          L     R15,=F'-3'                                               01310000
 GOBACK   DS    0H                                                       01320000
@@ -311,6 +330,9 @@ RXERRXIT DS     0H                Enter here with rc in R15             02680000
          BR     R14                                                     02720000
   TITLE 'HOSTCMD: Constants and literals'                               02730000
 *------------------------------------------------------------*          02740000
+         DS     0D
+EXECFNC  DC     CL8'EXEC',8X'FF'
+FENCE    EQU    EXECFNC+8,8
 SBQP     SUBCOM QUERY,NAME='EXECCOMM',MF=L                              02750000
 SBSP     SUBCOM SET,NAME='EXECCOMM',ENTRY=EXECCOMM,MF=L                 02760000
 SBCP     SUBCOM CLR,NAME='EXECCOMM',MF=L                                02770000
