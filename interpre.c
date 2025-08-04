@@ -630,7 +630,7 @@ I_CallFunction(void) {
     PBinLeaf leaf, litleaf;
     RxFunc *func;
     int ct, nargs, realarg, i;
-    char *ret_string;
+    char *ret_string = NULL;
     char *cmd_string;
     char **argv;
     int *lenv;
@@ -692,8 +692,8 @@ I_CallFunction(void) {
             /* Make the calltype 5 Arguments and prepare command string */
             L2STR(&(leaf->key));
             LASCIIZ(leaf->key);
-            argv = malloc(realarg * sizeof(char *));
-            lenv = malloc(realarg * sizeof(int));
+            argv = MALLOC(realarg * sizeof(char *), "Function argv");
+            lenv = MALLOC(realarg * sizeof(int), "Function lenv");
             st = (context->interpre_RxStckTop) - realarg;
             res = (context->interpre_RxStck)[st++];
             i = 0;
@@ -714,15 +714,15 @@ I_CallFunction(void) {
                         &ret_string);
 
             /* Cleanup and handle result string */
-            free(argv);
-            free(lenv);
+            FREE(argv);
+            FREE(lenv);
             if (ret_string) {
                 if (i <= 0) { /* Error or zero data returned */
                     Lscpy(res, ret_string);
                 } else { /* i is the length of data returned */
                     Lmcpy(res, ret_string, i);
                 }
-                free(ret_string);
+                free(ret_string);    /* not FREE():  HOSTFNC always calls malloc(), never mem_malloc() */
             }
 
             /* Error calling function */

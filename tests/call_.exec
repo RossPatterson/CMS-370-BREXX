@@ -6,6 +6,23 @@ if tc2() \== 1 then say 'test #2 failed'
 if tc3() \== 1 then say 'test #3 failed'
 if tc4() \== 1 then say 'test #4 failed'
 
+/* Issue 90 */
+signal on syntax name tc5b
+call nolbl
+say 'test #5A failed'
+signal tc5c
+tc5b:
+if rc \== 43 then say 'test #5B failed.  RC =' rc
+tc5c:
+signal on syntax name tc5d
+call nosuchlabel
+say 'test #5C failed'
+signal tc5d
+tc5d:
+if rc \== 43 then say 'test #5D failed.  RC =' rc
+tc5d:
+signal off syntax
+
 say 'CALL OK'
 exit
 
@@ -25,7 +42,7 @@ return 1
 /* Do not move this test around - it knows its line numbers! */
 tc2: ;
 call tc2a
-return (result == 27)
+return (result == 44)
 tc2a: procedure expose sigl
 return sigl
 
@@ -35,12 +52,12 @@ tc3: ;
 call tc3a
 return (result \== 0)
 tc3a: procedure expose sigl
-if sigl \== 35 then return 0
+if sigl \== 52 then return 0
 call tc3b
 if result \== 0 then return result
-return (sigl == 35)
+return (sigl == 52)
 tc3b: procedure expose sigl
-return (sigl == 39)
+return (sigl == 56)
 
 /* call passing sigl as arg */
 /* Do not move this test around - it knows its line numbers! */
@@ -51,4 +68,4 @@ tc4a: procedure expose sigl
 call tc4b sigl
 return result
 tc4b: procedure
-return (arg(1) == 48)
+return (arg(1) == 65)

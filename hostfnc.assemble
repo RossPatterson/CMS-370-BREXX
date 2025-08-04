@@ -77,6 +77,8 @@ FOUNDEND DS    0H
          LA    R15,ARGLIST
          LTR   R3,R3              Any arguments
          BZ    SKIPARGS
+         CH    R3,=H'10'          Over max arguments?
+         BH    BADARG             Yes, error.
 NXTARG   DS    0H
          MVC   0(4,R15),0(R4)     Set argument address
          MVC   4(4,R15),0(R5)     Set argument length
