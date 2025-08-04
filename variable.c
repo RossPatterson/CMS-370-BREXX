@@ -209,7 +209,7 @@ RxVarAdd(Scope scope, PLstr name, int hasdot, PBinLeaf stemleaf) {
 /*  : returns a BinLeaf of variable  */
 /*  when a) variable is found (found=TRUE) */
 /*  b) variable is an array an the  */
-/*  actuall variable is not found  */
+/*  actual variable is not found  */
 /*  but the tree head exist (found=FALSE) */
 /* ---------------------------------------------------- */
 PBinLeaf __CDECL
@@ -658,7 +658,7 @@ RxVarDelName(Scope scope, PLstr name, PBinLeaf varleaf) {
         tree = scope + (context->variable_hashchar)[(byte) LSTR(*name)[0]];
         BinDel(tree, name, RxVarFree);
 
-        /* Search in the litterals tree to see if it exist */
+        /* Search in the literals tree to see if it exist */
         leaf = BinFind(&(context->rexxrxLitterals), name);
         if (leaf) {
             inf = (IdentInfo *) (leaf->value);
@@ -702,7 +702,7 @@ RxVarExpose(Scope scope, PBinLeaf litleaf) {
 
     inf = (IdentInfo *) (litleaf->value);
 
-    /* --- first test to see if it is allready exposed --- */
+    /* --- first test to see if it is already exposed --- */
     leaf = RxVarFind(scope, litleaf, &found);
     if (found)
         return leaf;
@@ -710,7 +710,7 @@ RxVarExpose(Scope scope, PBinLeaf litleaf) {
         if (leaf) { /* then it is an array and the head is only found */
             var = (Variable *) (leaf->value);
             if (var->exposed != NO_PROC)
-                return leaf; /* don't worry head is allready exposed */
+                return leaf; /* don't worry head is already exposed */
         }
     }
 

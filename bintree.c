@@ -33,7 +33,7 @@
 /*
  * Binary Tree
  *  ~~~~~~ ~~~~
- * Very general purpose routines for binary tree implemetation.
+ * Very general purpose routines for binary tree implementation.
  * Each leaf contains a (PLstr)key with the name of the leaf
  * and a (void*)value which contains the value of the leaf.
  *

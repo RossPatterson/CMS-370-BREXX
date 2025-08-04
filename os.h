@@ -13,7 +13,7 @@
  *
  * Revision 1.7  2003/11/04 09:48:17  bnv
  * REMOVED: the mkstemp
- * mkstemp was openning the file and returing the file handle
+ * mkstemp was opening the file and returning the file handle
  *
  * Revision 1.6  2003/02/12 16:38:39  bnv
  * Added: pragma to disable the signed/unsigned comparison warning

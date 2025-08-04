@@ -1,5 +1,5 @@
 /*
-  These routines provide the CMS specific interfcaes for REXX
+  These routines provide the CMS specific interfaces for REXX
 
   Dave Wade - 15-Jan-2006
 

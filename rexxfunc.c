@@ -370,7 +370,7 @@ C_isBuiltin(PLstr func) {
     PBinLeaf leaf;
     Context *context = (Context *) CMSGetPG();
 
-    first = 0; /* Use binary search to find intruction */
+    first = 0; /* Use binary search to find instruction */
     last = DIMENSION(rexx_routine) - 1;
 
     while (first <= last) {

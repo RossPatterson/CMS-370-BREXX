@@ -41,7 +41,7 @@ struct Context {
    /* nextsymb.h */
    enum symboltype nextsymbsymbol; /* contains the symbol  */
    Lstr nextsymbsymbolstr;  /* symbol identifier  */
-   bool nextsymbsymbolisstr;  /* if litteral was inside quotes*/
+   bool nextsymbsymbolisstr;  /* if literal was inside quotes*/
    bool nextsymbsymbolPrevBlank; /* previous blank  */
    int nextsymbsymbolhasdot;  /* symbol has a dot->stem */
    char *nextsymbsymbolptr;  /* current symbol pointer */
@@ -75,7 +75,7 @@ struct Context {
    PLstr rexx_code;  /* code of program  */
    BinTree rexx_labels; /* Labels   */
    Args rexxrxArg;  /* global arguments for internal routines */
-   BinTree rexxrxLitterals; /* Litterals   */
+   BinTree rexxrxLitterals; /* Literals   */
    BinLeaf *rexxnullStr; /* basic leaf Lstrings  */
    BinLeaf *rexxzeroStr;
    BinLeaf *rexxoneStr;
@@ -95,7 +95,7 @@ struct Context {
    long bmem_total_mem;
 
    /* error.c */
-   Lstr error_errmsg;   /* initialise string from begining  */
+   Lstr error_errmsg;   /* initialise string from beginning  */
 
    /* expr.h */
    int expr_exp_ct;

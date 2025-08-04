@@ -73,7 +73,7 @@ RXEXCM(int set, char *varname,
         /* Lscpy(&value, buffer_value);                        */
         /* We move in the value ourselves instead of calling   */
         /* Lscpy, to support data buffers which contain        */
-        /* binary zeros. Lscpy has problems wirh that.         */
+        /* binary zeros. Lscpy has problems with that.         */
         MEMCPY(LSTR(value), buffer_value, *buffer_length);
         LLEN(value) = *buffer_length;
         LTYPE(value) = LSTRING_TY;

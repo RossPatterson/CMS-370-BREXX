@@ -125,7 +125,7 @@ RxInitialize(char *prorgram_name) {
     DQINIT((context->rexxrxStackList)); /* initialise stacks */
     CreateStack();  /* create first stack */
 #endif
-    (context->rexxrxFileList) = NULL; /* intialise rexx files */
+    (context->rexxrxFileList) = NULL; /* initialise rexx files */
     LPMALLOC((context->rexx_code));
     (context->compileCompileClause) = NULL;
 
@@ -134,7 +134,7 @@ RxInitialize(char *prorgram_name) {
     RxInitVariables(); /* initialise hash table for variables */
 
     BINTREEINIT((context->rexx_labels)); /* initialise labels */
-    BINTREEINIT((context->rexxrxLitterals)); /* initialise litterals */
+    BINTREEINIT((context->rexxrxLitterals)); /* initialise literals */
 
     Lscpy(&str, "HALT");
     (context->rexxhaltStr) = _Add2Lits(&str, FALSE);
@@ -436,7 +436,7 @@ RxRun(char *filename, PLstr programstr,
 
 #ifdef __DEBUG__
     if ((context->rexx__debug__)) {
-     printf("Litterals are:\n");
+     printf("Literals are:\n");
      BinPrint((context->rexxrxLitterals).parent);
      getchar();
 

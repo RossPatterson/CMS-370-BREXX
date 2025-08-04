@@ -48,7 +48,7 @@
 
 /*
  * Defined symbols in makefile
- * __DEBUG__ enable debuging
+ * __DEBUG__ enable debugging
  * MSDOS  MSDOS compilation routines
  * __BORLANDC__ to enable PORT,INTR,STORAGE()
  * ALIGN  to enable DWORD align instead of byte
@@ -138,7 +138,7 @@ struct tidentinfo {
     int stem;  /* if it is a stem   */
     PBinLeaf leaf[1]; /* Variable array of leafs  */
     /* Variable value if stem=0 OR  */
-    /* pointers to litterals  */
+    /* pointers to literals  */
 } IdentInfo;
 
 /* ------------ argument structure ---------------- */

@@ -72,7 +72,7 @@ typedef struct tfunction {
 
 /* --------------- rexx options ----------------- */
 enum options_type {
-  environment_opt /* address envirnoment */
+  environment_opt /* address environment */
  ,trace_opt  /* trace option  */
  ,digits_opt  /* numeric digits */
  ,fuzz_opt  /* fuzz digits  */
@@ -90,7 +90,7 @@ enum options_type {
 };
 
 enum expr_type {
-  exp_assign  /* expr for assingment */
+  exp_assign  /* expr for assignment */
  ,exp_tmp  /* expr copied to tmp */
  ,exp_normal  /* do not do anything */
 };
@@ -149,7 +149,7 @@ enum mnemonic_type {
  ,OP_PVAR /* parse into a variable */
  ,OP_PDOT /* parse to a dot */
  ,OP_TR_SPACE /* trigger a space */
- ,OP_TR_LIT /* trigger a litteral */
+ ,OP_TR_LIT /* trigger a literal */
  ,OP_TR_ABS /* trigger absolute pos */
  ,OP_TR_REL /* trigger relative pos */
  ,OP_TR_END /* trigger to end */

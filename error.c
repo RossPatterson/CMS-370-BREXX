@@ -112,7 +112,7 @@ Rerror(const int errno, const int subno, ...) {
 
     if ((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_SYNTAX) {
         RxSetSpecialVar(RCVAR, errno);
-        if ((context->nextsymbsymbolptr) == NULL) /* we are in intepret */
+        if ((context->nextsymbsymbolptr) == NULL) /* we are in interpret */
             RxSignalCondition(SC_SYNTAX);
         else {   /* we are in compile */
             (context->rexxrxReturnCode) = errno;
@@ -120,7 +120,7 @@ Rerror(const int errno, const int subno, ...) {
         }
     } else {
         line = TraceCurline(&rxf, TRUE);
-        if ((context->nextsymbsymbolptr) == NULL) /* we are in intepret */
+        if ((context->nextsymbsymbolptr) == NULL) /* we are in interpret */
             RxSetSpecialVar(SIGLVAR, line);
 
 #ifndef WIN

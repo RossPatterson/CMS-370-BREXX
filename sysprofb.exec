@@ -17,7 +17,7 @@ RESLIB LOAD BREXX (NAME DMSREX
 &IF &RETCODE NE 0 &TYPE SYSPROF Error loading bREXX into memory!
 &IF &RETCODE NE 0 &GOTO -DONE
 
-* Initialize the bREXX interpretor
+* Initialize the bREXX interpreter
 DMSREX
 
 -DONE

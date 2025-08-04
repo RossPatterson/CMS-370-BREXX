@@ -74,7 +74,7 @@
 //
 // Need To DO
 //  DO NOT ACCEPT LABELS inside DO-END, IF THEN SELECT etc... blocks
-// Kill after the interpetation the extra CLAUSES!!!!!
+// Kill after the interpretation the extra CLAUSES!!!!!
 //
 */
 
@@ -159,7 +159,7 @@ static void C_trace(void);
 static void C_upper(void);
 
 /* ---------------------------------------------------------- */
-/* because ths is const we shall keep it really global */
+/* because this is const we shall keep it really global */
 static const
 struct sort_list_st {
     char *name;
@@ -507,7 +507,7 @@ _AddLabel(int type, size_t offset) {
     TBltFunc *isbuiltin;
     Context *context = (Context *) CMSGetPG();
 
-    /* --- check to see if we are interpeting a string --- */
+    /* --- check to see if we are interpreting a string --- */
     if ((context->compile_str_interpreted) && type == FT_LABEL &&
         offset != UNKNOWN_LABEL)
         (context->lstring_Lerror)(ERR_UNEXPECTED_LABEL, 1,
@@ -572,7 +572,7 @@ C_error(void) {
 /*  ADDRESS [<(context->nextsymbsymbol) | string> [expr]] ;                          */
 /*      redirect commands or a single command to a new            */
 /*      environment. ADDRESS VALUE expr may be used               */
-/*      for an evaluated enviroment name.                         */
+/*      for an evaluated environment name.                         */
 /* -------------------------------------------------------------- */
 static void
 C_address(void) {
@@ -972,7 +972,7 @@ C_do(void) {
         }
     }
 
-    /* --- end of loop, add a jump to the beggining --- */
+    /* --- end of loop, add a jump to the beginning --- */
     _CodeAddByte(OP_JMP);
     _CodeAddWord(body_p);
     CODEFIXUP(fix_leave, (context->compileCompileCodeLen));
@@ -1823,7 +1823,7 @@ C_chk4assign(void) {
         return FALSE;
 } /* C_chk4assign */
 
-/* ------ assigment ------- */
+/* ------ assignment ------- */
 static void
 C_assign(void) {
     void *var;
@@ -1907,7 +1907,7 @@ C_instr(bool until_end) {
     } else
         C_HostCmd();
 
-    if (!(context->compile_checked_semicolon))  /* if noone has checked for a */
+    if (!(context->compile_checked_semicolon))  /* if no one has checked for a */
         MUSTBE_SEMICOLON; /* semicolon then check it now */
 
     (context->compileCompileNesting)--;
