@@ -60,7 +60,7 @@ TraceCurline(RxFile **rxf, int print) {
     char *ch, *chend;
     Context *context = (Context *) CMSGetPG();
 
-    if ((context->nextsymbsymbolptr) == NULL) { /* we are in intepret */
+    if ((context->nextsymbsymbolptr) == NULL) { /* we are in interpret */
         if ((context->compileCompileClause) == NULL) {
             if (rxf) *rxf = (context->rexxrxFileList);
             return -1;

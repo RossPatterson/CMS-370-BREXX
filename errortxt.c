@@ -450,7 +450,7 @@ const ErrorMsg errortext[] = {
          "For this STEM APPEND, the value of \"<name>\" must be a count of lines; found: \"<value>\""},
 #endif
         {ERRNUM(55, 0), "DB Error"},
-        {ERRNUM(55, 1), "Database is not openned"},
+        {ERRNUM(55, 1), "Database is not opened"},
         {ERRNUM(55, 2), "Field not found"},
 
         {ERRNUM(56, 0), "Shared library error \"<dlopen>\""},

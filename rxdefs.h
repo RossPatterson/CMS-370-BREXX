@@ -6,7 +6,7 @@
  * MVS/CMS corrections
  *
  * Revision 1.9  2008/07/15 14:57:11  bnv
- * mvs corretions
+ * mvs corrections
  *
  * Revision 1.8  2008/07/14 13:09:21  bnv
  * MVS,CMS support

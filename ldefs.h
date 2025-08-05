@@ -24,7 +24,7 @@ typedef unsigned short word;
 typedef unsigned long dword;
 typedef int bool;
 
-/* ---------------- comonly used definitions ----------------- */
+/* ---------------- commonly used definitions ----------------- */
 #ifndef FALSE
 # define FALSE 0
 # define TRUE 1
@@ -86,7 +86,7 @@ typedef int bool;
 #define BIT15 0x8000
 #define BIT16 0x10000L
 
-/* ------------------ comonly used macros -------------------- */
+/* ------------------ commonly used macros -------------------- */
 #define ISPRINT(c) ((c)>=' ' && (c)<='~' && (c)!='\'')
 /*#define ISSPACE(c) ((c==0x09) || (c==0x0D) || (c==0x20))*/
 #if defined(__CMS__) || defined(__MVS__) /* compiler bug hack */

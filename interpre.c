@@ -39,7 +39,7 @@
  * Added: CDECL
  *
  * Revision 1.10  2001/09/28 10:00:39  bnv
- * Added: Quotes arround the arguments of a system-function call
+ * Added: Quotes around the arguments of a system-function call
  *
  * Revision 1.9  2001/06/25 18:50:56  bnv
  * Added: Memory check in debug version at the end of Interpretation
@@ -49,7 +49,7 @@
  * Changed: To use the new macros.
  *
  * Revision 1.7  1999/06/10 14:08:35  bnv
- * When a called procedure with local variables returne a variable
+ * When a called procedure with local variables returned a variable
  * the variable contents was freed first before copied to the RESULT.
  *
  * Revision 1.6  1999/05/14 12:31:22  bnv
@@ -1182,7 +1182,7 @@ RxInterpret(void) {
                 goto main_loop;
 
                 /* PUSH p[lit]   */
-                /* push a litteral to stack */
+                /* push a literal to stack */
             case OP_PUSH:
                 (context->interpre_RxStckTop)++;
                 STACKTOP = (PLstr) (*(dword *) (context->interpreRxcip));
@@ -1315,7 +1315,7 @@ RxInterpret(void) {
 
                 inf = (IdentInfo *) (litleaf->value);
 
-                /* check to see if we have allready its position */
+                /* check to see if we have already its position */
                 if (inf->id == (context->interpreRx_id)) {
                     leaf = inf->leaf[0];
                     STACKTOP = LEAFVAL(leaf);
@@ -1350,7 +1350,7 @@ RxInterpret(void) {
 
                 /* STORE p[leaf]   */
                 /* store top stack item to VARiable */
-            case OP_CREATE:  /* assigmnent */
+            case OP_CREATE:  /* assignment */
             INCSTACK;
                 PLEAF(litleaf); /* Get pointer to variable */
                 DEBUGDISPLAYi("CREATE", &(litleaf->key));
@@ -1401,7 +1401,7 @@ RxInterpret(void) {
                 goto main_loop;
 
                 /* indirect drop, from stack */
-                /* asssume that is UPPER case tmp */
+                /* assume that is UPPER case tmp */
             case OP_DROPIND:
                 DEBUGDISPLAY("DROP_IND");
                 RxVarDelInd((context->interpre_VarScope), STACKTOP);
@@ -1438,7 +1438,7 @@ RxInterpret(void) {
                     STACKTOP = &((context->interpre__tmpstr)[(context
                             ->interpre_RxStckTop)]);
                 }
-                /* patch comparision code */
+                /* patch comparison code */
                 if (Llt(STACKTOP, &((context->rexxzeroStr)->key)))
                     *(CIPTYPE *) ((byte huge *) (context->interpreRxcodestart) +
                                   w) = OP_TLE;
@@ -1885,7 +1885,7 @@ RxInterpret(void) {
                 goto main_loop;
 
                 /* TR_LIT   */
-                /* trigger a litteral from stck */
+                /* trigger a literal from stck */
             case OP_TR_LIT:
                 DEBUGDISPLAY("TR_LIT");
                 word_start = (context->interpre_DataStart) = (context->interpre_BreakEnd);

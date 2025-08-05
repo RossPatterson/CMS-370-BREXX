@@ -74,7 +74,7 @@ Lsoundex(const PLstr to, const PLstr str) {
         if (!ISALPHA(c))
             continue;
 
-        /* skip succesive occurance */
+        /* skip successive occurrence */
         if (c == prior) continue;
         prior = c;
 

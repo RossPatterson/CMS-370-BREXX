@@ -7,7 +7,7 @@
  * MVS/CMS corrections
  *
  * Revision 1.10  2009/02/02 09:26:34  bnv
- * Modications for CMS,MVS
+ * Modifications for CMS,MVS
  *
  * Revision 1.9  2008/07/15 07:40:54  bnv
  * #include changed from <> to ""

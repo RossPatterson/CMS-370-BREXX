@@ -1,5 +1,5 @@
 /* Modified for VM/370 CMS and GCC by Robert O'Hara, July 2010. */
-/* NOTE: Not certain if these funtions are used. AS             */
+/* NOTE: Not certain if these functions are used. AS             */
 
 #define __STACK_C__
 

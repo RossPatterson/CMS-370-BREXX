@@ -163,7 +163,7 @@
 /* Version number of package */
 #define VERSION "CMS "CMS_VERSION
 
-/* Enable debuging information */
+/* Enable debugging information */
 /* #undef __DEBUG__ */
 
 /* Enable profiling information */

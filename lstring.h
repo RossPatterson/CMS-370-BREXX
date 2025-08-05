@@ -234,7 +234,7 @@ typedef Lstr *PLstr;
 # define LMAXNUMERICDIGITS 30
 #endif
 
-/* --- for interal use of lstring --- */
+/* --- for internal use of lstring --- */
 /* With some extra chars */
 /* it must have enough space to allow transformation from */
 /* int or real to string without resizing */
