@@ -1,30 +1,17 @@
 /* CALL_ EXEC */
+parse source . calltype .
+if calltype = 'FUNCTION' | calltype = 'SUBROUTINE' then do
+	parse arg testcase .
+	if testcase = '6' then signal tc6a
+    retun 'unknown call:' calltype arg(1)
+end
 say 'Look for CALL OK'
 
 if tc1() \== 1 then say 'test #1 failed'
 if tc2() \== 1 then say 'test #2 failed'
 if tc3() \== 1 then say 'test #3 failed'
 if tc4() \== 1 then say 'test #4 failed'
-
-/* Issue 90 */
-signal on syntax name tc5b
-call nolbl
-say 'test #5A failed'
-signal tc5c
-tc5b:
-if rc \== 43 then say 'test #5B failed.  RC =' rc
-tc5c:
-signal on syntax name tc5d
-call nosuchlabel
-say 'test #5C failed'
-signal tc5d
-tc5d:
-if rc \== 43 then say 'test #5D failed.  RC =' rc
-tc5d:
-signal off syntax
-
-say 'CALL OK'
-exit
+signal tc5
 
 /* argument check */
 tc1: ;
@@ -42,7 +29,7 @@ return 1
 /* Do not move this test around - it knows its line numbers! */
 tc2: ;
 call tc2a
-return (result == 44)
+return (result == 31)
 tc2a: procedure expose sigl
 return sigl
 
@@ -52,12 +39,12 @@ tc3: ;
 call tc3a
 return (result \== 0)
 tc3a: procedure expose sigl
-if sigl \== 52 then return 0
+if sigl \== 39 then return 0
 call tc3b
 if result \== 0 then return result
-return (sigl == 52)
+return (sigl == 39)
 tc3b: procedure expose sigl
-return (sigl == 56)
+return (sigl == 43)
 
 /* call passing sigl as arg */
 /* Do not move this test around - it knows its line numbers! */
@@ -68,4 +55,40 @@ tc4a: procedure expose sigl
 call tc4b sigl
 return result
 tc4b: procedure
-return (arg(1) == 65)
+return (arg(1) == 52)
+
+/* bREXX issue 90 */
+tc5
+signal on syntax name tc5b
+call nolbl
+say 'test #5A failed'
+signal tc5c
+tc5b:
+if rc \== 43 then say 'test #5B failed.  RC =' rc
+tc5c:
+signal on syntax name tc5d
+call nosuchlabel
+say 'test #5C failed'
+signal tc5d
+tc5d:
+if rc \== 43 then say 'test #5D failed.  RC =' rc
+tc5d:
+signal off syntax
+
+/* bREXX issue 104 */
+parse source system calltype .
+if calltype = 'COMMAND' then do
+	if system='CMS' then call call_ '6 hi from subr'
+	else call call_.exec '6 hi from subr'
+	if result <> 'hi from subr' then say 'test #6 failed'
+end 
+
+signal tc6e
+tc6a:
+parse arg . rest
+return rest
+tc6e:
+
+say 'CALL OK'
+exit
+
