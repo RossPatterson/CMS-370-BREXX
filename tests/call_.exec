@@ -58,7 +58,7 @@ tc4b: procedure
 return (arg(1) == 52)
 
 /* bREXX issue 90 */
-tc5
+tc5:
 signal on syntax name tc5b
 call nolbl
 say 'test #5A failed'
@@ -81,8 +81,7 @@ if calltype = 'COMMAND' then do
 	if system='CMS' then call call_ '6 hi from subr'
 	else call call_.exec '6 hi from subr'
 	if result <> 'hi from subr' then say 'test #6 failed'
-end 
-
+end
 signal tc6e
 tc6a:
 parse arg . rest
