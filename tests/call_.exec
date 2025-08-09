@@ -1,8 +1,8 @@
 /* CALL_ EXEC */
 parse source . calltype .
 if calltype = 'FUNCTION' | calltype = 'SUBROUTINE' then do
-	parse arg testcase .
-	if testcase = '6' then signal tc6a
+    parse arg testcase .
+    if testcase = '6' then signal tc6a
     retun 'unknown call:' calltype arg(1)
 end
 say 'Look for CALL OK'
@@ -78,9 +78,9 @@ signal off syntax
 /* bREXX issue 104 */
 parse source system calltype .
 if calltype = 'COMMAND' then do
-	if system='CMS' then call call_ '6 hi from subr'
-	else call call_.exec '6 hi from subr'
-	if result <> 'hi from subr' then say 'test #6 failed'
+    if system='CMS' then call call_ '6 hi from subr'
+    else call call_.exec '6 hi from subr'
+    if result <> 'hi from subr' then say 'test #6 failed'
 end
 signal tc6e
 tc6a:
