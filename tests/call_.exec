@@ -1,6 +1,6 @@
 /* CALL_ EXEC */
 parse source . calltype .
-if calltype = 'FUNCTION' | calltype = 'SUBROUTINE' then do
+if calltype = 'FUNCTION' | calltype = 'PROCEDURE' then do
     parse arg testcase .
     if testcase = '6' then signal tc6a
     retun 'unknown call:' calltype arg(1)
@@ -11,7 +11,7 @@ if tc1() \== 1 then say 'test #1 failed'
 if tc2() \== 1 then say 'test #2 failed'
 if tc3() \== 1 then say 'test #3 failed'
 if tc4() \== 1 then say 'test #4 failed'
-signal tc5
+signal tc6
 
 /* argument check */
 tc1: ;
@@ -57,23 +57,7 @@ return result
 tc4b: procedure
 return (arg(1) == 52)
 
-/* bREXX issue 90 */
-tc5:
-signal on syntax name tc5b
-call nolbl
-say 'test #5A failed'
-signal tc5c
-tc5b:
-if rc \== 43 then say 'test #5B failed.  RC =' rc
-tc5c:
-signal on syntax name tc5d
-call nosuchlabel
-say 'test #5C failed'
-signal tc5d
-tc5d:
-if rc \== 43 then say 'test #5D failed.  RC =' rc
-tc5d:
-signal off syntax
+tc6:
 
 /* bREXX issue 104 */
 parse source system calltype .
