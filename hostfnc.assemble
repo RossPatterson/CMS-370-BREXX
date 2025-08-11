@@ -176,15 +176,13 @@ LASTCALL DS    0H
          BAL   R14,CALLTYP5       Issue call in __HOST05
 *
 CALLDONE DS    0H                 Here on return from SVC
-         SR    R0,R0
-         ST    R0,0(,R7)          Assume subroutine, no result
-         LTR   R6,R6              Subroutine or function call?
-         BNZ   GOBACK             No result for a subroutine
+         LTR   R7,R7              Was EVALBLOK pointer pointer passed?
+         BZ    NOEVDATA           No, nothing to pass back then.
 *
          LR    R3,R15             Hold SVC return code
          L     R2,AEVALBLK        Point to possible EVALBLOK
          LTR   R2,R2              Was it defined?
-         BZ    GOBACK             Bif nothing to do
+         BZ    NOEVDATA           Bif nothing to do
          USING EVALBLOK,R2
          L     R1,EVLEN           Size of result string plus
          LA    R1,1(,R1)              one for null terminator
@@ -203,6 +201,7 @@ CALLDONE DS    0H                 Here on return from SVC
          LA    R1,EVALBLOK        Done with this EVALBLOK
          L     R0,EVSIZE          Size in doublewords
          DMSFRET DWORDS=(0),LOC=(1) Release the EVALBLOK
+NOEVDATA DS    0H
          LR    R15,R3             R15 has the return code
          B     GOBACK
 BADARG   DS    0H
