@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0104 - PARSE SOURCE says "PROCEDURE" for subroutine, not "SUBROUTINE".
 P0103 - Fixed many typos #103 (PR from @polluks/develop)
 I0090 - Calling a function that doesn't exist aborts Rexx with the error message "DLMALLOC PANIC LINE 3503".
 I0098 - CMS crashes processing ADDRESS CMS ''.
