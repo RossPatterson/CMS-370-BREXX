@@ -278,7 +278,7 @@ I_LoadOption(const PLstr value, const int opt) {
         case calltype_opt:
             switch ((context->rexx_proc)[(context->rexx_rx_proc)].calltype) {
                 case CT_PROCEDURE:
-                    Lscpy(value, "PROCEDURE");
+                    Lscpy(value, "SUBROUTINE");
                     break;
                 case CT_FUNCTION:
                     Lscpy(value, "FUNCTION");

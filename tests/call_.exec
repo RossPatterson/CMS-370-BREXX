@@ -1,6 +1,6 @@
 /* CALL_ EXEC */
 parse source . calltype .
-if calltype = 'FUNCTION' | calltype = 'PROCEDURE' then do
+if calltype = 'FUNCTION' | calltype = 'SUBROUTINE' then do
     parse arg testcase .
     if testcase = '6' then signal tc6a
     retun 'unknown call:' calltype arg(1)
@@ -86,6 +86,19 @@ tc6a:
 parse arg . rest
 return rest
 tc6e:
+
+/* bREXX Issue 104 */
+call tc7a
+if result \==1 then say 'test #7A failed'
+if tc7b() \==1 then say 'test #7B failed'
+signal tc7e
+tc7a:
+parse source . calltype .
+return calltype == 'SUBROUTINE'
+tc7b:
+parse source . calltype .
+return calltype == 'FUNCTION'
+tc7e:
 
 say 'CALL OK'
 exit
