@@ -5,6 +5,7 @@ if tc1() \== 1 then say 'test #1 failed'
 if tc2() \== 1 then say 'test #2 failed'
 if tc3() \== 1 then say 'test #3 failed'
 if tc4() \== 1 then say 'test #4 failed'
+signal tc5
 
 /* Issue 90 */
 signal on syntax name tc5b
@@ -23,9 +24,6 @@ if rc \== 43 then say 'test #5D failed.  RC =' rc
 tc5d:
 signal off syntax
 
-say 'CALL OK'
-exit
-
 /* argument check */
 tc1: ;
 call tc1a 'a', 'B', c, 1, 2.3
@@ -42,7 +40,7 @@ return 1
 /* Do not move this test around - it knows its line numbers! */
 tc2: ;
 call tc2a
-return (result == 44)
+return (result == 42)
 tc2a: procedure expose sigl
 return sigl
 
@@ -52,12 +50,12 @@ tc3: ;
 call tc3a
 return (result \== 0)
 tc3a: procedure expose sigl
-if sigl \== 52 then return 0
+if sigl \== 50 then return 0
 call tc3b
 if result \== 0 then return result
-return (sigl == 52)
+return (sigl == 50)
 tc3b: procedure expose sigl
-return (sigl == 56)
+return (sigl == 54)
 
 /* call passing sigl as arg */
 /* Do not move this test around - it knows its line numbers! */
@@ -68,4 +66,23 @@ tc4a: procedure expose sigl
 call tc4b sigl
 return result
 tc4b: procedure
-return (arg(1) == 65)
+return (arg(1) == 63)
+
+/* bREXX Issue 105 */
+tc5:
+call tc5a
+if result \==1 then say 'test #5 failed'
+signal tc5e
+tc5a:
+parse source . calltype .
+return calltype == 'SUBROUTINE'
+tc5e:
+if tc6a() \==1 then say 'test #6 failed'
+signal tc6e
+tc6a:
+parse source . calltype .
+return calltype == 'FUNCTION'
+tc6e:
+
+say 'CALL OK'
+exit
