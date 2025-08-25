@@ -1668,8 +1668,9 @@ RxInterpret(void) {
 /**
 // It is possible to do a DUP in the compile code of returnf
 **/
-                    Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].arg.r,
-                            STACKTOP);
+                    if ((context->rexx_proc)[(context->rexx_rx_proc)].arg.r)
+                        Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].arg.r,
+                            STACKTOP);  /* Copy result if caller wants it. */
                 else {
                     /* is the Variable space private? */
                     /* proc: PROCEDURE */

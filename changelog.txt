@@ -1,5 +1,7 @@
 bREXX CMS Change LOG
 ====================
+I0077 - Protection exception in Lstrcpy() under INTERPRET.
+
 1.1.2 - 12 Aug 2025
 I0104 - PARSE SOURCE says "PROCEDURE" for subroutine, not "SUBROUTINE".
 I0105 - CALL to external routine does not set RESULT
