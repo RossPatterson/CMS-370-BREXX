@@ -422,6 +422,7 @@ RxRun(char *filename, PLstr programstr,
         Lscpy(pr->env, environment);
     else
         Lstrcpy(pr->env, &((context->rexxsystemStr)->key));
+    LPMALLOC(pr->env_alt);
     Lstrcpy(pr->env_alt, pr->env);
 #ifdef __CMS__
     pr->digits = 9;
