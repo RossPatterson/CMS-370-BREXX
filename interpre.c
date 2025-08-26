@@ -347,14 +347,14 @@ I_StoreOption(const PLstr value, const int opt) {
             } else {
                 Lstrcpy(new_env, (context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
             }
-            if ((context->rexx_proc)[(context->rexx_rx_proc)].env_alt ==
-                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env_alt)
+            if (((context->rexx_rx_proc) > 0) & ((context->rexx_proc)[(context->rexx_rx_proc)].env_alt ==
+                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env_alt))
                     LPMALLOC((context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
             Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env_alt,
                 (context->rexx_proc)[(context->rexx_rx_proc)].env);
-            if ((context->rexx_proc)[(context->rexx_rx_proc)].env ==
-                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env) LPMALLOC(
-                    (context->rexx_proc)[(context->rexx_rx_proc)].env);
+            if (((context->rexx_rx_proc) > 0) & ((context->rexx_proc)[(context->rexx_rx_proc)].env ==
+                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env))
+                    LPMALLOC((context->rexx_proc)[(context->rexx_rx_proc)].env);
             Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env, new_env);
             LPFREE(new_env);
             break;
@@ -958,8 +958,8 @@ RxDoneInterStr(void) {
             (context->rexx_proc)[(context->rexx_rx_proc)].codelen;
     (context->compileCompileCurClause) =
             (context->rexx_proc)[(context->rexx_rx_proc)].clauselen;
-    if ((context->rexx_proc)[(context->rexx_rx_proc)].env !=
-        (context->rexx_proc)[(context->rexx_rx_proc) - 1].env) {
+    if (((context->rexx_rx_proc) > 0) & ((context->rexx_proc)[(context->rexx_rx_proc)].env !=
+        (context->rexx_proc)[(context->rexx_rx_proc) - 1].env)) {
         Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc) - 1].env,
                 (context->rexx_proc)[(context->rexx_rx_proc)].env);
         LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env);
