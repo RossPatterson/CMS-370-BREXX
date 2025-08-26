@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0107 - INTERPRET "RETURN" at top-level does not end main program.
 I0077 - Protection exception in Lstrcpy() under INTERPRET.
 I0106 - Protection exception in Lstrcpy() during ADDRESS.
 

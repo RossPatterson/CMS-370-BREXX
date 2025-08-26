@@ -167,6 +167,21 @@ DebugStackList(void)
 } /* DebugStackList */
 #endif
 
+/* ---------------- DeepestNonTransparentProc ---------------- */
+/* Climb the context->rexx_proc stack looking for the most-recent
+   RxProc that isn't some form of INTERPRET.
+ */
+static int
+DeepestNonTransparentProc(int proc_depth) {
+    int i;
+    for (i = proc_depth; i--; i > 0) {
+        if (context->rexx_proc[i].calltype != CT_INTERACTIVE |
+            context->rexx_proc[i].calltype != CT_INTERPRET)
+                break;
+    }
+    return i;
+} /* DeepestNonTransparentProc */
+
 /* ---------------- RxProcResize ---------------- */
 void __CDECL
 RxProcResize(void) {
@@ -1056,6 +1071,7 @@ RxInterpret(void) {
     int oldTraceFlag = CMSGetFlag(TRACEFLAG);
     int newTraceFlag;
     Context *context = (Context *) CMSGetPG();
+    int proc_idx;
 
     (context->rexxrxReturnCode) = 0;
     (context->interpreRx_id) = (context->rexx_proc)[(context->rexx_rx_proc)].id;
@@ -1632,10 +1648,10 @@ RxInterpret(void) {
                 /* if first prg then exit */
             case OP_RETURN:
                 DEBUGDISPLAY0("RETURN");
-                if ((context->rexx_proc)[(context->rexx_rx_proc)].calltype ==
-                    CT_FUNCTION)
+                proc_idx = DeepestNonTransparentProc(context->rexx_rx_proc);
+                if ((context->rexx_proc)[proc_idx].calltype == CT_FUNCTION)
                     (context->lstring_Lerror)(ERR_NO_DATA_RETURNED, 0);
-                if ((context->rexx_rx_proc) == 0) { /* root program */
+                if (proc_idx == 0) { /* root program */
                     (context->rexxrxReturnCode) = 0;
                     if (CMScalltype() == 5)
                         Lscpy(&(context->rexxrxReturnResult), "0");
@@ -1650,7 +1666,8 @@ RxInterpret(void) {
                 /* clear stack   */
             case OP_RETURNF:
                 DEBUGDISPLAY0("RETURNF");
-                if ((context->rexx_rx_proc) == 0) { /* Root program */
+                proc_idx = DeepestNonTransparentProc(context->rexx_rx_proc);
+                if (proc_idx == 0) { /* root program */
                     if (CMScalltype() == 5) {
                         Lstrcpy(&(context->rexxrxReturnResult),
                                 (context->interpre_RxStck)[(context
@@ -1661,16 +1678,11 @@ RxInterpret(void) {
                                 (context->interpre_RxStck)[(context
                                         ->interpre_RxStckTop)--]);
                     goto interpreter_fin;
-                } else if (
-                        (context->rexx_proc)[(context->rexx_rx_proc)]
-                                .calltype !=
-                        CT_PROCEDURE)
+                } else if ((context->rexx_proc)[proc_idx].calltype != CT_PROCEDURE)
 /**
 // It is possible to do a DUP in the compile code of returnf
 **/
-                    if ((context->rexx_proc)[(context->rexx_rx_proc)].arg.r)
-                        Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].arg.r,
-                            STACKTOP);  /* Copy result if caller wants it. */
+                    Lstrcpy((context->rexx_proc)[proc_idx].arg.r, STACKTOP);
                 else {
                     /* is the Variable space private? */
                     /* proc: PROCEDURE */
@@ -1693,8 +1705,7 @@ RxInterpret(void) {
 
                 I_ReturnProc();
 
-                if ((context->rexx_proc)[(context->rexx_rx_proc) +
-                                         1].calltype == CT_PROCEDURE)
+                if ((context->rexx_proc)[(proc_idx + 1].calltype == CT_PROCEDURE)
                     /* Assign the the RESULT variable */
                     RxVarSet((context->interpre_VarScope),
                              (context->rexxresultStr), a);
