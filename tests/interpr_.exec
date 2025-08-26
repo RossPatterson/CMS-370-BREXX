@@ -1,0 +1,51 @@
+/* INTERPRET */
+arg test_case_num .
+if test_case_num \= '' then signal value ('TC' || test_case_num)
+ 
+parse source system .
+if system='CMS' then parse value '' with suffix interpreter .
+else parse value '.exec rexx' with suffix interpreter .
+ 
+say 'Testing INTERPRET statement ...'
+ 
+interpreter 'interpr_'||suffix '1'
+if rc \== 1 then say 'failed in test 1'
+ 
+/* bREXX Issue #77 */
+interpreter 'interpr_'||suffix '2'
+if rc \== 2 then say 'failed in test 2'
+interpreter 'interpr_'||suffix '3'
+if rc \== 3 then say 'failed in test 3'
+interpreter 'interpr_'||suffix '4'
+if rc \== 4 then say 'failed in test 4'
+interpreter 'interpr_'||suffix '5'
+if rc \== 5 then say 'failed in test 5'
+ 
+ 
+say 'INTERPRET done'
+exit 0
+ 
+tc1:
+interpret "call TC1A"
+exit 1
+tc1a: return 11
+exit 0
+ 
+tc2:
+interpret "return 2"
+exit 0
+ 
+tc3:
+interpret "interpret 'return 3'"
+exit 0
+ 
+tc4:
+tc4x = tc4a()
+exit tc4x
+tc4a: interpret "return 4"
+exit 0
+ 
+tc5:
+interpret "return tc5a()"
+exit 0
+tc5a: return 5
