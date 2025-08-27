@@ -167,21 +167,6 @@ DebugStackList(void)
 } /* DebugStackList */
 #endif
 
-/* ---------------- DeepestNonTransparentProc ---------------- */
-/* Climb the context->rexx_proc stack looking for the most-recent
-   RxProc that isn't some form of INTERPRET.
- */
-static int
-DeepestNonTransparentProc(int proc_depth) {
-    int i;
-    for (i = proc_depth; i--; i > 0) {
-        if (context->rexx_proc[i].calltype != CT_INTERACTIVE |
-            context->rexx_proc[i].calltype != CT_INTERPRET)
-                break;
-    }
-    return i;
-} /* DeepestNonTransparentProc */
-
 /* ---------------- RxProcResize ---------------- */
 void __CDECL
 RxProcResize(void) {
@@ -1648,7 +1633,11 @@ RxInterpret(void) {
                 /* if first prg then exit */
             case OP_RETURN:
                 DEBUGDISPLAY0("RETURN");
-                proc_idx = DeepestNonTransparentProc(context->rexx_rx_proc);
+                for (proc_idx = (context->rexx_rx_proc); proc_idx--; proc_idx > 0) {
+                    if ((context->rexx_proc)[proc_idx].calltype != CT_INTERACTIVE &
+                        (context->rexx_proc)[proc_idx].calltype != CT_INTERPRET)
+                            break;
+                }
                 if ((context->rexx_proc)[proc_idx].calltype == CT_FUNCTION)
                     (context->lstring_Lerror)(ERR_NO_DATA_RETURNED, 0);
                 if (proc_idx == 0) { /* root program */
@@ -1666,7 +1655,11 @@ RxInterpret(void) {
                 /* clear stack   */
             case OP_RETURNF:
                 DEBUGDISPLAY0("RETURNF");
-                proc_idx = DeepestNonTransparentProc(context->rexx_rx_proc);
+                for (proc_idx = (context->rexx_rx_proc); proc_idx--; proc_idx > 0) {
+                    if ((context->rexx_proc)[proc_idx].calltype != CT_INTERACTIVE &
+                        (context->rexx_proc)[proc_idx].calltype != CT_INTERPRET)
+                            break;
+                }
                 if (proc_idx == 0) { /* root program */
                     if (CMScalltype() == 5) {
                         Lstrcpy(&(context->rexxrxReturnResult),
