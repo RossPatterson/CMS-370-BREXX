@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0077 - Protection exception in Lstrcpy() under INTERPRET.
 I0106 - Protection exception in Lstrcpy() during ADDRESS.
 
 1.1.2 - 12 Aug 2025

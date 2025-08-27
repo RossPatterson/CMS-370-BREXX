@@ -43,6 +43,7 @@ interpreter ' form_'||suffix
 interpreter ' format_'||suffix
 interpreter ' fuzz_'||suffix
 interpreter ' insert_'||suffix
+interpreter ' interpr_'||suffix
 interpreter ' lastpos_'||suffix
 interpreter ' left_'||suffix
 interpreter ' length_'||suffix
