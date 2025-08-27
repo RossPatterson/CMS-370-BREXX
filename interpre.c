@@ -1633,7 +1633,7 @@ RxInterpret(void) {
                 /* if first prg then exit */
             case OP_RETURN:
                 DEBUGDISPLAY0("RETURN");
-                for (proc_idx = (context->rexx_rx_proc); proc_idx--; proc_idx > 0) {
+                for (proc_idx = (context->rexx_rx_proc); proc_idx > 0; proc_idx--) {
                     if ((context->rexx_proc)[proc_idx].calltype != CT_INTERACTIVE &
                         (context->rexx_proc)[proc_idx].calltype != CT_INTERPRET)
                             break;
@@ -1655,7 +1655,7 @@ RxInterpret(void) {
                 /* clear stack   */
             case OP_RETURNF:
                 DEBUGDISPLAY0("RETURNF");
-                for (proc_idx = (context->rexx_rx_proc); proc_idx--; proc_idx > 0) {
+                for (proc_idx = (context->rexx_rx_proc); proc_idx > 0; proc_idx--) {
                     if ((context->rexx_proc)[proc_idx].calltype != CT_INTERACTIVE &
                         (context->rexx_proc)[proc_idx].calltype != CT_INTERPRET)
                             break;
@@ -1698,7 +1698,7 @@ RxInterpret(void) {
 
                 I_ReturnProc();
 
-                if ((context->rexx_proc)[(proc_idx + 1].calltype == CT_PROCEDURE)
+                if ((context->rexx_proc)[proc_idx + 1].calltype == CT_PROCEDURE)
                     /* Assign the the RESULT variable */
                     RxVarSet((context->interpre_VarScope),
                              (context->rexxresultStr), a);
