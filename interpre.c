@@ -1634,10 +1634,12 @@ RxInterpret(void) {
             case OP_RETURN:
                 DEBUGDISPLAY0("RETURN");
                 for (proc_idx = (context->rexx_rx_proc); proc_idx > 0; proc_idx--) {
+                    printf("OP_RETURN: rp[%d].ct = %d\n", proc_idx, (context->rexx_proc)[proc_idx].calltype);
                     if ((context->rexx_proc)[proc_idx].calltype != CT_INTERACTIVE &
                         (context->rexx_proc)[proc_idx].calltype != CT_INTERPRET)
                             break;
                 }
+                printf("OP_RETURN: rp[%d].ct = %d FINAL\n", proc_idx, (context->rexx_proc)[proc_idx].calltype);
                 if ((context->rexx_proc)[proc_idx].calltype == CT_FUNCTION)
                     (context->lstring_Lerror)(ERR_NO_DATA_RETURNED, 0);
                 if (proc_idx == 0) { /* root program */
@@ -1656,10 +1658,12 @@ RxInterpret(void) {
             case OP_RETURNF:
                 DEBUGDISPLAY0("RETURNF");
                 for (proc_idx = (context->rexx_rx_proc); proc_idx > 0; proc_idx--) {
+                    printf("OP_RETURNF: rp[%d].ct = %d\n", proc_idx, (context->rexx_proc)[proc_idx].calltype);
                     if ((context->rexx_proc)[proc_idx].calltype != CT_INTERACTIVE &
                         (context->rexx_proc)[proc_idx].calltype != CT_INTERPRET)
                             break;
                 }
+                printf("OP_RETURNF: rp[%d].ct = %d FINAL\n", proc_idx, (context->rexx_proc)[proc_idx].calltype);
                 if (proc_idx == 0) { /* root program */
                     if (CMScalltype() == 5) {
                         Lstrcpy(&(context->rexxrxReturnResult),
