@@ -12,6 +12,11 @@
 #include "rxdefs.h"
 #include "context.h"
 
+/* Temporary aid to register entry point for HRC402DS           */
+/* Will be removed once bREXX CMS deployment approach confirmed */
+/* Entry point for REXX is stored @ 0x90 - NUCRSV6 */
+#define REXX_ENTRY_HANDLE 0x90
+
 void __CRT0(void); /* Entry Point pointer */
 
 /* ------- Includes for any other external library ------- */
@@ -43,82 +48,81 @@ main(int ac, char *av[]) {
     int returnCode;
     int entry_point;
     Context *context;
+    unsigned int initial_debug;  /* Initial debugging status, copied to/from CMS. */
 
     if (!ac) return -1; /* Should never happen! */
 
+    initial_debug = ( ( (unsigned int) CMSGetNUCON((void *) REXX_ENTRY_HANDLE) >> 24) & 0x80) == 0x80;
+
     if (CMScalltype() != 5) {
         if (issamearg("DMSREX", av[0])) {
-            int version = 0;
-            int debug = 0;
-            int error = 0;
+            int show_version_msg = 0;
+            int show_debug_msg = 0;
+            int arg_error = 0;
 
-            /* Temporary aid to register entry point for HRC402DS           */
-            /* Will be removed once BREXX CMS deployment approach confirmed */
-            /* Entry point for REXX is stored @ 0x90 - NUCRSV6 */
-#define REXX_ENTRY_HANDLE 0x90
-
-            /* Register Entry Point Address */
-            entry_point = (int) __CRT0;
-            CMSSetNUCON((void *) REXX_ENTRY_HANDLE, entry_point);
-
-            if (ac > 1) {
-                if (ac > 2) error = 1;
-                if (ac == 2) {
-                    if (issamearg("VERSION", av[1])) {
-                        version = 1;
-                    } else if (issamearg("DEBUG", av[1])) {
-                        version = 1;
-                        debug = 1;
-                        __SDEBUG(1);
-                    } else error = 1;
+            if (ac <= 1) {
+                ;
+            } else if (ac > 3) {
+                arg_error = 1;
+            } else if (ac == 2 & issamearg("VERSION", av[1])) {
+                show_version_msg = 1;
+            } else if (ac >= 2 & issamearg("DEBUG", av[1])) {
+                show_version_msg = 1;
+                show_debug_msg = 1;
+                if (ac == 3) {
+                    if (issamearg("ON", av[2])) {
+                        initial_debug = 1; /* Turn on bREXX debugging */
+#ifndef __DEBUG__
+                        printf("WARNING: bREXX not compiled with debug.\n");
+#endif
+                    } else if (issamearg("OFF", av[2])) {
+                        initial_debug = 0; /* Turn off bREXX debugging */
+                    } else arg_error = 1;
                 }
-            }
-            if (error) {
+            } else arg_error = 1;
+            if (arg_error) {
                 printf("Invalid arguments\n");
-                printf("   DMSREX [VERSION|DEBUG]\n");
+                printf("   DMSREX [VERSION | DEBUG [ON | OFF]]\n");
                 return -1;
             }
-            if (version) {
-                printf("BREXX Version %s ", VERSIONSTR " "
+
+            /* Register Entry Point Address */
+            entry_point = ((int) __CRT0) & 0x00ffffff;
+            if (initial_debug)
+                entry_point = entry_point | 0x80000000;  /* Save initial_debug in high bit */
+            CMSSetNUCON((void *) REXX_ENTRY_HANDLE, entry_point);
+
+            if (show_version_msg) {
+                printf("bREXX Version %s ", VERSIONSTR " "
                 #ifndef __DEBUG__
                     "no"
                 #endif
                     "debug\n");
             }
-            if (debug) {
-                printf("BREXX Entry Address is 0x%x saved in NUCON at 0x%x\n",
-                       entry_point, REXX_ENTRY_HANDLE);
+            if (show_debug_msg) {
+                printf("bREXX Entry Address is 0x%x saved in NUCON at 0x%x, debugging is %s.\n",
+                       entry_point, REXX_ENTRY_HANDLE, (initial_debug ? "active" : "inactive"));
             }
-
             return 0;
         }
     }
 
     InitContext();
     context = (Context *) CMSGetPG();
+    if (initial_debug) {
+       (context->rexx__debug__) = TRUE;    /* Turn on bREXX debugging */
+        __SDEBUG(1);    /* Turn on GCCLIB debugging */
+    } else {
+       (context->rexx__debug__) = FALSE;    /* Turn off bREXX debugging */
+        __SDEBUG(0);    /* Turn off GCCLIB debugging */
+    }
 
-    for (ia = 0; ia < MAXARGS; ia++) LINITSTR(args[ia]);
+    for (ia = 0; ia < MAXARGS; ia++)
+        LINITSTR(args[ia]);
     LINITSTR(tracestr);
 
     /* Start Processing arguments */
-    if (CMScalltype() == 5) ia = 0;
-    else {
-        ia = 1;
-
-        /* Debug flag */
-#ifdef __DEBUG__
-        (context->rexx__debug__) = FALSE;
-#endif
-        if (issamearg("-D", av[ia])) {
-            ia++;
-#ifdef __DEBUG__
-            (context->rexx__debug__) = TRUE;
-            __SDEBUG(1);
-#else
-            printf("WARNING: BREXX not compiled with debug, -D ignored\n");
-#endif
-        }
-    }
+    ia = (CMScalltype() == 5) ? 0 : 1;
 
     /* No program name */
     if (ia >= ac) {
@@ -161,15 +165,14 @@ main(int ac, char *av[]) {
     /* --- Free everything --- */
     RxFinalize();
 
-    for (ia = 0; ia < MAXARGS; ia++) LFREESTR(args[ia]);
+    for (ia = 0; ia < MAXARGS; ia++)
+        LFREESTR(args[ia]);
     LFREESTR(tracestr);
 
-#ifdef __DEBUG__
     if ((context->rexx__debug__) && mem_allocated()!=0) {
      fprintf(STDERR,"\nMemory left allocated: %ld\n",mem_allocated());
      mem_list();
     }
-#endif
 
     return returnCode;
 } /* main */

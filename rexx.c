@@ -76,6 +76,8 @@ void __CDECL Rerror(const int, const int, ...);
 
 void __CDECL RxRegFunctionDone(void);
 
+void __CDECL disasm();   /* in disasm.c */
+
 /* ---------------- RxInitProc ---------------- */
 static void
 RxInitProc(void) {
@@ -448,14 +450,18 @@ RxRun(char *filename, PLstr programstr,
 
 #ifdef __DEBUG__
     if ((context->rexx__debug__)) {
-     printf("Literals are:\n");
-     BinPrint((context->rexxrxLitterals).parent);
-     getchar();
+        printf("Literals are:\n");
+        BinPrint((context->rexxrxLitterals).parent);
+        getchar();
 
-     printf("Labels(&functions) are:\n");
-     BinPrint((context->rexx_labels).parent);
-     printf("Code Size: %d\n\n",LLEN(*(context->rexx_code)));
-     getchar();
+        printf("Labels(&functions) are:\n");
+        BinPrint((context->rexx_labels).parent);
+        printf("Code Size: %d\n\n",LLEN(*(context->rexx_code)));
+        getchar();
+
+        printf("Compiled code is:\n");
+        disasm();
+        getchar();
     }
 #endif
 

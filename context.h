@@ -13,6 +13,10 @@
 typedef struct Context Context;
 
 struct Context {
+   /* rexx.h */
+   int rexx__debug__;
+   /* Everything above here must match the CONTEXT assembler macro. */
+
    /* interpre.h */
    int interpreRx_proc;  /* current procedure */
    int interpreRx_id;   /* current program id */
@@ -57,9 +61,6 @@ struct Context {
    bool nextsymb__in_nextsymbol;  /* Used only to track error inside nextsymb*/
 
    /* rexx.h */
-#ifdef __DEBUG__
-   int rexx__debug__;
-#endif
    char *rexx_prgname; /* point to argv[0]  */
    jmp_buf rexx_error_trap; /* error trap for compile */
    jmp_buf rexx_exit_trap; /* exit from prg  */

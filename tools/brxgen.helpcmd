@@ -4,7 +4,7 @@ Use the BRXGEN command to create the runtime files for the bREXX interpretor.
 
 The format of the BRXGEN command is:
 +----------+------------------------------------------------------------------+
-| BRXGEN   |                                                                  |
+| BRXGEN   | [outfn]                                                          |
 +----------+------------------------------------------------------------------+
 
 Usage Notes:
@@ -12,10 +12,17 @@ Usage Notes:
 1. Set up the proper minidisk search order with the BRXSRCH command before
    using this command.
 
-2. The BRXGEN EXEC creates the following files on the A disk:
+2. If not specified, the output filename defaults to BREXX.
 
-   bREXX TEXT
+3. The BRXGEN EXEC creates the following files on the A disk:
+
+   outfn TEXT
 
           Contains the combined TEXT files to make up the bREXX interpretor.
           The output TEXT file will then be loaded into memory when CMS
-          is started, and will execute EXECs written in REXX.
+          is started, and will execute EXECs written in Rexx.
+   outfn MAP
+
+          Contains the load map for the bREXX interpretor.  Note that the map
+          starts at x'20000', but that CMS will load the interpretor into
+          free storage at startup.

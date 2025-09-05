@@ -136,10 +136,10 @@ CHKSUBCM DS    0H                                                       01090000
 * The 2nd word points to the beginning of the argument       *
 * string. The third word points past the last argument.      *
 *------------------------------------------------------------*
-         MVC   EPLIST(16),NUCPLIST Copy EPLIST from ASCANN              01200000
-         MVC   EPLIST+4(4),EPLIST Adjust second word of EP
-         ST    R1,EPLIST          Adjust first word                     01220000
-         LA    R0,EPLIST           and extended plist                   01230000
+         MVC   MYEPLIST(16),NUCPLIST Copy EPLIST from ASCANN            01200000
+         MVC   MYEPLIST+4(4),MYEPLIST Adjust second word of EP
+         ST    R1,MYEPLIST          Adjust first word                   01220000
+         LA    R0,MYEPLIST           and extended plist                 01230000
          ICM   R1,B'1000',=X'02'  Subcommand call                       01240000
          SVC   202                Call the subcommand                   01250000
          DC    AL4(1)                                                   01260000
@@ -228,7 +228,22 @@ EXECCOMM DS    0D                                                       01480000
 * Main loop for processing SHVBLOCKs starts here             *
 *                                                            *
 *------------------------------------------------------------*
-MAINLOOP DS    0H                 Process next SHVBLOCK                 01710000
+MAINLOOP DS    0H                 Process next SHVBLOCK
+         L     R1,GCCCRABA    Get the GCCCRAB.
+         USING GCCCRAB,R1
+         L     R1,PGLOBAL     Get the bREXX context.
+         USING BRXCTX,R1
+         CLC   CTXDEBUG,=F'1' Debug = true?
+         BNE   MAINNDBG       No, skip message.
+         DROP  R1
+         L     R4,SHVNAMA     Name addr/
+         L     R6,SHVNAML        len.
+         LINEDIT TEXT='EXECCOMM: code=..(X''..'') name="...............*
+               ..............."',                                      *
+               SUB=(CHARA,(SHVCODE,1),HEXA,SHVCODE-3,                  *
+               CHARA,((R4),(R6))),                                     *
+               DOT=NO,MF=(E,LINEDPL)
+MAINNDBG DS    0H
 *------------------------------------------------------------*
 * EXECIO only uses calls for SHVFETCH and SHVSTORE.          *
 * *** We will implement others later if the need arises.     *
@@ -244,6 +259,24 @@ MAINLOOP DS    0H                 Process next SHVBLOCK                 01710000
 * Processing for SHVSTORE                                    *
 *------------------------------------------------------------*
 EXCSET   DS    0H
+         L     R1,GCCCRABA    Get the GCCCRAB.
+         USING GCCCRAB,R1
+         L     R1,PGLOBAL     Get the bREXX context.
+         USING BRXCTX,R1
+         CLC   CTXDEBUG,=F'1' Debug = true?
+         BNE   SETNDBG        No, skip message.
+         DROP  R1
+         L     R4,SHVNAMA     Name addr
+         L     R6,SHVNAML        and len.
+         L     R7,SHVVALA     Value addr
+         L     R8,SHVVALL        and len.
+         LINEDIT TEXT='EXECCOMM: code=..(X''..'') name="...............*
+               ..............." value=".............................."'*
+               ,                                                       *
+               SUB=(CHARA,(SHVCODE,1),HEXA,SHVCODE-3,                  *
+               CHARA,((R4),(R6)),CHARA,((R7),(R8))),                   *
+               DOT=NO,MF=(E,LINEDPL)
+SETNDBG  DS    0H
          LA    R0,1               Set call
          ST    R0,RXECALLT        Set call type
          LA    R15,SHVVALL        Set address of the
@@ -317,6 +350,26 @@ NOBADNM  DS    0H
 * of EXECCOMM.                                               *
 *------------------------------------------------------------*
 RXERET   DS     0H                                                      02610000
+         TM    SHVCODE,C's'   Some kind of SET?
+         BE    RXERNDBG       Yes, skip.
+         L     R1,GCCCRABA    Get the GCCCRAB.
+         USING GCCCRAB,R1
+         L     R1,PGLOBAL     Get the bREXX context.
+         USING BRXCTX,R1
+         CLC   CTXDEBUG,=F'1' Debug = true?
+         BNE   RXERNDBG       No, skip message.
+         DROP  R1
+         L     R4,SHVNAMA     Name addr
+         L     R6,SHVNAML        and len.
+         L     R7,SHVVALA     Value addr
+         L     R8,SHVVALL        and len.
+         LINEDIT TEXT='EXECCOMM: code=..(X''..'') name="...............*
+               ..............." value=".............................."'*
+               ,                                                       *
+               SUB=(CHARA,(SHVCODE,1),HEXA,SHVCODE-3,                  *
+               CHARA,((R4),(R6)),CHARA,((R7),(R8))),                   *
+               DOT=NO,MF=(E,LINEDPL)
+RXERNDBG DS    0H
          SR     R15,R15           Set the return code                   02620000
          IC     R15,SHVRET                                              02630000
          LTR    R15,R15           Success with this SHVNLOK?            02640000
@@ -368,7 +421,7 @@ SBCLLEN  EQU   *-SBCL                                                   03050000
 ENVNAME  DS    CL8                Environment name                      03070000
          DS    8X'FF'             FENCE                                 03080000
 *                                                                       03090000
-EPLIST   DS    0D                                                       03100000
+MYEPLIST DS    0D                                                       03100000
          DS    6A                 Extended plist                        03110000
 *                                                                       03120000
 RXEPLIST DS    0A                                                       03130000
@@ -382,10 +435,13 @@ RXEBUFFL DS    A                  Address of SHVVALL. A FETCH
 *                                 from SHVBUFL to SHVVALL
 *                                 before calling RXEXCM
 *                                                                       03230000
+LINEDPL  LINEDIT MF=L,MAXSUBS=4
 VARNAME  DS    CL256              Uppercased variable name              03240000
 *                                 Assumes variable name
 *                                    length <= 255
 WKAREALN EQU   *-CMSCRAB                                                03250000
+         BRXCTX ,
+         GCCCRAB ,
          SVCSAVE ,                                                      03260000
          REGEQU ,                                                       03270000
          SCBLOCK ,                                                      03280000

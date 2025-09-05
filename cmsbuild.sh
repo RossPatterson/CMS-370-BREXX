@@ -205,11 +205,12 @@ herccontrol "/" -w "^Ready;"
 herccontrol "/DMSREX VERSION" -w "^Ready;" \
 	| sed -e "/Ready/ d" \
 	| sed -n -e "2p" \
-	| sed -e "s/^BREXX Version \+/ /" -e "s/ \+\(no\)\?debug$//" \
+	| sed -e "s/^[bB]REXX Version \+/ /" -e "s/ \+\(no\)\?debug$//" \
 	| sed -e "s/^ \+\([^ ]*\) */VERSION_STRING=\1\n /" \
 	| sed -e "s/^ \+\([^ ]*\) */REXX_LEVEL=\1\n /" \
 	| sed -e "s/^ \+\(.*\) *$/BUILD_DATE=\1/" \
 	>> "$GITHUB_OUTPUT"
+cat "$GITHUB_OUTPUT"
 herccontrol "/LOGOFF" -w "^VM/370 Online"
 
 # SHUTDOWN

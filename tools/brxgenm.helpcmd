@@ -1,0 +1,20 @@
+BRXGENM                                                          MAINTC command
+
+Use the BRXGENM command to create the assembler macro libary for the bREXX
+interpretor.
+
+The format of the BRXGENM command is:
++----------+------------------------------------------------------------------+
+| BRXGENM  |                                                                  |
++----------+------------------------------------------------------------------+
+
+Usage Notes:
+
+1. Set up the proper minidisk search order with the BRXSRCH command before
+   using this command.
+
+2. The BRXGENM EXEC creates the following files on the A disk:
+
+   BRXLIB MACLIB
+
+          Contains the assembler macro files to make up the bREXX interpretor.

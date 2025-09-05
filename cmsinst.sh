@@ -344,7 +344,7 @@ herccontrol "/DISK LOAD"  -w "^Ready;"
 herccontrol "/DMSREX VERSION" -w "^Ready;" \
 	| sed -e "/Ready/ d" \
 	| sed -n -e "2p" \
-	| sed -e "s/^BREXX Version \+/ /" -e "s/ \+\(no\)\?debug$//" \
+	| sed -e "s/^[bB]REXX Version \+/ /" -e "s/ \+\(no\)\?debug$//" \
 	| sed -e "s/^ \+\([^ ]*\) */MY_VERSION_STRING=\"\1\"\n /" \
 	| sed -e "s/^ \+\([^ ]*\) */MY_REXX_LEVEL=\"\1\"\n /" \
 	| sed -e "s/^ \+\(.*\) *$/MY_BUILD_DATE=\"\1\"/" \

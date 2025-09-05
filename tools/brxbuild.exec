@@ -8,6 +8,9 @@ EXEC BRXSRCH
 &TYPE Access the compiler output disk as A and erase all the files there
 ACCESS 193 A ( ERASE
 &TYPE ******** ********
+&TYPE Generate the GCCLIB macro library
+EXEC BRXGENM
+&TYPE ******** ********
 &TYPE Create a CMS EXEC file with the names of all
 &TYPE the ASSEMBLE files
 LISTFILE * ASSEMBLE F ( EXEC

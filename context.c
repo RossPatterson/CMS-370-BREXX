@@ -7,7 +7,6 @@
 #include "context.h"
 
 void InitContext() {
-    /* printf("InitContext()\n"); */
     Context *context = (Context *) CMSPGAll(sizeof(Context));
 
     /* bmem.c */
@@ -24,6 +23,9 @@ void InitContext() {
 
     /* ltime.c */
     context->ltime_elapsed = 0.0;
+
+    /* rexx.h */
+    (context->rexx__debug__) = 0;
 
     /* rexxfunc.c */
     context->rexxfunc_ExtraFuncs = NULL;

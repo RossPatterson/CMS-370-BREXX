@@ -1116,6 +1116,9 @@ RxInterpret(void) {
             goto interpreter_fin;
            case '\n':
             goto outofcmd;
+           default:
+            printf("Memory, Stack, Quit, or return\n");
+            break;
           }
          }
        outofcmd:

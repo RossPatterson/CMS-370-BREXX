@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+      - Improve debuggability: add disassembler, support debug in ASSEMBLE files.
 I0117 - CALL can fail to set RESULT after v1.1.3.
 I0118 - SIGNAL OFF NOTREADY doesn't
 I0114 - CHARIN() and LINEIN() delay signalling NotReady

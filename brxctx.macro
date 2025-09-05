@@ -1,0 +1,9 @@
+         MACRO ,
+         BRXCTX ,
+BRXCTX   DSECT ,
+*
+*        Everything in this macro must match the starting section of
+*        the C context.h header file.
+*
+CTXDEBUG DS    F                   int rexx__debug__;
+         MEND  ,
