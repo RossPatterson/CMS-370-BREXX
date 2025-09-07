@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0108 - EXECCOMM doesn't support dropping variables.
 V0085 - Support FBLOCK interface
       - Improve debuggability: add disassembler, support debug in ASSEMBLE files.
 I0117 - CALL can fail to set RESULT after v1.1.3.

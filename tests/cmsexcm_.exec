@@ -19,7 +19,12 @@ setvar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 say 'Variable value to retrieve is:' setvar
 'CMSEXCM FETCH SETVAR'
 if rc \== 0 then call test_failed '3, rc='rc
-say 'Was that correct?'
+unsetvar = setvar
+say 'Variable value to unset is:' unsetvar
+if symbol('UNSETVAR') \== 'VAR' then call test_failed 'failed in test 4'
+'CMSEXCM DROP SETVAR'
+if rc \== 0 then call test_failed '5, rc='
+if symbol('SETVAR') \== 'LIT' then call test_failed 'failed in test 6'
 done:
 signal off error
 'ERASE CMSEXCM LISTING A'

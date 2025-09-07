@@ -322,18 +322,7 @@ if [ "$INST_MODE" = "src-vmarc" ] ; then
 	herccontrol "/" -w "^Ready;"
 	herccontrol "/BRXSRCH" -w "^Ready;"
 	herccontrol "/SPOOL PUNCH CMSUSER CONT" -w "^Ready;"
-	#   Hercules has a very old bug in /cgi-bin/tasks/syslog that makes
-	#   herccontrol fail its search for the Ready message.  So we can't do it
-	#   normally here, which would look like this:
-	#      herccontrol "/EXPLOIT (BRXTESTS) DISK DUMP &FN &FT F" -w "^Ready;"
-	#   Instead, we start EXPLOIT, which runs very quickly, then sleep for
-	#   5 seconds, then re-sync on the LOGOFF.
-	#
-	#   NOTE: This problem doesn't occur on the other installation tests,
-	#   just this one.  It appears to be related to the volume of console log
-	#   messages, but it's highly repeatable.
-	herccontrol "/EXPLOIT (BRXTESTS) DISK DUMP &FN &FT F"
-	sleep 5
+	herccontrol "/EXPLOIT (BRXTESTS) DISK DUMP &FN &FT F" -w "^Ready;"
 	herccontrol "/LOGOFF" -w "^VM/370 Online"
 fi
 

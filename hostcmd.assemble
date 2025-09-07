@@ -294,13 +294,17 @@ MAINLOOP DS    0H                 Process next SHVBLOCK
                DOT=NO,MF=(E,LINEDPL)
 MAINNDBG DS    0H
 *------------------------------------------------------------*
-* EXECIO only uses calls for SHVFETCH and SHVSTORE.          *
-* *** We will implement others later if the need arises.     *
+* We only implement the "direct" interface, and then only    *
+* part of it: the Store, Fetch, and Drop functions.  We will *
+* implement the "symbolic" interface and the NextVariable    *
+* PrivateInformation functions later if the need arises.     *
 *------------------------------------------------------------*
          CLI   SHVCODE,SHVSTORE   Is it?
          BE    EXCSET
          CLI   SHVCODE,SHVFETCH   Is it?
          BE    EXCFETCH
+         CLI   SHVCODE,SHVDROPV   Is it?
+         BE    EXCDROPV
 *
          MVI   SHVRET,SHVBADF     Bad function code
          B     RXERET             Tell the caller bad function
@@ -341,6 +345,14 @@ EXCFETCH DS    0H
 *                                    value length
          LA    R15,SHVVALL        Set address of the
          ST    R15,RXEBUFFL          buffer length
+         B     EXCSETUP           Go finish plist setup
+*------------------------------------------------------------*
+* Processing for SHVDROPV                                    *
+*------------------------------------------------------------*
+EXCDROPV DS    0H
+         LA    R0,2               Drop call
+         ST    R0,RXECALLT        Set call type
+         B     EXCSETUP           Go finish plist setup
 *------------------------------------------------------------*
 * Processing common to SHVFETCH and SHVSTORE                 *
 *------------------------------------------------------------*
@@ -480,6 +492,7 @@ MYEPLIST DS    0D
 RXEPLIST DS    0A
 RXECALLT DS    F                  0 = fetch value
 *                                 1 = set value
+*                                 2 = drop variable
 RXENAME  DS    A                  Ptr to VARNAME string
 RXEBUFFA DS    A                  Ptr to user buffer
 *                                   copied from SHVVALA

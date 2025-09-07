@@ -47,13 +47,15 @@ EPLSET   DS    0H
          MVC   EPLLEFT,EPLENGTH   Set remaining bytes to scan
 *                                 EPLTOKEN has next parm
 *
-* Retrieve a command of FETCH or SET
+* Retrieve a command of DROP, FETCH, or SET
 *
          LA    R4,=CL8'COMMAND'
          BAL   R14,NXTTOKEN       Get the next token
          B     MISSING            Bif operand is missing
 *
          MVC   COMMAND,EPLTOKEN   Remember command verb
+         CLC   =C'DROP',EPLTOKEN
+         BE    VERBOK
          CLC   =C'FETCH',EPLTOKEN
          BE    VERBOK
          CLC   =C'SET',EPLTOKEN
@@ -78,6 +80,8 @@ FOUNDIT  DS    0H
          LA    R4,1(,R4)            length
          ST    R4,VARNAMEL
 *
+         CLC   =C'DROP',COMMAND
+         BE    DROP               Parsing complete for drop
          CLC   =C'FETCH',COMMAND
          BE    FETCH              Parsing complete for fetch
 *
@@ -109,6 +113,33 @@ EXITRC   DS    0H
          DMSFRET DWORDS=(0),LOC=(1)
          LM    R14,R12,12(R13)
          BR    R14
+*------------------------------------------------------------*
+*                                                            *
+* Unset the variable in the calling EXEC                     *
+*                                                            *
+*------------------------------------------------------------*
+DROP     DS    0H
+         USING SHVBLOCK,R5
+         LA    R1,VARNAME         REXX variable name address
+         L     R0,VARNAMEL        REXX variable name length
+         LA    R5,SHVAREA
+         XC    SHVBLOCK(SHVBLEN),SHVBLOCK
+         XC    SHEPLIST(16),SHEPLIST
+*
+         MVI   SHVCODE,SHVDROPV   Unset variable
+         ST    R1,SHVNAMA         Set VAR name address
+         ST    R0,SHVNAML                  and length
+         LA    R2,BUFFER
+*
+         LA    R1,EXECCOMM        Fill in
+         ST    R1,SHEPLIST           EPLIST
+         ST    R5,SHEPL4          Word 4 -> SHVBLOCK
+         LA    R0,SHEPLIST
+         ICM   R1,B'1000',=X'02'
+         SVC   202
+         DC    AL4(1)
+         B     EXITRC
+         DROP  R5
 *------------------------------------------------------------*
 *                                                            *
 * Retrieve incoming information from the calling EXEC        *

@@ -1,17 +1,18 @@
-/*  Set or retrieve a variable value from the */
-/*  internal variable pool.                   */
+/*  Set, drop, or retrieve a variable value from the */
+/*  internal variable pool.                          */
 #include <cmssys.h>
 #include "rexx.h"
 
 #define __RXEXCOMM_C__
 
 int __CDECL
-RXEXCM(int set, char *varname,
+RXEXCM(int operation, char *varname,
        char *buffer_value, int *buffer_length) {
 /*----------------------------------------------------------*/
 /* Entry conditions:                                        */
-/*   set      set to 1 to assign a REXX variable value      */
-/*            set to 0 to retrieve a REXX variable value    */
+/*   set      set to 0 to retrieve a REXX variable value    */
+/*            set to 1 to assign a REXX variable value      */
+/*            set to 2 to drop a REXX variable value        */
 /*                                                          */
 /*   varname  is a pointer to the name of the REXX variable */
 /*            being assigned or retrieved                   */
@@ -62,7 +63,7 @@ RXEXCM(int set, char *varname,
     Lfx(&tempstr, 6);
     Lscpy(&tempstr, "VALUE");
 
-    if (set) {
+    if (operation == 1) {
         /* Assign variable a value from the EXECCOMM caller    */
 
         /* Build a'value' LSTR from the buffer_value           */
@@ -82,7 +83,7 @@ RXEXCM(int set, char *varname,
 
         response = RxPoolSet(&pool, &name, &value);
         LFREESTR(value);                   /* Release the LSTR */
-    } else {
+    } else if (operation == 0) {
         /* Retrieve a variable value for the EXECCOMM caller   */
 
         response = RxPoolGet(&pool, &name, &tempstr);
@@ -116,7 +117,11 @@ RXEXCM(int set, char *varname,
             /* Return the actual data length to the caller.       */
             *buffer_length = actual_length;
         }
-    }
+    } else if (operation == 2) {
+        /* Drop variable from the EXECCOMM caller                 */
+        RxVarDelInd((context->rexx_proc)[context->rexx_rx_proc].scope, &name);
+    } else
+        rc = 5;       /* Invalid operation */
 
     LFREESTR(tempstr);                   /* Release the LSTR */
     LFREESTR(pool);                      /* Release the LSTR */
