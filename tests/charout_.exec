@@ -32,7 +32,11 @@ if linein(file)\=='Line 2' then      call test_failed '3'
 if linein(file)\=='Line 3' then      call test_failed '4'
 if linein(file)\=='Line 4' then      call test_failed '5'
 if linein(file)\=='Line 5' then      call test_failed '6'
-if linein(file)\==''       then      call test_failed '7'
+signal on notready name t7z
+x = linein(file)
+call test_failed '7'
+t7z:
+signal off notready
 call charout file, 'Done 3', (linelen * 2) + 1
 call lineout file
 linecount=lines(file)
@@ -42,7 +46,11 @@ if linein(file)\=='Line 2' then      call test_failed '10'
 if linein(file)\=='Done 3' then      call test_failed '11'
 if linein(file)\=='Line 4' then      call test_failed '12'
 if linein(file)\=='Line 5' then      call test_failed '13'
-if linein(file)\==''       then      call test_failed '14'
+signal on notready name t14z
+x = linein(file)
+call test_failed '14'
+t14z:
+signal off notready
 if system='CMS' then 'erase' file
 else if system='UNIX' then 'rm' file
 else if system='WIN64' then 'del' file

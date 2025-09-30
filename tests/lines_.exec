@@ -35,8 +35,12 @@ Call linein file
 if lines(file)\==1 then               call test_failed '5'
 Call linein file
 if lines(file)\==0 then               call test_failed '6'
+signal on notready name t7z
 Call linein file
-if lines(file)\==0 then               call test_failed '7'
+call test_failed '7'
+t7z:
+signal off notready
+if lines(file)\==0 then               call test_failed '8'
 call lineout file
 if system='CMS' then 'erase' file
 else if system='UNIX' then 'rm' file

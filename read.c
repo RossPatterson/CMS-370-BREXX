@@ -1,4 +1,4 @@
-/* /* VM/370 CMS and GCCLIB read.c */
+/* VM/370 CMS and GCCLIB read.c */
 #include <stdio.h>
 #include "lstring.h"
 

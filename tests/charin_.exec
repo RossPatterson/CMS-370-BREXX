@@ -38,13 +38,6 @@ t1_6:
 call test_failed '1-6, notready signaled'
 t6z:
 /* Test that NOTREADY is signaled if there are no characters to read. */
-if system='CMS' then do
-    /* Suppress test until bREXX bug #114 is fixed.
-       See https://github.com/adesutherland/CMS-370-BREXX/issues/114.
-    */
-    say 'skipped test 7 due to bREXX bug #114'
-    signal t7z
-end
 signal on notready name t7z
 x=charin(file)
 call test_failed '7'

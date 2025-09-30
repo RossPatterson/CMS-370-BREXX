@@ -31,7 +31,11 @@ if linein(file)\=='Line 2' then       call test_failed '3'
 if linein(file)\=='Line 3' then       call test_failed '4'
 if linein(file)\=='Line 4' then       call test_failed '5'
 if linein(file)\=='Line 5' then       call test_failed '6'
-if linein(file)\=='' then             call test_failed '7'
+signal on notready name t7z
+x = linein(file)
+call test_failed '7'
+t7z:
+signal off notready
 /* test that a line can be replaced correctly. */
 call lineout file
 call lineout file, 'Done 3', 3
@@ -43,7 +47,11 @@ if linein(file)\=='Line 2' then       call test_failed '10'
 if linein(file)\=='Done 3' then       call test_failed '11'
 if linein(file)\=='Line 4' then       call test_failed '12'
 if linein(file)\=='Line 5' then       call test_failed '13'
-if linein(file)\=='' then             call test_failed '14'
+signal on notready name t14z
+x = linein(file)
+call test_failed '14'
+t14z:
+signal off notready
 call lineout file
 /* test that a closed file can be deleted and rewritten correctly. */
 if system='CMS' then 'ERASE' file
@@ -63,7 +71,11 @@ if linein(file)\=='Line 2' then       call test_failed '17'
 if linein(file)\=='Line 3' then       call test_failed '18'
 if linein(file)\=='Line 4' then       call test_failed '19'
 if linein(file)\=='Line 5' then       call test_failed '20'
-if linein(file)\=='' then             call test_failed '21'
+signal on notready name t21z
+x = linein(file)
+call test_failed '21'
+t21z:
+signal off notready
 call lineout file
 /* test that a line can be written, overwriting the next, correctly. */
 if system='CMS' then call lineout file, 'Done 3 Long 4', 3
@@ -84,7 +96,11 @@ if system='CMS' then do
 end
 else if line\=='4' then               call test_failed '26'
 if linein(file)\=='Line 5' then       call test_failed '27'
-if linein(file)\=='' then             call test_failed '28'
+signal on notready name t28z
+x = linein(file)
+call test_failed '28'
+t28z:
+signal off notready
 if system='CMS' then 'ERASE' file
 else if system='UNIX' then 'rm' file
 else if system='WIN64' then 'del' file

@@ -32,13 +32,6 @@ t1_5:
 call test_failed '1-5, notready signaled'
 t5z:
 /* Test that NOTREADY is signaled if there are no lines to read. */
-if system='CMS' then do
-    /* Suppress test until bREXX bug #114 is fixed.
-       See https://github.com/adesutherland/CMS-370-BREXX/issues/114.
-    */
-    say 'skipped test 6 due to bREXX bug #114'
-    signal t6z
-end
 signal on notready name t6z
 x=linein(file)
 call test_failed '6'
