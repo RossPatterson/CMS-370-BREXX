@@ -1,25 +1,49 @@
 /* LINES */
-say "Look for LINES OK"
-file="TEST FILE A"
-call lineout file, "Line 1"
-call lineout file, "Line 2"
-call lineout file, "Line 3"
-call lineout file, "Line 4"
-call lineout file, "Line 5"
+say 'Testing LINES ...'
+fail_count=0
+parse source system .
+if system='CMS' then do
+    file='test FILE A'
+    address command 'ERASE' file
+end
+else if system='UNIX' then do
+    file='test.file'
+    'rm' file '2>/dev/null'
+end
+else if system='WIN64' then do
+    file='test.file'
+    'del' file '2>NUL:'
+end
+call lineout file, 'Line 1'
+call lineout file, 'Line 2'
+call lineout file, 'Line 3'
+call lineout file, 'Line 4'
+call lineout file, 'Line 5'
 call lineout file
-if lines(file)\=5 then              say 'failed in test          1'
+linecount=lines(file)
+if linecount\==1 & linecount\==5 then call test_failed '1'
 Call linein file
-if lines(file)\=4 then              say 'failed in test          2'
+linecount=lines(file)
+if linecount\==1 & linecount\==4 then call test_failed '2'
 Call linein file
-if lines(file)\=3 then              say 'failed in test          3'
+linecount=lines(file)
+if linecount\==1 & linecount\==3 then call test_failed '3'
 Call linein file
-if lines(file)\=2 then              say 'failed in test          4'
+linecount=lines(file)
+if linecount\==1 & linecount\==2 then call test_failed '4'
 Call linein file
-if lines(file)\=1 then              say 'failed in test          5'
+if lines(file)\==1 then               call test_failed '5'
 Call linein file
-if lines(file)\=0 then              say 'failed in test          6'
+if lines(file)\==0 then               call test_failed '6'
 Call linein file
-if lines(file)\=0 then              say 'failed in test          7'
+if lines(file)\==0 then               call test_failed '7'
 call lineout file
-'erase' file
-say "LINES OK"
+if system='CMS' then 'erase' file
+else if system='UNIX' then 'rm' file
+else if system='WIN64' then 'del' file
+say '... LINES done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

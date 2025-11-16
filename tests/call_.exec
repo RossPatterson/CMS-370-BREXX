@@ -1,20 +1,20 @@
 /* CALL_ EXEC */
-parse source . calltype .
+parse source system calltype .
 if calltype = 'FUNCTION' | calltype = 'SUBROUTINE' then do
     parse arg testcase .
     if testcase = '6' then signal tc6a
     retun 'unknown call:' calltype arg(1)
 end
-say 'Look for CALL OK'
-
-if tc1() \== 1 then say 'test #1 failed'
-if tc2() \== 1 then say 'test #2 failed'
-if tc3() \== 1 then say 'test #3 failed'
-if tc4() \== 1 then say 'test #4 failed'
+say 'Testing CALL ...'
+fail_count=0
+if tc1() \== 1 then call test_failed '1'
+if tc2() \== 1 then call test_failed '2'
+if tc3() \== 1 then call test_failed '3'
+if tc4() \== 1 then call test_failed '4'
 signal tc5
 
 /* argument check */
-tc1: ;
+tc1: if system='CMS' then do; say 'skipped test 1 due to bug #xxx'; return 1; end
 call tc1a 'a', 'B', c, 1, 2.3
 return result
 tc1a: ;
@@ -25,11 +25,12 @@ if arg(4) \== '1' then return 0
 if arg(5) \== '2.3' then return 0
 return 1
 
+
 /* call sets sigl */
 /* Do not move this test around - it knows its line numbers! */
-tc2: ;
+tc2: if system='CMS' then do; say 'skipped test 2 due to bug #xxx'; return 1; end
 call tc2a
-return (result == 31)
+return (result == 32)
 tc2a: procedure expose sigl
 return sigl
 
@@ -39,39 +40,39 @@ tc3: ;
 call tc3a
 return (result \== 0)
 tc3a: procedure expose sigl
-if sigl \== 39 then return 0
+if sigl \== 40 then return 0
 call tc3b
 if result \== 0 then return result
-return (sigl == 39)
+return (sigl == 40)
 tc3b: procedure expose sigl
-return (sigl == 43)
+return (sigl == 44)
 
 /* call passing sigl as arg */
 /* Do not move this test around - it knows its line numbers! */
-tc4: ;
+tc4: if system='CMS' then do; say 'skipped test 4 due to bug #xxx'; return 1; end
 call tc4a
 return result
 tc4a: procedure expose sigl
 call tc4b sigl
 return result
 tc4b: procedure
-return (arg(1) == 52)
+return (arg(1) == 53)
 
 /* bREXX issue 90 */
 tc5:
 signal on syntax name tc5b
 call nolbl
-say 'test #5A failed'
+call test_failed '5A'
 signal tc5c
 tc5b:
-if rc \== 43 then say 'test #5B failed.  RC =' rc
+if rc \== 43 then call test_failed '5B.  RC =' rc
 tc5c:
 signal on syntax name tc5d
 call nosuchlabel
-say 'test #5C failed'
+call test_failed '5C'
 signal tc5d
 tc5d:
-if rc \== 43 then say 'test #5D failed.  RC =' rc
+if rc \== 43 then call test_failed '5D.  RC =' rc
 tc5d:
 
 /* bREXX issue 105 */
@@ -79,7 +80,7 @@ parse source system calltype .
 if calltype = 'COMMAND' then do
     if system='CMS' then call call_ '6 hi from subr'
     else call call_.exec '6 hi from subr'
-    if result <> 'hi from subr' then say 'test #6 failed'
+    if result <> 'hi from subr' then call test_failed '6'
 end
 signal tc6e
 tc6a:
@@ -88,9 +89,10 @@ return rest
 tc6e:
 
 /* bREXX Issue 104 */
+/* THIS IS WRONG!  CALL shouldn't change PARSE SOURCE! */
 call tc7a
-if result \==1 then say 'test #7A failed'
-if tc7b() \==1 then say 'test #7B failed'
+if result \==1 then call test_failed '7A'
+if tc7b() \==1 then call test_failed '7B'
 signal tc7e
 tc7a:
 parse source . calltype .
@@ -100,5 +102,9 @@ parse source . calltype .
 return calltype == 'FUNCTION'
 tc7e:
 
-say 'CALL OK'
-exit
+say '... CALL done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

@@ -3,88 +3,94 @@ parse source system .
 if system = 'CMS' then suffix = ''
 else suffix = '.exec'
 
-say "Look for TRACE OK"
+say 'Testing TRACE ...'
+fail_count=0
 
-/* These from the Rexx book. */
+/* These from TRL2. */
 value = trace()
-if value \== 'N' then say 'failed in test 1: trace()=' value
+if value \== 'N' then call test_failed '1: trace()=' value
 value = trace('O')
-if value \== 'N' then say 'failed in test 2: trace()=' value
+if value \== 'N' then call test_failed '2: trace()=' value
 value = trace('A')
-if value \== 'O' then say 'failed in test 3: trace()=' value
+if value \== 'O' then call test_failed '3: trace()=' value
 value = trace('F')
-if value \== 'A' then say 'failed in test 4: trace()=' value
+if value \== 'A' then call test_failed '4: trace()=' value
 value = trace()
-if value \== 'F' then say 'failed in test 5: trace()=' value
+if value \== 'F' then call test_failed '5: trace()=' value
 
 trace O
 
 trace N
 value = trace()
-if value \== 'N' then say 'failed in test 6: trace()=' value
+if value \== 'N' then call test_failed '6: trace()=' value
 say 'test 6 expecting a trace ...'
 'exitneg_' || suffix
-if RC >=0 then say 'failed in test 6'
+if RC >=0 then call test_failed '6'
 else say '... was there one?'
 
 trace N
 value = trace()
-if value \== 'N' then say 'failed in test 7: trace()=' value
+if value \== 'N' then call test_failed '7: trace()=' value
 say 'test 7 expecting no trace ...'
 'exitok_' || suffix
-if RC <>0 then say 'failed in test 7'
+if RC <>0 then call test_failed '7'
 else say '... was there one?'
 
 trace N
 value = trace()
-if value \== 'N' then say 'failed in test 8: trace()=' value
+if value \== 'N' then call test_failed '8: trace()=' value
 say 'test 8 expecting no trace ...'
 'exitpos_' || suffix
-if RC <=0 then say 'failed in test 8'
+if RC <=0 then call test_failed '8'
 else say '... was there one?'
 
 trace F
-if trace() \== 'F' then say 'failed in test 9'
+if trace() \== 'F' then call test_failed '9'
 say 'test 9 expecting a trace ...'
 'exitneg_' || suffix
-if RC >=0 then say 'failed in test 9'
+if RC >=0 then call test_failed '9'
 else say '... was there one?'
 
 trace F
 value = trace()
-if value \== 'F' then say 'failed in test 10: trace()=' value
+if value \== 'F' then call test_failed '10: trace()=' value
 say 'test 10 expecting no trace ...'
 'exitok_' || suffix
-if RC <>0 then say 'failed in test 10'
+if RC <>0 then call test_failed '10'
 else say '... was there one?'
 
 trace F
-if trace() \== 'F' then say 'failed in test 11'
+if trace() \== 'F' then call test_failed '11'
 say 'test 11 expecting no trace ...'
 'exitpos_' || suffix
-if RC <=0 then say 'failed in test 11'
+if RC <=0 then call test_failed '11'
 else say '... was there one?'
 
 trace E
-if trace() \== 'E' then say 'failed in test 12'
+if trace() \== 'E' then call test_failed '12'
 say 'test 12 expecting a trace ...'
 'exitneg_' || suffix
-if RC >=0 then say 'failed in test 12'
+if RC >=0 then call test_failed '12'
 else say '... was there one?'
 
 trace E
 value = trace()
-if value \== 'E' then say 'failed in test 13: trace()=' value
+if value \== 'E' then call test_failed '13: trace()=' value
 say 'test 13 expecting no trace ...'
 'exitok_' || suffix
-if RC <>0 then say 'failed in test 13'
+if RC <>0 then call test_failed '13'
 else say '... was there one?'
 
 trace E
-if trace() \== 'E' then say 'failed in test 14'
+if trace() \== 'E' then call test_failed '14'
 say 'test 14 expecting a trace ...'
 'exitpos_' || suffix
-if RC <=0 then say 'failed in test 14'
+if RC <=0 then call test_failed '14'
 else say '... was there one?'
 
-say "TRACE OK"
+say '... TRACE done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

@@ -1,5 +1,9 @@
 bREXX CMS Change LOG
 ====================
+      - Make build fail if any test failures.
+      - Skip all tests that currently fail, and create issues to repair them.
+      - Fix all broken tests.
+      - Add more Rexx tests.
 I0112 - I/O stream tests don't work because of "!=" instead of "\=".
 
 1.1.3 - 01 Sep 2025

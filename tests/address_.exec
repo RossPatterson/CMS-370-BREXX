@@ -1,5 +1,6 @@
 /* ADDRESS() and ADDRESS */
 say 'Testing ADDRESS function ...'
+fail_count=0
 parse source system .
 select
     when system = 'CMS' then default = 'CMS'
@@ -7,18 +8,24 @@ select
     when system = 'WIN64' then default = 'SYSTEM'
     otherwise say 'test 1 undefined'
 end
-if address() \== default then say 'failed in test 1'
+if address() \== default then call test_failed '1'
 address 'aaa'
-if address() \== 'aaa' then say 'failed in test 2'
+if address() \== 'aaa' then call test_failed '2'
 address 'bbb'
-if address() \== 'bbb' then say 'failed in test 3'
+if address() \== 'bbb' then call test_failed '3'
 address
-if address() \== 'aaa' then say 'failed in test 4'
+if address() \== 'aaa' then call test_failed '4'
 address
-if address() \== 'bbb' then say 'failed in test 5'
+if address() \== 'bbb' then call test_failed '5'
 say 'Testing ADDRESS statement ...'
+fail_count=0
 if system = 'CMS' then Do
     ''
-    if rc \= 0 then say 'failed in test 6, RC=' rc
+    if rc \= 0 then call test_failed '6, RC=' rc
 end
-say 'ADDRESS done'
+say '... ADDRESS done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

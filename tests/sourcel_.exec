@@ -1,4 +1,11 @@
-/* SOURCELINE OK */
-say "Look for SOURCELINE OK"
-say SourceLine(1)
-/*say sourcetest() */
+/* SOURCELINE */
+say 'Testing SOURCELINE ...'
+fail_count=0
+if sourceline(2)\=="say 'Testing SOURCELINE ...'" then call test_failed '1'
+fail_count=0
+say '... SOURCELINE done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

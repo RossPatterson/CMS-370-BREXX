@@ -1,21 +1,63 @@
 /* LINEIN */
-say "Look for LINEIN OK"
-file="TEST FILE A"
-cr = '0D'x
-call lineout file, "Line 1"
-call lineout file, "Line 2"
-call lineout file, "Line 3"
-call lineout file, "Line 4"
-call lineout file, "Line 5"
+say 'Testing LINEIN ...'
+fail_count=0
+parse source system .
+if system='CMS' then do
+    file='test FILE A'
+    address command 'ERASE' file
+end
+else if system='UNIX' then do
+    file='test.file'
+    'rm' file '2>/dev/null'
+end
+else if system='WIN64' then do
+    file='test.file'
+    'del' file '2>NUL:'
+end
+call lineout file, 'Line 1'
+call lineout file, 'Line 2'
+call lineout file, 'Line 3'
+call lineout file, 'Line 4'
+call lineout file, 'Line 5'
 call lineout file
-if linein(file)\="Line 1" then say 'failed in test          1'
-if linein(file)\="Line 2" then say 'failed in test          2'
-if linein(file)\="Line 3" then say 'failed in test          3'
-if linein(file)\="Line 4" then say 'failed in test          4'
-if linein(file)\="Line 5" then say 'failed in test          5'
-if linein(file)\="" then       say 'failed in test          6'
-if linein(file,3)\="Line 3" then say 'failed in test        7'
-if linein(file,2,2)\="Line 2"cr"Line 3"cr then say 'failed in test        8'
+/* Test that lines written can be read. */
+signal on notready name t1_5
+if linein(file)\=='Line 1'   then call test_failed '1'
+if linein(file)\=='Line 2'   then call test_failed '2'
+if linein(file)\=='Line 3'   then call test_failed '3'
+if linein(file)\=='Line 4'   then call test_failed '4'
+if linein(file)\=='Line 5'   then call test_failed '5'
+signal t5z
+t1_5:
+call test_failed '1-5, notready signaled'
+t5z:
+/* Test that NOTREADY is signaled if there are no lines to read. */
+if system='CMS' then do
+    /* Suppress test until bREXX bug #114 is fixed.
+       See https://github.com/adesutherland/CMS-370-BREXX/issues/114.
+    */
+    say 'skipped test 6 due to bREXX bug #114'
+    signal t6z
+end
+signal on notready name t6z
+x=linein(file)
+call test_failed '6'
+t6z:
+/* Test that a specific line can be read. */
+signal on notready name t7a
+if linein(file,3)\=='Line 3' then call test_failed '7'
+signal t7z
+t7a:
+call test_failed '7, notready signaled'
+t7z:
+signal off notready
 call lineout file
-"erase" file
-say "LINEIN OK"
+if system='CMS' then 'erase' file
+else if system='UNIX' then 'rm' file
+else if system='WIN64' then 'del' file
+say '... LINEIN done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

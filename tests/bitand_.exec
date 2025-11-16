@@ -1,14 +1,27 @@
-/* BITAND */
-say "Look for BITAND OK"
-/* These from the Rexx book. */
-if bitand('73'x,'27'x) \== '23'x then say 'failed in test 1 '
-if bitand('13'x,'5555'x) \== '1155'x then say 'failed in test 2 '
-if bitand('13'x,'5555'x,'74'x) \== '1154'x then say 'failed in test 3 '
+/* BITAND() */
+say 'Testing BITAND ...'
+fail_count=0
+parse source system .
+select
+    when system = 'CMS' then charset = 'E'
+    when system = 'UNIX' then charset = 'A'
+    when system = 'WIN64' then charset = 'A'
+    otherwise say 'test 8 and 9 undefined'
+end
+/* These from TRL2. */
+if bitand('73'x,'27'x) \== '23'x then call test_failed '1'
+if bitand('13'x,'5555'x) \== '1155'x then call test_failed '2'
+if bitand('13'x,'5555'x,'74'x) \== '1154'x then call test_failed '3'
 /* These from Mark Hessling. */
-if bitand( '123456'x, '3456'x ) \== '101456'x then say 'failed in test 4 '
-if bitand( '3456'x, '123456'x, '99'x ) \== '101410'x then say 'failed in test 5 '
-if bitand( '123456'x,, '55'x) \== '101454'x then say 'failed in test 6 '
-if bitand( 'foobar' ) \== 'foobar' then say 'failed in test 7 '
-/* This one is ASCII dependent. */
-/* if bitand( 'FooBar' ,, 'df'x) \== 'FOOBAR' then say 'failed in test 8 ' */
-say "BITAND OK"
+if bitand( '123456'x, '3456'x ) \== '101456'x then call test_failed '4'
+if bitand( '3456'x, '123456'x, '99'x ) \== '101410'x then call test_failed '5'
+if bitand( '123456'x,, '55'x) \== '101454'x then call test_failed '6'
+if bitand( 'foobar' ) \== 'foobar' then call test_failed '7'
+if charset = 'A' & bitand( 'FooBar' ,, 'df'x) \== 'FOOBAR' then call test_failed '8'
+if charset = 'E' & bitand( 'FOOBAR' ,, 'BF'x) \== 'foobar' then call test_failed '9'
+say '... BITAND done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

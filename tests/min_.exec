@@ -1,18 +1,24 @@
 /* MIN */
-say "Look for MIN OK"
-/* These from the Rexx book. */
+say 'Testing MIN ...'
+fail_count=0
+/* These from TRL2. */
 if min(12,6,7,9) \= 6 then exit
 if min(17.3,19,17.03) \= 17.03 then exit
 if min(-7,-3,-4.3) \= -7 then exit
 /* These from Mark Hessling. */
-if min( 10.1 ) \== "10.1" then exit
-if min( -10.1, 3.8 ) \== "-10.1" then exit
-if min( 10.1, 10.2, 10.3 ) \== "10.1" then exit
-if min( 10.1, 10.2, 10.1 ) \== "10.1" then exit
-if min( 10.1, 10.2, 10.3 ) \== "10.1" then exit
-if min( 10.4, 10.1, 10.3 ) \== "10.1" then exit
-if min( 10.3, 10.2, 10.1 ) \== "10.1" then exit
-if min( 5, 2, 4, 1 ) \== "1" then exit
-if min( -0, 0 ) \== "0" then exit
-if min( 8,2,3,4,5,6,7,1,7,6,5,4,3,2 ) \== "1" then exit
-say "MIN OK"
+if min( 10.1 ) \== '10.1' then exit
+if min( -10.1, 3.8 ) \== '-10.1' then exit
+if min( 10.1, 10.2, 10.3 ) \== '10.1' then exit
+if min( 10.1, 10.2, 10.1 ) \== '10.1' then exit
+if min( 10.1, 10.2, 10.3 ) \== '10.1' then exit
+if min( 10.4, 10.1, 10.3 ) \== '10.1' then exit
+if min( 10.3, 10.2, 10.1 ) \== '10.1' then exit
+if min( 5, 2, 4, 1 ) \== '1' then exit
+if min( -0, 0 ) \== '0' then exit
+if min( 8,2,3,4,5,6,7,1,7,6,5,4,3,2 ) \== '1' then exit
+say '... MIN done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

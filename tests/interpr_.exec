@@ -6,32 +6,37 @@ parse source system .
 if system='CMS' then parse value 'EXEC' with interpreter suffix .
 else parse value 'rexx .exec' with interpreter suffix .
 
-say 'Testing INTERPRET statement ...'
+say 'Testing INTERPRET ...'
+fail_count=0
 
 interpreter 'interpr_'||suffix '1'
-if rc \== 1 then say 'failed in test 1'
+if rc \== 1 then call test_failed '1'
 
 /* bREXX Issue #77 and #107 */
 interpreter 'interpr_'||suffix '2'
-if rc \== 2 then say 'failed in test 2'
+if rc \== 2 then call test_failed '2'
 interpreter 'interpr_'||suffix '3'
-if rc \== 3 then say 'failed in test 3'
+if rc \== 3 then call test_failed '3'
 interpreter 'interpr_'||suffix '4'
-if rc \== 4 then say 'failed in test 4'
+if rc \== 4 then call test_failed '4'
 interpreter 'interpr_'||suffix '5'
-if rc \== 5 then say 'failed in test 5'
+if rc \== 5 then call test_failed '5'
 
-say 'INTERPRET done'
-exit 0
+say '... INTERPRET done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return
 
 tc1:
-interpret "call TC1A"
+interpret 'call TC1A'
 exit 1
 tc1a: return 11
 exit 0
 
 tc2:
-interpret "return 2"
+interpret 'return 2'
 exit 0
 
 tc3:
@@ -41,10 +46,10 @@ exit 0
 tc4:
 tc4x = tc4a()
 exit tc4x
-tc4a: interpret "return 4"
+tc4a: interpret 'return 4'
 exit 0
 
 tc5:
-interpret "return tc5a()"
+interpret 'return tc5a()'
 exit 0
 tc5a: return 5

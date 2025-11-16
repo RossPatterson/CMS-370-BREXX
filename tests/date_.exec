@@ -1,25 +1,39 @@
-/**/
-if date('S',0,'B') \== '00010101' then say 'failed in test 1'
-if GoodDate(3652059,'B') \== 0 then say 'failed in test 2'
-if date('S',3652058,'B') \== '99991231' then say 'failed in test 3'
-if date('B',"99991231",'S') \== 3652058 then say 'failed in test 4'
-if date('B',"00010101",'S') \== 0 then say 'failed in test 5'
-if GoodDate("00001231",'S') \== 0 then say 'failed in test 6'
-if TIME('C',0,'S') \== '12:00am' then say 'failed in test 7'
-if GoodTime(-1,'S') \== 0 then say 'failed in test 8'
-if TIME('C',3600*24-1,'S') \== '11:59pm' then say 'failed in test 9'
-if GoodTime(3600*24,'S') \== 0 then say 'failed in test 10'
-if TIME('C',0,'S') \== '12:00am' then say 'failed in test 11'
-if TIME('C',60,'S') \== '12:01am' then say 'failed in test 12'
-if TIME('C',3600*12-60,'S') \== '11:59am' then say 'failed in test 13'
-if TIME('C',3600*12,'S') \== '12:00pm' then say 'failed in test 14'
-if TIME('C',3600*12+60,'S') \== '12:01pm' then say 'failed in test 15'
-if TIME('C',3600*24-60,'S') \== '11:59pm' then say 'failed in test 16'
-if GoodTime(1,'S') \== 1 then say 'failed in test 17'
-if GoodTime(-1,'S') \== 0 then say 'failed in test 18'
-if GoodDate("19890827",'S') \== 1 then say 'failed in test 19'
-if GoodDate("19890837",'S') \== 0 then say 'failed in test 20'
-if 'TIME'() \== time() then say 'failed in test 21'
+/* DATE */
+parse source system .
+say 'Testing DATE ...'
+fail_count=0
+if date('S',0,'B') \== '00010101' then call test_failed '1'
+if GoodDate(3652059,'B') \== 0 then call test_failed '2'
+if system='CMS' then say 'skipped test 3 due to bREXX bug #59'
+else if date('S',3652058,'B') \== '99991231' then call test_failed '3'
+if system='CMS' then say 'skipped test 4 due to bREXX bug #59'
+else if date('B',"99991231",'S') \== 3652058 then call test_failed '4'
+if date('B',"00010101",'S') \== 0 then call test_failed '5'
+if GoodDate("00001231",'S') \== 0 then call test_failed '6'
+if TIME('C',0,'S') \== '12:00am' then call test_failed '7'
+if GoodTime(-1,'S') \== 0 then call test_failed '8'
+if system='CMS' then say 'skipped test 9 due to bREXX bug #59'
+else if TIME('C',3600*24-1,'S') \== '11:59pm' then call test_failed '9'
+if GoodTime(3600*24,'S') \== 0 then call test_failed '10'
+if TIME('C',0,'S') \== '12:00am' then call test_failed '11'
+if system='CMS' then say 'skipped test 12 due to bREXX bug #59'
+else if TIME('C',60,'S') \== '12:01am' then call test_failed '12'
+if system='CMS' then say 'skipped test 13 due to bREXX bug #59'
+else if TIME('C',3600*12-60,'S') \== '11:59am' then call test_failed '13'
+if system='CMS' then say 'skipped test 14 due to bREXX bug #59'
+else if TIME('C',3600*12,'S') \== '12:00pm' then call test_failed '14'
+if system='CMS' then say 'skipped test 15 due to bREXX bug #59'
+else if TIME('C',3600*12+60,'S') \== '12:01pm' then call test_failed '15'
+if system='CMS' then say 'skipped test 16 due to bREXX bug #59'
+else if TIME('C',3600*24-60,'S') \== '11:59pm' then call test_failed '16'
+if system='CMS' then say 'skipped test 17 due to bREXX bug #59'
+else if GoodTime(1,'S') \== 1 then call test_failed '17'
+if GoodTime(-1,'S') \== 0 then call test_failed '18'
+if system='CMS' then say 'skipped test 19 due to bREXX bug #59'
+else if GoodDate("19890827",'S') \== 1 then call test_failed '19'
+if GoodDate("19890837",'S') \== 0 then call test_failed '20'
+if system='CMS' then say 'skipped test 21 due to bREXX bug #61'
+else if 'TIME'() \== time() then call test_failed '21'
 parse version v .
 if v="OBJREXX" then do
   do j=1 to 6
@@ -69,31 +83,39 @@ if v="OBJREXX" then do
   end k
 end /* ObjRexx comparisons. */
 /* Sparse test of separators */
- if date('S',"99991231",'S','-') \== "9999-12-31" then say 'failed in test 22'
- if date('S',"99991231",'S',' ','') \== "9999 12 31" then say 'failed in test 23'
- if date('S',"9999 12 31",'S','',' ') \== "99991231" then say 'failed in test 24'
- if date('S',"9999-12-31",'S','','-') \== "99991231" then say 'failed in test 25'
- if date('B',"9999-12-31",'S',  ,'-') \== "3652058" then say 'failed in test 26'
+if system='CMS' then say 'skipped test 22 due to bREXX bug #59'
+else if date('S',"99991231",'S','-') \== "9999-12-31" then call test_failed '22'
+if system='CMS' then say 'skipped test 23 due to bREXX bug #59'
+else if date('S',"99991231",'S',' ','') \== "9999 12 31" then call test_failed '23'
+if system='CMS' then say 'skipped test 24 due to bREXX bug #59'
+else if date('S',"9999 12 31",'S','',' ') \== "99991231" then call test_failed '24'
+if system='CMS' then say 'skipped test 25 due to bREXX bug #59'
+else if date('S',"9999-12-31",'S','','-') \== "99991231" then call test_failed '25'
+if system='CMS' then say 'skipped test 26 due to bREXX bug #59'
+else if date('B',"9999-12-31",'S',  ,'-') \== "3652058" then call test_failed '26'
  signal on syntax name toolong
  date('S',"99991231",'S','--')
- say 'failed in test 27'
+ call test_failed '27'
 toolong:
 
  signal on syntax name alphan
  date('S',"99991231",'S','x')
- say 'failed in test 28'
+ call test_failed '28'
 alphan:
 
  signal on syntax name nosep
  date('B',"9999-12-31",'S','','-')
- say 'failed in test 29'
+ call test_failed '29'
 nosep:
 
-  say 'DATE OK'
+  say '... DATE done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
 return
 
-
-Time: procedure
+Time: procedure expose fail_count
 /* This routine is essentially the code from the standard, put in
 stand-alone form.  The only 'tricky bit' is that there is no Rexx way
 for it to fail with the same error codes as a "real" implementation
@@ -152,7 +174,7 @@ an error. */
     return TimeFormat(Micro, Option)
   return
 
-TimeFormat:procedure
+TimeFormat:procedure expose fail_count
   /* Convert from microseconds to given format. */
   /* The day will be irrelevant; actually it will be the first day possible. */
   x = Time2Date2(arg(1))
@@ -185,7 +207,7 @@ Time2Date:
      return 'Bad'
    return Time2Date2(arg(1))
 
-Time2Date2:Procedure
+Time2Date2:Procedure expose fail_count
    /*  Convert a timestamp to a date.
    Argument is a timestamp (the number of microseconds relative to
    0001 01 01 00:00:00.000000)
@@ -230,12 +252,12 @@ Time2Date2:Procedure
 
 return Year Month Day Hour Minute Second Microsecond BaseDays YearDays
 
-Leap: procedure
+Leap: procedure expose fail_count
    /* Return 1 if the year given as argument is a leap year, or 0
    otherwise. */
    return (arg(1)//4 = 0) & ((arg(1)//100 <> 0) | (arg(1)//400 = 0))
 
-date:procedure
+date:procedure expose fail_count
   /* cf commentary on TIME. */
   if arg() > 5 then return
   numeric digits 18
@@ -385,7 +407,7 @@ interpreters differ on whether the error of a function failing to
 return a result is an error that the level calling the function sees,
 or an error that the function itself sees. */
 
-GoodDate: procedure
+GoodDate: procedure expose fail_count
  signal on syntax name Better_Be_Unique1
  /* Next two clauses are deliberately on the same line. */
  GoodDateSigl = RecordSigl();GoodDateResult = date(arg(2),arg(1),arg(2))
@@ -400,7 +422,7 @@ Better_Be_Unique1:
 
 RecordSigl:return sigl
 
-GoodTime: procedure
+GoodTime: procedure expose fail_count
  signal on syntax name Better_Be_Unique2
  /* Next two clauses are deliberately on the same line. */
  GoodTimeSigl = RecordSigl();GoodTimeResult = time(arg(2),arg(1),arg(2))

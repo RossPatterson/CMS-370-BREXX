@@ -1,13 +1,19 @@
 /* REVERSE */
-say "Look for REVERSE OK"
-/* These from the Rexx book. */
-if reverse('ABc.') \== '.cBA' then say 'failed in test 1 '
-if reverse('XYZ ') \== ' ZYX' then say 'failed in test 2 '
-if reverse('Tranquility') \== 'ytiliuqnarT' then say 'failed in test 3 '
+say 'Testing REVERSE ...'
+fail_count=0
+/* These from TRL2. */
+if reverse('ABc.') \== '.cBA' then call test_failed '1'
+if reverse('XYZ ') \== ' ZYX' then call test_failed '2'
+if reverse('Tranquility') \== 'ytiliuqnarT' then call test_failed '3'
 /* These from Mark Hessling. */
-if reverse("foobar") \== "raboof" then say 'failed in test 4 '
-if reverse("") \== "" then say 'failed in test 5 '
-if reverse("fubar") \== "rabuf" then say 'failed in test 6 '
-if reverse("f") \== "f" then say 'failed in test 7 '
-if reverse(" foobar ") \== " raboof " then say 'failed in test 8 '
-say "REVERSE OK"
+if reverse('foobar') \== 'raboof' then call test_failed '4'
+if reverse('') \== '' then call test_failed '5'
+if reverse('fubar') \== 'rabuf' then call test_failed '6'
+if reverse('f') \== 'f' then call test_failed '7'
+if reverse(' foobar ') \== ' raboof ' then call test_failed '8'
+say '... REVERSE done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

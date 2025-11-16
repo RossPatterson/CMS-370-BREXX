@@ -1,12 +1,44 @@
-/* CHARS */
-say "Look for CHARS OK"
-file="TEST FILE A"
-call lineout file "F 80", "Line 1"
-call lineout file, "Line 2"
+/* CHARS() */
+say 'Testing CHARS ...'
+fail_count=0
+parse source system .
+if system='CMS' then do
+    /* See https://github.com/adesutherland/CMS-370-BREXX/issues/113
+       and https://github.com/adesutherland/CMS-370-GCCLIB/issues/58.
+    */
+    say 'skipped all tests due to GCCLIB bug #58.'
+    say '... CHARS done'
+    exit
+end
+if system='CMS' then do
+    file='test FILE A'
+    address command 'ERASE' file
+    expected_chars=(80+1)*2
+    call lineout file 'F 80', 'Line 1'
+end
+else if system='UNIX' then do
+    file='test.file'
+    'rm' file '2>/dev/null'
+    expected_chars=(6+1)*2
+    call lineout file, 'Line 1'
+end
+else if system='WIN64' then do
+    file='test.file'
+    'del' file '2>NUL:'
+    expected_chars=(6+2)*2
+    call lineout file, 'Line 1'
+end
+call lineout file, 'Line 2'
 call lineout file
-if chars(file)\=162 then            say 'failed in test          1'
-Call charin file, 30
-if chars(file)\=132 then            say 'failed in test          2'
-call lineout file
-'erase' file
-say "CHARS OK"
+if chars(file)\==expected_chars       then call test_failed '1'
+call charin file, 10
+if chars(file) \= (expected_chars-10) then call test_failed '2'
+if system='CMS' then 'erase' file
+else if system='UNIX' then 'rm' file
+else if system='WIN64' then 'del' file
+say '... CHARS done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

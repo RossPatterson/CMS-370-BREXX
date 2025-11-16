@@ -1,17 +1,31 @@
 /* TRANSLATE */
-  say "Look for TRANSLATE OK"
-/* These from the Rexx book. */
-  if translate('abcdef') \== 'ABCDEF'   then say 'failed in test          1 '
-  if translate('abbc','&','b') \== 'a&&c'   then say 'failed in test          2 '
-  if translate('abcdef','12','ec') \== 'ab2d1f'   then say 'failed in test          3 '
-  if translate('abcdef','12','abcd','.') \== '12..ef'   then say 'failed in test          4 '
-  if translate('4123','abcd','1234') \== 'dabc'   then say 'failed in test          5 '
+say 'Testing TRANSLATE ...'
+fail_count=0
+parse source system .
+select
+    when system='CMS' then charset='E'
+    when system='UNIX' then charset='A'
+    when system='WIN64' then charset='A'
+    otherwise say 'charset undefined'
+end
+/* These from TRL2. */
+if translate('abcdef')\=='ABCDEF'   then call test_failed '1'
+if translate('abbc','&','b')\=='a&&c'   then call test_failed '2'
+if translate('abcdef','12','ec')\=='ab2d1f'   then call test_failed '3'
+if translate('abcdef','12','abcd','.')\=='12..ef'   then call test_failed '4'
+if translate('4123','abcd','1234')\=='dabc'   then call test_failed '5'
 /* These from Mark Hessling. */
-  if translate("Foo Bar") \==  "FOO BAR"        then say 'failed in test          6 '
-  if translate("Foo Bar",,"") \==  "Foo Bar"    then say 'failed in test          7 '
-  if translate("Foo Bar","",) \==  "       "    then say 'failed in test          8 '
-  if translate("Foo Bar","",,'*') \==  "*******"  then say 'failed in test          9 '
-/*  if translate("Foo Bar",xrange('01'x,'ff'x)) \==  "Gpp!Cbs"  then say 'failed in test         10 ' ascii/ebcic */
-  if translate("","klasjdf","woieruw") \==  ""   then say 'failed in test         11 '
-  if translate("foobar","abcdef","fedcba") \==  "aooefr"  then say 'failed in test         12 '
-  say "TRANSLATE OK"
+if translate('Foo Bar')\=='FOO BAR'        then call test_failed '6'
+if translate('Foo Bar',,'')\=='Foo Bar'    then call test_failed '7'
+if translate('Foo Bar','',)\=='       '    then call test_failed '8'
+if translate('Foo Bar','',,'*')\=='*******'  then call test_failed '9'
+if charset='A' &  translate('Foo Bar',xrange('01'x,'ff'x))\=='Gpp!Cbs' then call test_failed '10'
+if charset='E' &  translate('Foo Bar',xrange('01'x,'ff'x))\==('Gpp' || '41'x || 'Cb' || '9A'x) then call test_failed '10'
+if translate('','klasjdf','woieruw')\==''   then call test_failed '11'
+if translate('foobar','abcdef','fedcba')\=='aooefr'  then call test_failed '12'
+say '... TRANSLATE done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

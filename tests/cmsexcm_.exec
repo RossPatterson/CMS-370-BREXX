@@ -1,0 +1,37 @@
+/* Test the EXECCOMM interface */
+say 'Testing EXECCOMM ...'
+parse source system .
+fail_count=0
+if system\='CMS' then signal exit
+address COMMAND
+say 'Testing EXECCOMM'
+fail_count=0
+'GLOBAL MACLIB CMSHRC CMSLIB'
+signal on error
+'ASSEMBLE CMSEXCM'
+'LOAD CMSEXCM'
+'GENMOD CMSEXCM'
+signal off error
+'CMSEXCM SET TESTVAR Use this string for test data'
+if rc \== 0 then call test_failed '1, rc='
+if testvar \== 'Use this string for test data' then call test_failed '2, testvar=/' || testvar || '/'
+setvar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+say 'Variable value to retrieve is:' setvar
+'CMSEXCM FETCH SETVAR'
+if rc \== 0 then call test_failed '3, rc='rc
+say 'Was that correct?'
+done:
+signal off error
+'ERASE CMSEXCM LISTING A'
+'ERASE CMSEXCM MODULE A'
+'ERASE CMSEXCM TEXT A'
+exit:
+say '... EXECCOMM done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return
+error:
+fail_count=fail_count+1
+signal done

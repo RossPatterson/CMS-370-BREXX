@@ -1,6 +1,12 @@
 /* FUZZ */
-say "Look for FUZZ OK"
-/* These from the Rexx book. */
+say 'Testing FUZZ ...'
+fail_count=0
+/* These from TRL2. */
 if fuzz() \= 0 then exit
 /* These from Mark Hessling. */
-say "FUZZ OK"
+say '... FUZZ done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

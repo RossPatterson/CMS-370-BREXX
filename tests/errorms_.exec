@@ -6,7 +6,7 @@ if k//10 \=0 then
 call Sayit(j'.'k)
 end k
 end j
-say "ERRORTEXT OK"
+say 'ERRORTEXT OK'
 exit
 Sayit:
 text = errortext(arg(1))

@@ -1,6 +1,7 @@
 /* */
-say 'Look for TIME OK'
-/* From TRL */
+say 'Testing TIME ...'
+fail_count=0
+/* From TRL2. */
 say time()
 say time('C')
 say time('H')
@@ -10,4 +11,9 @@ say time('n')
 say time('s')
 /* There are also lots of conversions. */
 /* say time('s',"16:54:22",'N') need to debug */
-say 'TIME OK'
+say '... TIME done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

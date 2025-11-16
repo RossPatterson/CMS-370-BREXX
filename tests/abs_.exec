@@ -1,11 +1,17 @@
-/* ABS */
-say "Look for ABS OK"
-/* These from the Rexx book. */
-if abs('12.3') \= 12.3 then say 'failed in test 1 '
-if abs(' -0.307') \= 0.307 then say 'failed in test 2 '
+/* ABS() */
+say 'Testing ABS ...'
+fail_count=0
+/* These from TRL2. */
+if abs('12.3') \= 12.3 then call test_failed '1'
+if abs(' -0.307') \= 0.307 then call test_failed '2'
 /* These from Mark Hessling. */
-if abs(-12.345) \== 12.345 then say 'failed in test 3 '
-if abs(12.345) \== 12.345 then say 'failed in test 4 '
-if abs(-0.0) \== 0 then say 'failed in test 5 '
-if abs(0.0) \== 0 then say 'failed in test 6 '
-say "ABS OK"
+if abs(-12.345) \== 12.345 then call test_failed '3'
+if abs(12.345) \== 12.345 then call test_failed '4'
+if abs(-0.0) \== 0 then call test_failed '5'
+if abs(0.0) \== 0 then call test_failed '6'
+say '... ABS done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

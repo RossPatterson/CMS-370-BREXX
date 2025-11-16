@@ -1,22 +1,30 @@
-/* BITXOR */
-say "Look for BITXOR OK"
-/* These from the Rexx book. */
-if bitxor('12'x,'22'x) \== '30'x then say 'failed in test 1 '
-if bitxor('1211'x,'22'x) \== '3011'x then say 'failed in test 2 '
-/* EBCDIC dependent
-if bitxor('C711'x,'222222'x,' ') \== 'E53362'x then say 'failed in test 3 '
-*/
-if bitxor('1111'x,'444444'x,'40'x) \== '555504'x then
-  say 'failed in test 4 '
-if bitxor('1111'x,,'4D'x) \== '5C5C'x then say 'failed in test 5 '
+/* BITXOR() */
+say 'Testing BITXOR ...'
+fail_count=0
+parse source system .
+select
+    when system = 'CMS' then charset = 'E'
+    when system = 'UNIX' then charset = 'A'
+    when system = 'WIN64' then charset = 'A'
+    otherwise say 'test 10 and 11 undefined'
+end
+/* These from TRL2. */
+if bitxor('12'x,'22'x) \== '30'x then call test_failed '1'
+if bitxor('1211'x,'22'x) \== '3011'x then call test_failed '2'
+if charset = 'E' &  bitxor('C711'x,'222222'x,' ') \== 'E53362'x then call test_failed '3'
+if bitxor('1111'x,'444444'x,'40'x) \== '555504'x then call test_failed '4'
+if bitxor('1111'x,,'4D'x) \== '5C5C'x then call test_failed '5'
 /* These from Mark Hessling. */
-if bitxor( '123456'x, '3456'x ) \== '266256'x then say 'failed in test 6 '
-if bitxor( '3456'x, '123456'x, '99'x ) \== '2662cf'x then
-  say 'failed in test 7 '
-if bitxor( '123456'x,, '55'x) \== '476103'x then say 'failed in test 8 '
-if bitxor( 'foobar' ) \== 'foobar' then say 'failed in test 9 '
-/* This one is ASCII dependent. */
-/* if bitxor( 'FooBar' ,, '20'x) \== 'fOObAR' then
-   say 'failed in test 10 ' */
+if bitxor( '123456'x, '3456'x ) \== '266256'x then call test_failed '6'
+if bitxor( '3456'x, '123456'x, '99'x ) \== '2662cf'x then call test_failed '7'
+if bitxor( '123456'x,, '55'x) \== '476103'x then call test_failed '8'
+if bitxor( 'foobar' ) \== 'foobar' then call test_failed '9'
+if charset = 'A' & bitxor( 'FooBar' ,, '20'x) \== 'fOObAR' then call test_failed '10'
+if charset = 'E' & bitxor( 'FooBar' ,, '40'x) \== 'fOObAR' then call test_failed '11'
 
-say "BITXOR OK"
+say '... BITXOR done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

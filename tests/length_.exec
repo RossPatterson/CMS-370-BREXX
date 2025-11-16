@@ -1,13 +1,17 @@
 /* LENGTH */
-say "Look for LENGTH OK"
-/* These from the Rexx book. */
-if length('abcdefgh') \= 8 then say 'failed in test 1 '
-if length('') \= 0 then say 'failed in test 2 '
+say 'Testing LENGTH ...'
+fail_count=0
+/* These from TRL2. */
+if length('abcdefgh') \= 8 then call test_failed '1'
+if length('') \= 0 then call test_failed '2'
 /* These from Mark Hessling. */
-if length("") \== 0 then say 'failed in test 3 '
-if length("a") \== 1 then say 'failed in test 4 '
-if length("abc") \== 3 then say 'failed in test 5 '
-if length("abcdefghij") \== 10 then say 'failed in test 6 '
-say "LENGTH OK"
-
-
+if length('') \== 0 then call test_failed '3'
+if length('a') \== 1 then call test_failed '4'
+if length('abc') \== 3 then call test_failed '5'
+if length('abcdefghij') \== 10 then call test_failed '6'
+say '... LENGTH done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

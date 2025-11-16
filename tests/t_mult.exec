@@ -1,5 +1,6 @@
 /* REXX */
 /* Test case generated from t_mult.in */
+say 'Testing T_MULT...'
 numeric digits 9
 
 Signal On Syntax
@@ -34,6 +35,7 @@ Parse Arg how
 Say how
 Say cnt.0ok  'ok'
 Say cnt.0err 'errors'
+say '... T_MULT done'
 Select
   When how<>'' Then   Exit 12
   When cnt.err=0 Then Exit 0

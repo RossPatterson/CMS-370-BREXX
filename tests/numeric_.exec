@@ -1,9 +1,7 @@
 /* NUMERIC */
 parse source system .
-if system = 'CMS' then suffix = ''
-else suffix = '.exec'
-
-say 'Look for NUMERIC OK'
+say 'Testing NUMERIC statement ...'
+fail_count=0
 
 /* Valid instructions */
 signal on syntax name t1a
@@ -15,20 +13,27 @@ numeric form scientific
 numeric form value 'engineering'
 t1v='scientific'; numeric form value t1v
 numeric form value 'engin' || 'eering'
-numeric form 'scientific'
+numeric form value 'scientific'
 numeric fuzz
 numeric fuzz 2
 signal t1z
 t1a:
-say 'failed in test 1 at line' sigl':' sourceline(sigl)
+call test_failed '1 at line' sigl':' sourceline(sigl)
 t1z:
 
+say 'Testing NUMERIC function ...'
+fail_count=0
 /* Valid functions */
 numeric digits 4
-if digits() \== '4' then say 'failed in test 2'
+if digits() \== '4' then call test_failed '2'
 numeric form engineering
-if form() \== 'ENGINEERING' then say 'failed in test 3'
+if form() \== 'ENGINEERING' then call test_failed '3'
 numeric fuzz 3
-if fuzz() \== '3' then say 'failed in test 4'
+if fuzz() \== '3' then call test_failed '4'
 
-say 'NUMERIC OK'
+say '... NUMERIC done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

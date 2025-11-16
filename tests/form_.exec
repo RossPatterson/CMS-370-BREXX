@@ -1,6 +1,12 @@
 /* FORM */
-say "Look for FORM OK"
-/* These from the Rexx book. */
+say 'Testing FORM ...'
+fail_count=0
+/* These from TRL2. */
 if form() \= 'SCIENTIFIC' then exit
 /* These from Mark Hessling. */
-say "FORM OK"
+say '... FORM done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

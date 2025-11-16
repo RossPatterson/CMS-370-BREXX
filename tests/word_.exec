@@ -1,18 +1,24 @@
 /* WORD */
-say "Look for WORD OK"
-/* These from the Rexx book. */
-if word('Now is the time',3) \== 'the' then say 'failed in test 1 '
-if word('Now is the time',5) \== '' then say 'failed in test 2 '
+say 'Testing WORD ...'
+fail_count=0
+/* These from TRL2. */
+if word('Now is the time',3) \== 'the' then call test_failed '1'
+if word('Now is the time',5) \== '' then call test_failed '2'
 /* These from Mark Hessling. */
-if word('This is certainly a test',1) \== 'This' then say 'failed in test 3 '
-if word(' This is certainly a test',1) \== 'This' then say 'failed in test 4 '
-if word('This is certainly a test',1) \== 'This' then say 'failed in test 5 '
-if word('This is certainly a test',2) \== 'is' then say 'failed in test 6 '
-if word('This is certainly a test',2) \== 'is' then say 'failed in test 7 '
-if word('This is certainly a test',5) \== 'test' then say 'failed in test 8 '
-if word('This is certainly a test ',5) \== 'test' then say 'failed in test 9 '
-if word('This is certainly a test',6) \== '' then say 'failed in test 10 '
-if word('',1) \== '' then say 'failed in test 11 '
-if word('',10) \== '' then say 'failed in test 12 '
-if word('test ',2) \== '' then say 'failed in test 13 '
-say "WORD OK"
+if word('This is certainly a test',1) \== 'This' then call test_failed '3'
+if word(' This is certainly a test',1) \== 'This' then call test_failed '4'
+if word('This is certainly a test',1) \== 'This' then call test_failed '5'
+if word('This is certainly a test',2) \== 'is' then call test_failed '6'
+if word('This is certainly a test',2) \== 'is' then call test_failed '7'
+if word('This is certainly a test',5) \== 'test' then call test_failed '8'
+if word('This is certainly a test ',5) \== 'test' then call test_failed '9'
+if word('This is certainly a test',6) \== '' then call test_failed '10'
+if word('',1) \== '' then call test_failed '11'
+if word('',10) \== '' then call test_failed '12'
+if word('test ',2) \== '' then call test_failed '13'
+say '... WORD done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

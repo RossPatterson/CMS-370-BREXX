@@ -1,13 +1,20 @@
-/* These from TRL */
-  say "Look for LEFT OK"
-  if left('abc d',8) \== 'abc d   '  then say 'failed in test          1 '
-  if left('abc d',8,'.') \== 'abc d...'  then say 'failed in test          2 '
-  if left('abc  def',7) \== 'abc  de'  then say 'failed in test          3 '
+/* LEFT */
+say 'Testing LEFT ...'
+fail_count=0
+/* These from TRL2. */
+if left('abc d',8) \== 'abc d   '  then call test_failed '1'
+if left('abc d',8,'.') \== 'abc d...'  then call test_failed '2'
+if left('abc  def',7) \== 'abc  de'  then call test_failed '3'
 /* These from Mark Hessling. */
-  if left("foobar",1) \==      "f"            then say 'failed in test          4 '
-  if left("foobar",0) \==      ""             then say 'failed in test          5 '
-  if left("foobar",6) \==      "foobar"       then say 'failed in test          6 '
-  if left("foobar",8) \==      "foobar  "     then say 'failed in test          7 '
-  if left("foobar",8,'*') \==  "foobar**"     then say 'failed in test          8 '
-  if left("foobar",1,'*') \==  "f"            then say 'failed in test          9 '
-  say "LEFT OK"
+if left('foobar',1) \==      'f'            then call test_failed '4'
+if left('foobar',0) \==      ''             then call test_failed '5'
+if left('foobar',6) \==      'foobar'       then call test_failed '6'
+if left('foobar',8) \==      'foobar  '     then call test_failed '7'
+if left('foobar',8,'*') \==  'foobar**'     then call test_failed '8'
+if left('foobar',1,'*') \==  'f'            then call test_failed '9'
+say '... LEFT done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

@@ -1,17 +1,35 @@
-/* These from TRL */
-  say "Look for CENTER OK"
-  if centre(abc,7) \== '  ABC  '              then say 'failed in test          1 '
-  if center(abc,7) \== '  ABC  '              then say 'failed in test          2 '
-  if center(abc,8,'-') \== '--ABC---'         then say 'failed in test          3 '
-  if center('The blue sky',8) \== 'e blue s'  then say 'failed in test          4 '
-  if center('The blue sky',7) \== 'e blue '   then say 'failed in test          5 '
+/* CENTER() / CENTRE() */
+/* These from TRL2. */
+say 'Testing CENTER / CENTRE ...'
+fail_count=0
+if center(abc,7) \== '  ABC  '              then call test_failed '1'
+if centre(abc,7) \== '  ABC  '              then call test_failed '2'
+if center(abc,8,'-') \== '--ABC---'         then call test_failed '3'
+if centre(abc,8,'-') \== '--ABC---'         then call test_failed '4'
+if center('The blue sky',8) \== 'e blue s'  then call test_failed '5'
+if centre('The blue sky',8) \== 'e blue s'  then call test_failed '6'
+if center('The blue sky',7) \== 'e blue '   then call test_failed '7'
+if centre('The blue sky',7) \== 'e blue '   then call test_failed '8'
 /* These from Mark Hessling. */
-  if center('****',8,'-')      \=='--****--'   then say 'failed in test          6 '
-  if center('****',7,'-')      \=='-****--'    then say 'failed in test          7 '
-  if center('*****',8,'-')     \=='-*****--'   then say 'failed in test          8 '
-  if center('*****',7,'-')     \=='-*****-'    then say 'failed in test          9 '
-  if center('12345678',4,'-')  \=='3456'       then say 'failed in test         10 '
-  if center('12345678',5,'-')  \=='23456'      then say 'failed in test         11 '
-  if center('1234567',4,'-')   \=='2345'       then say 'failed in test         12 '
-  if center('1234567',5,'-')   \=='23456'      then say 'failed in test         13 '
-  say "CENTER OK"
+if center('****',8,'-')      \=='--****--'   then call test_failed '9'
+if centre('****',8,'-')      \=='--****--'   then call test_failed '10'
+if center('****',7,'-')      \=='-****--'    then call test_failed '11'
+if centre('****',7,'-')      \=='-****--'    then call test_failed '12'
+if center('*****',8,'-')     \=='-*****--'   then call test_failed '13'
+if centre('*****',8,'-')     \=='-*****--'   then call test_failed '14'
+if center('*****',7,'-')     \=='-*****-'    then call test_failed '15'
+if centre('*****',7,'-')     \=='-*****-'    then call test_failed '16'
+if center('12345678',4,'-')  \=='3456'       then call test_failed '17'
+if centre('12345678',4,'-')  \=='3456'       then call test_failed '18'
+if center('12345678',5,'-')  \=='23456'      then call test_failed '19'
+if centre('12345678',5,'-')  \=='23456'      then call test_failed '20'
+if center('1234567',4,'-')   \=='2345'       then call test_failed '21'
+if centre('1234567',4,'-')   \=='2345'       then call test_failed '22'
+if center('1234567',5,'-')   \=='23456'      then call test_failed '23'
+if centre('1234567',5,'-')   \=='23456'      then call test_failed '24'
+say '... CENTER / CENTRE done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

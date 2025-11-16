@@ -4,7 +4,7 @@ Signal On Syntax
 Signal On Novalue
 cnt.=0
 /* ABBREV */
-/* These from the Rexx book. */
+/* These from TRL2. */
 id=3
 x=abbrev('XXX')
 Call err "SYNTAX" ID

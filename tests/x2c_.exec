@@ -1,16 +1,29 @@
 /* X2C */
-say "Look for X2C OK"
-/* These from the Rexx book. */
-/* if x2c('F7F2 A2') \== '72s' then say 'failed in test EBCDIC */
-/* if x2c('F7F2a2') \== '72s' then say 'failed in test EBCDIC */
-if x2c('F') \== '0F'x then say 'failed in test 3 '
+say 'Testing X2C ...'
+fail_count=0
+parse source system .
+select
+    when system='CMS' then charset='E'
+    when system='UNIX' then charset='A'
+    when system='WIN64' then charset='A'
+    otherwise say 'charset undefined'
+end
+if charset='E' & c2x( 'foobar')\=='869696828199' then call test_failed '3'
+/* These from TRL2. */
+if charset='E' & x2c('F7F2 A2')\=='72s' then call test_failed '1'
+if charset='E' & x2c('F7F2a2')\=='72s' then call test_failed '2'
+if x2c('F')\=='0F'x then call test_failed '3'
 /* These from Mark Hessling. */
-/* if x2c("416263") \== "Abc" then say 'failed in test 4 ' probably also EBCDIC */
-if x2c("DeadBeef") \== "deadbeef"x then say 'failed in test 5 '
-if x2c("1 02 03") \== "010203"x then say 'failed in test 6 '
-if x2c("11 0222 3333 044444") \== "1102223333044444"x then say 'failed in test 7 '
-if x2c("") \== "" then say 'failed in test 8 '
-if x2c("2") \== "02"x then say 'failed in test 9 '
-if x2c("1 02 03") \== "010203"x then say 'failed in test 10 '
-say "X2C OK"
-
+if charset='A' & x2c('416263')\=='Abc' then call test_failed '4'
+if x2c('DeadBeef')\=='deadbeef'x then call test_failed '5'
+if x2c('1 02 03')\=='010203'x then call test_failed '6'
+if x2c('11 0222 3333 044444')\=='1102223333044444'x then call test_failed '7'
+if x2c('')\=='' then call test_failed '8'
+if x2c('2')\=='02'x then call test_failed '9'
+if x2c('1 02 03')\=='010203'x then call test_failed '10'
+say '... X2C done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

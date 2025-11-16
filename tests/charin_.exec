@@ -1,20 +1,62 @@
-/* LINEIN */
-say "Look for CHARIN OK"
-file="TEST FILE A"
-cr = '0D'x
-call lineout file, "Line 1"
-call lineout file, "Line 2"
-call lineout file, "Line 3"
-call lineout file, "Line 4"
-call lineout file, "Line 5"
+/* CHARIN */
+say 'Testing CHARIN ...'
+fail_count=0
+parse source system .
+if system='CMS' then do
+    file='test FILE A'
+    address command 'ERASE' file
+    eol='15'x
+end
+else if system='UNIX' then do
+    file='test.file'
+    'rm' file '2>/dev/null'
+    eol='0D'x
+end
+else if system='WIN64' then do
+    file='test.file'
+    'del' file '2>NUL:'
+    eol='0D0A'x
+end
+linelen=length('Line 1')+length(eol)
+if system='CMS' then call lineout file 'F' linelen, 'Line 1'
+else call lineout file, 'Line 1'
+call lineout file, 'Line 2'
+call lineout file, 'Line 3'
+call lineout file, 'Line 4'
+call lineout file, 'Line 5'
 call lineout file
-if charin(file)\="L" then           say 'failed in test          1'
-if charin(file,,6)\="ine 1"cr then  say 'failed in test        2'
-if charin(file,,7)\="Line 2"cr then say 'failed in test          3'
-if charin(file,,7)\="Line 3"cr then say 'failed in test          4'
-if charin(file,,7)\="Line 4"cr then say 'failed in test          5'
-if charin(file,,7)\="Line 5"cr then say 'failed in test          6'
-if charin(file)\="" then            say 'failed in test          7'
+/* Test that characters written can be read. */
+signal on notready name t1_6
+if charin(file)\=='L'                   then call test_failed '1'
+if charin(file,,linelen-1)\=='ine 1'eol then call test_failed '2'
+if charin(file,,linelen)\=='Line 2'eol  then call test_failed '3'
+if charin(file,,linelen)\=='Line 3'eol  then call test_failed '4'
+if charin(file,,linelen)\=='Line 4'eol  then call test_failed '5'
+if charin(file,,linelen)\=='Line 5'eol  then call test_failed '6'
+signal t6z
+t1_6:
+call test_failed '1-6, notready signaled'
+t6z:
+/* Test that NOTREADY is signaled if there are no characters to read. */
+if system='CMS' then do
+    /* Suppress test until bREXX bug #114 is fixed.
+       See https://github.com/adesutherland/CMS-370-BREXX/issues/114.
+    */
+    say 'skipped test 7 due to bREXX bug #114'
+    signal t7z
+end
+signal on notready name t7z
+x=charin(file)
+call test_failed '7'
+t7z:
+signal off notready
 call lineout file
-"erase" file
-say "CHARIN OK"
+if system='CMS' then 'erase' file
+else if system='UNIX' then 'rm' file
+else if system='WIN64' then 'del' file
+say '... CHARIN done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

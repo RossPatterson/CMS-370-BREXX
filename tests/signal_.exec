@@ -1,67 +1,71 @@
 /* SIGNAL_ EXEC */
-say 'Look for SIGNAL OK'
-
+say 'Testing SIGNAL ...'
+fail_count=0
 /* signal */
 signal t1a
-say 'failed in test 1'
+call test_failed '1'
 t1a:
 
 /* signal value var */
-t2v = 't2a'
+t2v = 'T2A'
 signal value t2v
-say 'failed in test 2'
+call test_failed '2'
 t2a:
 
 /* novalue */
 signal on novalue
 t3v
-say 'failed in test 3'
+call test_failed '3'
 novalue:
 
 /* named novalue */
 signal on novalue name t4a
 t4v
-say 'failed in test 4'
-t4a:
+call test_failed '4'
+t4a: nop /* Prevents bREXX from setting SIGL to 25. */
 
 /* signal sets sigl */
 /* Do not move this test around - it knows its line numbers! */
 signal t5a
-say 'failed in test 5'
+call test_failed '5a'
 t5a:
-if sigl \== 29 then say 'failed in test 5'
+if sigl \== 29 then call test_failed '5b'
 
 /* signal novalue sets sigl */
 /* Do not move this test around - it knows its line numbers! */
 signal on novalue name t6a
 t6v
-say 'failed in test 6'
+call test_failed '6'
 t6a:
-if sigl \== 37 then say 'failed in test 6'
+if sigl \== 37 then call test_failed '6'
 
 /* signal value sets sigl */
 /* Do not move this test around - it knows its line numbers! */
-t7v = 't7a'
+t7v = 'T7A'
 signal value t7v
-say 'failed in test 7'
+call test_failed '7'
 t7a:
-if sigl \== 45 then say 'failed in test 7'
+if sigl \== 45 then call test_failed '7'
 
 /* signal value expr */
 /* Do not move this test around - it knows its line numbers! */
-t8v = 't8'
-signal value t8v || 'a'
-say 'failed in test 8'
+t8v = 'T8'
+signal value t8v || 'A'
+call test_failed '8'
 t8a:
-if sigl \== 53 then say 'failed in test 8'
+if sigl \== 53 then call test_failed '8'
 
 /* signal disables trap */
 signal on novalue name t9a
 t9x = t9v
-say 'failed in test 9.1'
+call test_failed '9.1'
 t9a:
 if sigl == 60 then t9x = t9v
-else say 'failed in test 9.2'
+else call test_failed '9.2'
 
-say 'SIGNAL OK'
-exit
+say '... SIGNAL done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return
