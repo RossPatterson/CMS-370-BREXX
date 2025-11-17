@@ -1710,7 +1710,7 @@ RxInterpret(void) {
                 }
                 I_ReturnProc();
 
-                if ((context->rexx_proc)[proc_idx + 1].calltype == CT_PROCEDURE)
+                if ((context->rexx_proc)[proc_idx].calltype == CT_PROCEDURE)
                     /* Assign the the RESULT variable */
                     RxVarSet((context->interpre_VarScope),
                              (context->rexxresultStr), a);

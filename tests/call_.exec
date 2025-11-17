@@ -14,7 +14,7 @@ if tc4() \== 1 then call test_failed '4'
 signal tc5
 
 /* argument check */
-tc1: if system='CMS' then do; say 'skipped test 1 due to bug #xxx'; return 1; end
+tc1:
 call tc1a 'a', 'B', c, 1, 2.3
 return result
 tc1a: ;
@@ -28,7 +28,7 @@ return 1
 
 /* call sets sigl */
 /* Do not move this test around - it knows its line numbers! */
-tc2: if system='CMS' then do; say 'skipped test 2 due to bug #xxx'; return 1; end
+tc2:
 call tc2a
 return (result == 32)
 tc2a: procedure expose sigl
@@ -104,6 +104,7 @@ tc7e:
 
 say '... CALL done'
 exit fail_count
+
 test_failed:
 say 'failed in test' arg(1)
 fail_count=fail_count+1
