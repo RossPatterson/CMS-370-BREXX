@@ -9,11 +9,15 @@ jobs:
     name: Build for CMS
     runs-on: [ubuntu-latest]
     container: rosspatterson/vm370:builder
-
+    outputs:
+      BUILD_DATE: ${{ steps.build.outputs.BUILD_DATE }}
+      REXX_LEVEL: ${{ steps.build.outputs.REXX_LEVEL }}
+      VERSION_STRING: ${{ steps.build.outputs.VERSION_STRING }}
     steps:
-
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
 
     - name: Move Source
       run: |
@@ -22,6 +26,7 @@ jobs:
       shell: bash
 
     - name: Build
+      id: build
       working-directory: /opt/hercules/vm370
       run: |
         chmod -R ugo+rw *
@@ -49,17 +54,61 @@ jobs:
       shell: bash
 
     - name: Upload Executable
-      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v4
       with:
         name: BREXX
         path: ./exe
 
 #**************************************************#
+  test-install:
+    strategy:
+      matrix:
+        inst_type: ["bin-tape", "bin-vmarc", "dasd", "src-tape", "src-vmarc"]
+      fail-fast: false
+    name: Test install via ${{ matrix.inst_type }}
+    needs: [build-cms]
+    runs-on: [ubuntu-latest]
+    container: rosspatterson/vm370:builder
+    steps:
+      - name: Checkout (minimal)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            cmsinst.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Move Source
+        run: |
+          mkdir -p /opt/hercules/vm370/io/BREXX
+          mv cmsinst.sh /opt/hercules/vm370/io
+        shell: bash
+
+      - name: Get CMS binary
+        uses: actions/download-artifact@v4
+        with:
+          name: BREXX
+          path: /opt/hercules/vm370/io/BREXX
+
+      - name: Install
+        working-directory: /opt/hercules/vm370
+        env:
+          BUILD_DATE: ${{needs.build-cms.outputs.BUILD_DATE}}
+          VERSION_STRING: ${{needs.build-cms.outputs.VERSION_STRING}}
+        run: |
+          chmod -R ugo+rw *
+          hercules -f hercules.conf -d >/dev/null 2>/dev/null &
+          cd io
+          chmod +x cmsinst.sh
+          echo "Running CMSINST ${{ matrix.inst_type }}"
+          ./cmsinst.sh "${{ matrix.inst_type }}" "$VERSION_STRING" "$BUILD_DATE"
+        shell: bash
+
+#**************************************************#
   release:
     if: startsWith(github.ref, 'refs/tags/')
     name: Release
-    needs: [build-cms]
+    needs: [build-cms, test-install]
     runs-on: [ubuntu-latest]
     steps:
       - name: Get CMS binary

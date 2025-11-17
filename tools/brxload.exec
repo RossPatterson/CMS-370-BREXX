@@ -31,13 +31,20 @@ ERASE NEWBREXX CONTROL B
 
 * Extract the bREXX compiled code
 ACCESS 193 E (ERASE
-&IF &MODE NE TAPE &SKIP 4
+&IF &MODE NE TAPE &SKIP 8
+    * TAPE may give RC=100 after "unload"
+    &ERROR &CONTINUE
+    TAPE RUN
+	&ERROR &EXIT &RETCODE
     &TYPE Mount binary tape on 181 and press ENTER
     &READ VARS &X
     TAPE LOAD * * E
     &GOTO -BIN1
-&IF &MODE NE VMARC &SKIP 2
+&IF &MODE NE VMARC &SKIP 5
+    * VMARC may give RC=8 due to header cards at end of BREXXBIN
+    &ERROR &CONTINUE
     VMARC UNPK BREXXBIN VMARC A * * E (OLDDATE
+    &IF &RETCODE GT 8 &EXIT &RETCODE
     &GOTO -BIN1
 -BIN1
 

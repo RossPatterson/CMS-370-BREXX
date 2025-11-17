@@ -15,7 +15,7 @@ it includes.
 
 Pre-built releases of VM/370 CMS bREXX are available at the
 [Releases](https://github.com/RossPatterson/CMS-370-releases) page at that same
-GitHub repository.  You can download the release ZIPfile and install it without
+GitHub repository.  You can download the release ZIP file and install it without
 having to compile anything.
 
 # Installation
@@ -58,12 +58,12 @@ the one from the new release.
    3. `ACCESS (NOPROF`
    4. `GCCSEG F20000 GCCLIB`
    5. Results: `GCCSEG COMPLETE`.
+   6. `IPL CMS`
 8. Install all the bREXX files (including some on the Y-disk): `NEWBREXX`
-9. Re-save the CMS saved systemt to update the shared Y-stat:
-   1. `DEFINE STORAGE 16M`
-   2. `IPL 190 CLEAR`
-   3. `SAVESYS CMS`
-   4. Results: `SYSTEM SAVED`.
+9. Re-save the CMS saved system to update the shared Y-stat:
+   1. `IPL 190 CLEAR`
+   2. `SAVESYS CMS`
+   3. Results: `SYSTEM SAVED`.
 
 ## Install pre-built via VMARC.
 
@@ -76,7 +76,7 @@ the one from the new release.
 5. Extract the pre-built bREXX file: `VMARC UNPK BREXXBIN VMARC A BREXX TEXT A (OLDDATE`.
 6. Move the `BREXX TEXT` file to the Y-disk:
    1. `ACCESS 19E Y`
-   2. `COPY BREXX TEXT A = = Y (OLDD REPLACE`
+   2. `COPY BREXX TEXT A = = Y (OLDDATE REPLACE`
    3. `ACCESS 19E Y/S`
 7. Upload `brexxsrc.vmarc` to VM in binary, fixed format, record length 80 as
    `BREXXSRC VMARC`.
@@ -106,7 +106,7 @@ the one from the new release.
 6. Load the pre-built bREXX file: `TAPE LOAD BREXX TEXT A`.
 7. Move the `BREXX TEXT` file to the Y-disk:
    1. `ACCESS 19E Y`
-   2. `COPY BREXX TEXT A = = Y (OLDD REPLACE`
+   2. `COPY BREXX TEXT A = = Y (OLDDATE REPLACE`
    3. `ACCESS 19E Y/S`
 8. Load the archive of `HELP` files: `TAPE LOAD BRXHELP VMARC A (TAP2`.
 9. Detach the tape drives: `DETACH 181-182`.
@@ -114,8 +114,7 @@ the one from the new release.
 11. Move the `* HELPREXX` files to the `HELP` disk (typically `MAINT 19D`).
 12. Merge the `REXX HELPTASK` file into the HELP HELPTASK` file on the `HELP`
     disk.
-13. Detach the tape drives: `DETACH 181-182`.
-14. Re-save the CMS saved system to update the shared Y-stat:
+13. Re-save the CMS saved system to update the shared Y-stat:
    1. `DEFINE STORAGE 16M`
    2. `IPL 190 CLEAR`
    3. `SAVESYS CMS`
@@ -135,9 +134,14 @@ the one from the new release.
 7. Run the loader exec: `BRXLOAD VMARC`
 8. Compile bREXX from source: `BRXBUILD`
 9. Build the bREXX file: `BRXGEN`
-10. Log on to `MAINT` on VM.
-11. Install all the bREXX files (including some on the Y-disk): `NEWBREXX`
-12. Re-save the CMS saved systemt to update the shared Y-stat:
+10. Send the bREXX deployment EXEC to MAINT:
+   1. `SPOOL PUNCH MAINT`
+   2. `DISK DUMP NEWBREXX EXEC`
+11. Log on to `MAINT` on VM.
+12. Install all the bREXX files (including some on the Y-disk):
+   1. `DISK LOAD`
+   2. `NEWBREXX`
+13. Re-save the CMS saved system to update the shared Y-stat:
    1. `DEFINE STORAGE 16M`
    2. `IPL 190 CLEAR`
    3. `SAVESYS CMS`
@@ -149,20 +153,25 @@ the one from the new release.
    the machine where you run Hercules.
 2. Unzip `BREXX.zip`.
 3. Log on to `MAINTC` on VM.
-4. At the Hercules console, attach the source tape:
+4. At the Hercules console, mount and attach the source tape:
    1. `devinit 480` _unzip_dir_`/brexxsrc.aws`.
    2. `/ATTACH 480 TO MAINTC AS 181`
 5. Extract the loader exec: `TAPE LOAD BRXLOAD EXEC A`.
 6. Rewind the tape: `TAPE REW`.
 7. Run the loader exec: `BRXLOAD TAPE`
-8. When prompted to, at the Hercules console, attach the binary tape:
+8. When prompted to, at the Hercules console, mount the binary tape:
    `devinit 480` _unzip_dir_`/brexxbin.aws`.
 9. Detach the tape drive: `DETACH 181`.
 10. Compile bREXX from source: `BRXBUILD`
 11. Build the bREXX file: `BRXGEN`
+12. Send the bREXX deployment EXEC to MAINT:
+   1. `SPOOL PUNCH MAINT`
+   2. `DISK DUMP NEWBREXX EXEC`
 12. Log on to `MAINT` on VM.
-13. Install all the bREXX files (including some on the Y-disk): `NEWBREXX`
-14. Re-save the CMS saved systemt to update the shared Y-stat:
+13. Install all the bREXX files (including some on the Y-disk):
+   1. `DISK LOAD`
+   2. `NEWBREXX`
+14. Re-save the CMS saved system to update the shared Y-stat:
    1. `DEFINE STORAGE 16M`
    2. `IPL 190 CLEAR`
    3. `SAVESYS CMS`

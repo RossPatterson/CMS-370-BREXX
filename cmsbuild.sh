@@ -194,6 +194,24 @@ herccontrol "/BRXSRCH" -w "^Ready;"
 herccontrol "/runtest_" -w "^Ready;"
 herccontrol "/logoff" -w "^VM/370 Online"
 
+# Export version string
+# For example:
+#	VERSION_STRING=REXX-bREXX-2.1.9-CMS370-1.1.3
+#	REXX_LEVEL=3.45
+#	BUILD_DATE=Sep  2 2025
+# Note: GITHUB_OUTPUT wants raw data (i.e. XXX, not "XXX").
+herccontrol "/LOGON MAINT CPCMS" -w "^VM Community Edition"
+herccontrol "/" -w "^Ready;"
+herccontrol "/DMSREX VERSION" -w "^Ready;" \
+	| sed -e "/Ready/ d" \
+	| sed -n -e "2p" \
+	| sed -e "s/^BREXX Version \+/ /" -e "s/ \+\(no\)\?debug$//" \
+	| sed -e "s/^ \+\([^ ]*\) */VERSION_STRING=\1\n /" \
+	| sed -e "s/^ \+\([^ ]*\) */REXX_LEVEL=\1\n /" \
+	| sed -e "s/^ \+\(.*\) *$/BUILD_DATE=\1/" \
+	>> "$GITHUB_OUTPUT"
+herccontrol "/LOGOFF" -w "^VM/370 Online"
+
 # SHUTDOWN
 herccontrol "/logon operator operator" -w "RECONNECTED AT"
 herccontrol "/shutdown" -w "^HHCCP011I"

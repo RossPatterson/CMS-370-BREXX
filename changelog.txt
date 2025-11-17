@@ -1,5 +1,7 @@
 bREXX CMS Change LOG
 ====================
+      - Upgrade to Docker container version 1.6.7.
+      - Test all documented installation procedures and update doc as needed.
       - Make build fail if any test failures.
       - Skip all tests that currently fail, and create issues to repair them.
       - Fix all broken tests.
