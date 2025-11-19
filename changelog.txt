@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0118 - SIGNAL OFF NOTREADY doesn't
 I0114 - CHARIN() and LINEIN() delay signalling NotReady
       - Upgrade to Docker container version 1.6.7.
       - Test all documented installation procedures and update doc as needed.

@@ -276,7 +276,7 @@ R_charlinein(const int func) {
         Lcharin(i, ARGR, start, length);
     else if (func == f_linein)
         Llinein(i, ARGR, start, length);
-    if (FEOF(i))
+    if (((context->rexx_proc)[(context->rexx_rx_proc)].condition & SC_NOTREADY) && FEOF(i))
         RxSignalCondition(SC_NOTREADY, LSTR(*ARG1));
 } /* R_charlinein */
 
