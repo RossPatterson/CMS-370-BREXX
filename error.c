@@ -188,8 +188,15 @@ Rerror(const int errno, const int subno, ...) {
             }
 
             if ((context->rexx_proc)[(context->rexx_rx_proc)].env !=
-                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env) LPFREE(
-                    (context->rexx_proc)[(context->rexx_rx_proc)].env);
+                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env) {
+#ifdef CMS
+                    LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env->name);
+                    LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env->prefix);
+                    FREE((context->rexx_proc)[(context->rexx_rx_proc)].env);
+#else
+                    LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env);
+#endif
+                }
 
             (context->rexx_rx_proc)--;
             (context->interpreRx_id) =

@@ -1,23 +1,24 @@
-  TITLE 'HOSTCMD - Issue commands from REXX programs'                   00010000
-HOSTCMD  CSECT                                                          00020000
+  TITLE 'HOSTCMD - Issue commands from REXX programs'
+HOSTCMD  CSECT
 *------------------------------------------------------------*
-* This programs issues commands and subcommands in CMS for   *          00040000
-* REXX programs. The REXX Address statement defines the      *          00050000
-* command or subcommand environment that will receive and    *          00060000
-* execute the command character string.                      *          00070000
-*                                                            *          00080000
-* It also implements the entry point to the EXECCOMM         *          00090000
-* subcommand entry into the interpretor. Programs like       *          00100000
-* EXECIO issue the EXECCOMM subcommand to set values for,    *          00110000
-* retrieve values from, and drop REXX variables.             *          00120000
+* This programs issues commands and subcommands in CMS for   *
+* REXX programs. The REXX Address statement defines the      *
+* command or subcommand environment that will receive and    *
+* execute the command character string.                      *
+*                                                            *
+* It also implements the entry point to the EXECCOMM         *
+* subcommand entry into the interpretor. Programs like       *
+* EXECIO issue the EXECCOMM subcommand to set values for,    *
+* retrieve values from, and drop REXX variables.             *
 *------------------------------------------------------------*
-         USING CMSCRAB,R13                                              00140000
-         USING HOSTCMD,R12                                              00150000
-         USING NUCON,0                                                  00160000
-@@HOSTCM PDPPRLG CINDEX=0,FRAME=WKAREALN,BASER=12,ENTRY=YES             00170000
-         LA    R15,@@HOSTCM-HOSTCMD                                     00180000
-         SLR   R12,R15                                                  00190000
-         USING HOSTCMD,R12                                              00200000
+         USING CMSCRAB,R13
+         USING HOSTCMD,R12
+         USING NUCON,0
+@@HOSTCM PDPPRLG CINDEX=0,FRAME=WKAREALN,BASER=12,ENTRY=YES
+         LA    R15,@@HOSTCM-HOSTCMD
+         SLR   R12,R15
+         USING HOSTCMD,R12
+         MVI   FLAGS,0
 *------------------------------------------------------------*
 * Retrieve parameters. Entry R1 points to a two word parm    *
 * list. The first word is the address of an LSTR structure   *
@@ -26,42 +27,45 @@ HOSTCMD  CSECT                                                          00020000
 * of the REXX address environment.                           *
 * The LSTR structure is defined in the LSTR DSECT below.     *
 *------------------------------------------------------------*
-         LM     R4,R5,0(R1)       Ptr to cmd, Ptr to env name           00290000
-*                                                                       00300000
+         LM     R4,R5,0(R1)       Ptr to cmd, Ptr to env name
+*
 *------------------------------------------------------------*
 * Build a tokenized plist and an extended plist from         *
 * the input command line string.                             *
 *------------------------------------------------------------*
-         USING  LSTR,R4           Command line                          00350000
-         L      R1,LSTRPSTR       Address of command line               00360000
-         L      R0,LSTRLEN        Length of command line                00370000
-*                                                                       00390000
-         IPK    ,                                                       00400000
-         SPKA   0                 Key 0                                 00410000
-         SSM    *+1               Disable                               00420000
-         L      R15,ASCANN        Build tokenied plist                  00430000
-         BALR   R14,R15              and extended plist                 00440000
-         LTR    R15,R15                                                 00450000
-         BNZ    BADARG                                                  00460000
+         USING  LSTR,R4           Command line
+         L      R1,LSTRPSTR       Address of command line
+         L      R0,LSTRLEN        Length of command line
+         DROP   R4
+*
+         IPK    ,
+         SPKA   0                 Key 0
+         SSM    *+1               Disable
+         L      R15,ASCANN        Build tokenied plist
+         BALR   R14,R15              and extended plist
+         CH    R15,=H'4'          Anything besides plist too long?
+         BH    BADARG             Yes, that's bad.
+         LTR   R15,R15            Was plist truncated?
+         BZ    *+8                No, skip
+         OI    FLAGS,TPLTRUNC     Yes, remember that.
          CLC   0(8,R1),FENCE      Empty command?
          BE    NULLCMD1           Yes, return w/ RC=0.
          CLC   0(16,R1),EXECFNC   Empty command?
-         BE    NULLCMD1           Yes, return w/ RC=0.
-*                                                                       00470000
-         L     R15,NUCUPPER       Standard uppercase table              00480000
-         LR    R4,R1              Tokenized plist pointer               00490000
-         LR    R3,R0              Tokenized plist length                00500000
-*                                                                       00510000
-         CH    R3,*+10            Less than or equal to max?            00520000
-         BNH   *+8                OK                                    00530000
-         LA    R3,256             Else use max                          00540000
-*                                                                       00550000
-         BCTR  R3,0                                                     00560000
-         EX    R3,UPTRANS         Uppercase this section                00570000
-*                                                                       00580000
-         SPKA   0(R2)             Enable                                00590000
-         SSM    =X'FF'            User key                              00600000
-         B     SETENVNM           Go set environment name               00610000
+         BE    NULLCMD1           Yes, return w/ RC=0
+         L     R15,NUCUPPER       Standard uppercase table
+         LR    R4,R1              Tokenized plist pointer
+         LR    R3,R0              Tokenized plist length
+*
+         CH    R3,*+10            Less than or equal to max?
+         BNH   *+8                OK
+         LA    R3,256             Else use max
+*
+         BCTR  R3,0
+         EX    R3,UPTRANS         Uppercase this section
+*
+         SPKA   0(R2)             Enable
+         SSM    =X'FF'            User key
+         B     SETENVNM           Go set environment name*
 *
 BADARG   DS    0H
          SPKA  0(R2)              Enable
@@ -73,89 +77,134 @@ NULLCMD1 DS    0H
          SSM   =X'FF'             User key
          B     NULLCMD2
 *
-UPTRANS  TR    0(*-*,R4),0(R15)                                         00620000
+UPTRANS  TR    0(*-*,R4),0(R15)
 *------------------------------------------------------------*
 * Create an 8 byte uppercase version of the environment name *
 *------------------------------------------------------------*
-SETENVNM DS     0H                                                      00660000
-         USING  LSTR,R5           Environment name                      00670000
-         MVC    ENVNAME,=CL8'COMMAND' Assume standard env.              00680000
-         MVC    ENVNAME+8(8),FENCE  CMS command fence                   00690000
-         L      R2,LSTRPSTR       Address of environment name           00700000
-         L      R3,LSTRLEN        Length of environment name            00710000
-         LTR    R3,R3             Null string is                        00720000
-*                                    another way to specify             00730000
-*                                       address 'COMMAND'               00740000
-         BZ     ENVSET                                                  00750000
-         CH     R3,*+10           Truncate length                       00760000
-         BNH    *+8                 to 8 bytes                          00770000
-         LA     R3,8                                                    00780000
-*                                                                       00790000
-         MVI    ENVNAME,C' '      Set Environment                       00800000
-         MVC    ENVNAME+1(8-1),ENVNAME  Name and                        00810000
-         OC     ENVNAME(*-*),0(R2)      uppercase                       00820000
-         EX     R3,*-6                                                  00830000
-ENVSET   DS     0H                                                      00840000
-         DROP   R5                                                      00850000
-*------------------------------------------------------------*          00860000
-* Setup EXECCOMM subcommand environment                      *          00870000
-*------------------------------------------------------------*          00880000
-         MVC   SBSL(SBSLLEN),SBSP Set MF=L pattern                      00900000
-         SUBCOM SET,NAME='EXECCOMM',ENTRY=EXECCOMM,                    *00910000
+SETENVNM DS     0H
+         USING  LSTR,R5           Environment name
+         MVC    ENVNAME,=CL8'COMMAND' Assume standard env.
+         MVC    ENVNAME+8(8),FENCE  CMS command fence
+         L      R2,LSTRPSTR       Address of environment name
+         L      R3,LSTRLEN        Length of environment name
+         LTR    R3,R3             Null string is
+*                                    another way to specify
+*                                       address 'COMMAND'
+         BZ     ENVSET
+         CH     R3,=H'8'          Could it be a PSW?
+         BNE    ENVNPSW           No.
+         CLI    3(R2),X'00'       Is it a PSW?
+         BNE    ENVNPSW           No.
+         MVC    ENVNAME,0(R2)     Yes, set it,
+         OI     FLAGS,ENVISPSW       remember that,
+         B      ENVSET                  and don't upcase it.
+ENVNPSW  DS     0H
+         CH     R3,*+10           Truncate length
+         BNH    *+8                 to 8 bytes
+         LA     R3,8
+*
+         MVI    ENVNAME,C' '      Set Environment
+         MVC    ENVNAME+1(8-1),ENVNAME  Name and
+         OC     ENVNAME(*-*),0(R2)      uppercase
+         EX     R3,*-6
+ENVSET   DS     0H
+         DROP   R5
+*------------------------------------------------------------*
+* Setup EXECCOMM subcommand environment                      *
+*------------------------------------------------------------*
+         MVC   SBSL(SBSLLEN),SBSP Set MF=L pattern
+         SUBCOM SET,NAME='EXECCOMM',ENTRY=EXECCOMM,                    *
                UWORD=(R13),INTTYPE=ALL,KEY=NUCLEUS,                    *
-               MF=(E,SBSL)                                              00930000
-*------------------------------------------------------------*          00940000
-* address COMMAND is called with a call type X'01' plist     *          00950000
-*------------------------------------------------------------*          00960000
-         CLC   ENVNAME,=CL8'COMMAND' Standard environment?              00970000
-         BNE   CHKSUBCM           Try subcommand environments           00980000
+               MF=(E,SBSL)
+         TM    FLAGS,ENVISPSW    Is it a PSW?
+         BZ    NOTPSW            No, normal SUBCOM.
+*------------------------------------------------------------*
+* "Non-SVC invocation" is called by LPSW of the env name.    *
+* Hope that PSW was right!!!                                 *
+*------------------------------------------------------------*
+*
+         STM   R0,R15,MYSAVE     Save against damage by callee.
+         PUSH  USING
+* IBM Rexx Reference says to pass PSW instead of command name:
+         IPK   ,                 Save protect key.
+         SPKA  0                 Get to key 0.
+         MVC   CMNDLIST(8),ENVNAME  Set PSW as "command".
+         SPKA  0(R2)             Back to prior key.
+*        Fix EPLIST same way as for SUBCOM.
+         MVC   MYEPLIST(16),NUCPLIST Copy EPLIST from ASCANN
+         MVC   MYEPLIST+4(4),MYEPLIST Adjust second word of EP
+         LA    R1,CMNDLIST        Set PSW in
+         ST    R1,MYEPLIST           EPLIST.
+*
+         L     R2,GCCCRABA       Get the GCCCRAB.
+         L     R2,ROOTCMSC-GCCCRAB(,R2)  Get the rootcmscrab.
+         L     R2,BACK-CMSCRAB(,R2)  Go back to our save area.
+         L     R2,GR2-CMSCRAB(,R2)  R2 at time of bREXX invocation.
+         LA    R0,MYEPLIST       Point to cleaned-up EPLIST.
+         LA    R1,CMNDLIST       Point to PLIST.
+         LA    R13,SAVEAREA      Pass savearea.
+         USING SAVEAREA,R13
+         LA    R14,PSWRET        Return address.
+         LPSW  CMNDLIST          Call subcommand.
+PSWRET   DS    0H
+         LM    R0,R14,MYSAVE-SAVEAREA(R13)  Restore all but R15.
+         POP   USING
+         B     GOBACK            Pass back the return code
+*------------------------------------------------------------*
+* address COMMAND is called with a call type X'01' plist     *
+*------------------------------------------------------------*
+NOTPSW   DS    0H
+         CLC   ENVNAME,=CL8'COMMAND' Standard environment?
+         BNE   CHKSUBCM           Try subcommand environments
          CLC   CMNDLIST(8),FENCE  Empty command?
          BE    NULLCMD2           Yes, return w/ RC=0.
-         LA    R1,CMNDLIST                                              00990000
-         LA    R0,NUCPLIST        Point to contructed EPLIST            01000000
-         ICM   R1,B'1000',=X'01'                                        01010000
-         SVC   202            Run command now                           01020000
-         DC    AL4(1)                                                   01030000
-         B     GOBACK             Pass back the return code             01040000
-*------------------------------------------------------------*          01050000
-* Special command environment. Look for a subcommand         *          01060000
-* processor to handle it.                                    *          01070000
-*------------------------------------------------------------*          01080000
-CHKSUBCM DS    0H                                                       01090000
-         MVC   SBQL(SBQLLEN),SBQP Set MF=L pattern                      01100000
-         SUBCOM QUERY,NAME=ENVNAME,MF=(E,SBQL)                          01110000
-         LTR   R15,R15                                                  01120000
-         BNZ   ENVUNKN            Unknown environment                   01130000
+         TM    FLAGS,TPLTRUNC     Was tokenized plist truncated?
+         BO    BADARG             Yes, can't risk running it.
+         LA    R1,CMNDLIST
+         LA    R0,NUCPLIST        Point to contructed EPLIST
+         ICM   R1,B'1000',=X'01'
+         SVC   202            Run command now
+         DC    AL4(1)
+         B     GOBACK             Pass back the return code
+*------------------------------------------------------------*
+* Special command environment. Look for a subcommand         *
+* processor to handle it.                                    *
+*------------------------------------------------------------*
+CHKSUBCM DS    0H
+         MVC   SBQL(SBQLLEN),SBQP Set MF=L pattern
+         SUBCOM QUERY,NAME=ENVNAME,MF=(E,SBQL)
+         LTR   R15,R15
+         BNZ   ENVUNKN            Unknown environment
 *------------------------------------------------------------*
 * For a subcommand call, R1 point to the subcommand          *
 * environment name, followed by a plist fence                *
 *------------------------------------------------------------*
-         LA    R1,ENVNAME                                               01160000
+         LA    R1,ENVNAME
 *------------------------------------------------------------*
 * The extended plist 1st word points to the subcommand name  *
 * The 2nd word points to the beginning of the argument       *
 * string. The third word points past the last argument.      *
 *------------------------------------------------------------*
-         MVC   MYEPLIST(16),NUCPLIST Copy EPLIST from ASCANN            01200000
+         MVC   MYEPLIST(16),NUCPLIST Copy EPLIST from ASCANN
          MVC   MYEPLIST+4(4),MYEPLIST Adjust second word of EP
-         ST    R1,MYEPLIST          Adjust first word                   01220000
-         LA    R0,MYEPLIST           and extended plist                 01230000
-         ICM   R1,B'1000',=X'02'  Subcommand call                       01240000
-         SVC   202                Call the subcommand                   01250000
-         DC    AL4(1)                                                   01260000
-         B     GOBACK             Pass back the return code             01270000
+         ST    R1,MYEPLIST          Adjust first word
+         LA    R0,MYEPLIST           and extended plist
+         ICM   R1,B'1000',=X'02'  Subcommand call
+         SVC   202                Call the subcommand
+         DC    AL4(1)
+         B     GOBACK             Pass back the return code
 *
 NULLCMD2 DS    0H
          SR    R3,R3
          B     GOBACK
 *
-ENVUNKN  DS    0H                                                       01300000
-         L     R15,=F'-3'                                               01310000
-GOBACK   DS    0H                                                       01320000
-         LR    R3,R15             Hold the command return code          01330000
-         MVC   SBCL(SBCLLEN),SBCP Set MF=L pattern                      01340000
-         SUBCOM CLR,NAME='EXECCOMM',MF=(E,SBCL)                         01350000
-         LR    R15,R3             Get back the command RC               01360000
+ENVUNKN  DS    0H
+         L     R15,=F'-3'
+GOBACK   DS    0H
+         LR    R3,R15             Hold the command return code
+         MVC   SBCL(SBCLLEN),SBCP Set MF=L pattern
+         SUBCOM CLR,NAME='EXECCOMM',MF=(E,SBCL)
+         LR    R15,R3             Get back the command RC
          PDPEPIL                  Return to caller
 *------------------------------------------------------------*
 * This entry point is called to issue a type X'05' call to   *
@@ -192,37 +241,37 @@ GOBACK   DS    0H                                                       01320000
          SUBCOM CLR,NAME='EXECCOMM',MF=(E,SBCL)
          LR    R15,R3             Get back the command RC
          PDPEPIL                  Return to caller
-*                                                                       01380000
-*------------------------------------------------------------*          01390000
-* This is the entry point for the EXECCOMM REXX subcommand.  *          01420000
-* It is reached via an SVC 202 from a program called from    *          01430000
-* a REXX EXEC. It reconnects to the GCC runtime environment  *          01440000
-* of the REXX program.                                       *          01450000
+*
 *------------------------------------------------------------*
-         ENTRY EXECCOMM                                                 01470000
-EXECCOMM DS    0D                                                       01480000
-         STM   R14,R12,12(R13)    Save entry regs                       01490000
-         LR    R12,R15                                                  01500000
-         LA    R15,EXECCOMM-HOSTCMD                                     01510000
-         SLR   R12,R15            Establish common base                 01520000
-         LR    R3,R13             Hold EXECCOMM R13                     01530000
-         USING HOSTCMD,R12                                              01540000
-         USING SCBLOCK,R2                                               01550000
-         L     R13,SCBWKWRD       Load HOSTCMD R13                      01560000
-*                                                                       01570000
-* Now R13 points to the GCC savearea in use when HOSTCOM                01580000
-* called the external program with address COMMAND, or                  01590000
-* with an address call to a subcommand environment.                     01600000
-* Since we have a C runtime environment now, we can call                01610000
-* any C program CSECTs in the BREXX module.                             01620000
-*                                                                       01630000
-         LR    R5,R0              EXECCOMM EPLIST Word 4                01640000
-         CLC   4(4,R5),8(R5)      BEGARGS must equal ENDARGS            01650000
-         L     R15,=F'-1'                                               01660000
-         BNE   RXERRXIT           Error exit if not                     01670000
-*                                                                       01680000
-         L     R5,12(,R5)         Fetch a pointer to a chain            01690000
-         USING SHVBLOCK,R5           chain of SHVBLOCKS                 01700000
+* This is the entry point for the EXECCOMM REXX subcommand.  *
+* It is reached via an SVC 202 from a program called from    *
+* a REXX EXEC. It reconnects to the GCC runtime environment  *
+* of the REXX program.                                       *
+*------------------------------------------------------------*
+         ENTRY EXECCOMM
+EXECCOMM DS    0D
+         STM   R14,R12,12(R13)    Save entry regs
+         LR    R12,R15
+         LA    R15,EXECCOMM-HOSTCMD
+         SLR   R12,R15            Establish common base
+         LR    R3,R13             Hold EXECCOMM R13
+         USING HOSTCMD,R12
+         USING SCBLOCK,R2
+         L     R13,SCBWKWRD       Load HOSTCMD R13
+*
+* Now R13 points to the GCC savearea in use when HOSTCOM
+* called the external program with address COMMAND, or
+* with an address call to a subcommand environment.
+* Since we have a C runtime environment now, we can call
+* any C program CSECTs in the BREXX module.
+*
+         LR    R5,R0              EXECCOMM EPLIST Word 4
+         CLC   4(4,R5),8(R5)      BEGARGS must equal ENDARGS
+         L     R15,=F'-1'
+         BNE   RXERRXIT           Error exit if not
+*
+         L     R5,12(,R5)         Fetch a pointer to a chain
+         USING SHVBLOCK,R5           chain of SHVBLOCKS
 *------------------------------------------------------------*
 *                                                            *
 * Main loop for processing SHVBLOCKs starts here             *
@@ -296,24 +345,24 @@ EXCFETCH DS    0H
 * Processing common to SHVFETCH and SHVSTORE                 *
 *------------------------------------------------------------*
 EXCSETUP DS    0H
-         MVI   SHVRET,0                                                 01720000
-         L     R15,SHVNAML        Length of the variable name           01730000
-         C     R15,=F'255'                                              01740000
+         MVI   SHVRET,0
+         L     R15,SHVNAML        Length of the variable name
+         C     R15,=F'255'
          BNH   NAMEOK             Bif name is not too long
-         MVI   SHVRET,SHVBADN                                           01760000
-         B     RXERET             Return to EXECCOMM caller             01770000
+         MVI   SHVRET,SHVBADN
+         B     RXERET             Return to EXECCOMM caller
 *
-NAMEOK   DS    0H                                                       01780000
-         L     R14,SHVNAMA        Address of the name                   01790000
-         LA    R0,VARNAME                                               01800000
-         LA    R1,1(,R15)         Output 1 longer than input            01810000
-         MVCL  R0,R14             Copy name and append a null           01820000
-         L     R15,SHVNAML        Length of name                        01830000
-         BCTR  R15,0                -1 for execute                      01840000
-         L     R14,NUCUPPER                                             01850000
-         B     *+10                                                     01860000
-         TR    VARNAME(*-*),0(R14) Uppercase the var name               01870000
-         EX    R15,*-6            Now we have a C string                01880000
+NAMEOK   DS    0H
+         L     R14,SHVNAMA        Address of the name
+         LA    R0,VARNAME
+         LA    R1,1(,R15)         Output 1 longer than input
+         MVCL  R0,R14             Copy name and append a null
+         L     R15,SHVNAML        Length of name
+         BCTR  R15,0                -1 for execute
+         L     R14,NUCUPPER
+         B     *+10
+         TR    VARNAME(*-*),0(R14) Uppercase the var name
+         EX    R15,*-6            Now we have a C string
 *------------------------------------------------------------*
 * Call "RXE" to implement the data transfers specified in    *
 * the SHVBLOCK structure passed as an argument to EXECCOMM.  *
@@ -325,9 +374,9 @@ NAMEOK   DS    0H                                                       01780000
 *------------------------------------------------------------*
 * Call RXEXCM in RXEXCOMM C for processing                   *
 *------------------------------------------------------------*
-         LA    R1,RXEPLIST        Plist address                         02490000
-         L     R15,=V(RXEXCM)     Call RXEXCOMM C                       02500000
-         BALR  R14,R15              to perform operation                02510000
+         LA    R1,RXEPLIST        Plist address
+         L     R15,=V(RXEXCM)     Call RXEXCOMM C
+         BALR  R14,R15              to perform operation
          LTR   R15,R15            OK?
          BZ    RXERET             Done if so
 *
@@ -349,7 +398,7 @@ NOBADNM  DS    0H
 * Now restore the EXECCOMM runtime and return to the caller  *
 * of EXECCOMM.                                               *
 *------------------------------------------------------------*
-RXERET   DS     0H                                                      02610000
+RXERET   DS     0H
          TM    SHVCODE,C's'   Some kind of SET?
          BE    RXERNDBG       Yes, skip.
          L     R1,GCCCRABA    Get the GCCCRAB.
@@ -370,61 +419,65 @@ RXERET   DS     0H                                                      02610000
                CHARA,((R4),(R6)),CHARA,((R7),(R8))),                   *
                DOT=NO,MF=(E,LINEDPL)
 RXERNDBG DS    0H
-         SR     R15,R15           Set the return code                   02620000
-         IC     R15,SHVRET                                              02630000
-         LTR    R15,R15           Success with this SHVNLOK?            02640000
-         BNZ    RXERRXIT          Sadly, no. Return to caller           02650000
-         ICM    R5,B'1111',SHVNEXT More SHVBLOCKs to process?           02660000
-         BNZ    MAINLOOP          If so go do that                      02670000
-RXERRXIT DS     0H                Enter here with rc in R15             02680000
-         LR     R13,R3            Back to EXECCOMM R13                  02690000
-         L      R14,12(,R13)                                            02700000
-         LM     R0,R12,20(R13)                                          02710000
-         BR     R14                                                     02720000
-  TITLE 'HOSTCMD: Constants and literals'                               02730000
-*------------------------------------------------------------*          02740000
+         SR     R15,R15           Set the return code
+         IC     R15,SHVRET
+         LTR    R15,R15           Success with this SHVNLOK?
+         BNZ    RXERRXIT          Sadly, no. Return to caller
+         ICM    R5,B'1111',SHVNEXT More SHVBLOCKs to process?
+         BNZ    MAINLOOP          If so go do that
+RXERRXIT DS     0H                Enter here with rc in R15
+         LR     R13,R3            Back to EXECCOMM R13
+         L      R14,12(,R13)
+         LM     R0,R12,20(R13)
+         BR     R14
+  TITLE 'HOSTCMD: Constants and literals'
+*------------------------------------------------------------*
          DS     0D
 EXECFNC  DC     CL8'EXEC',8X'FF'
 FENCE    EQU    EXECFNC+8,8
-SBQP     SUBCOM QUERY,NAME='EXECCOMM',MF=L                              02750000
-SBSP     SUBCOM SET,NAME='EXECCOMM',ENTRY=EXECCOMM,MF=L                 02760000
-SBCP     SUBCOM CLR,NAME='EXECCOMM',MF=L                                02770000
-         LTORG ,                                                        02780000
-  TITLE 'HOSTCMD: Savearea and variables'                               02790000
-*                                                                       02800000
-* The LSTR data structure is used throughout BREXX to define            02810000
-* BREXX variables.                                                      02820000
-*                                                                       02830000
-LSTR     DSECT                                                          02840000
-LSTRPSTR DS    A                  Pointer to data                       02850000
-LSTRLEN  DS    F                  Current length of the data            02860000
-LSTRLMAX DS    F                  Max data bytes allocated              02870000
-LSTRTYPE DS    H                  Data type                             02880000
-LSTRING  EQU   0                     Character string data              02890000
-LINTEGER EQU   1                     Integer fata                       02900000
-LREAL    EQU   2                     Floating point data                02910000
-LSTRSIZE EQU   *-LSTR                                                   02920000
-*                                                                       02930000
-* This is the HOSTCMD dynamic storage area addressed by R13             02940000
-*                                                                       02950000
-         CMSCRAB                                                        02960000
-         ORG   MAINSTK                                                  02970000
-SUBCOML  SUBCOM QUERY,NAME='ENV',MF=L                                   02980000
-SUBCOMLL EQU   *-SUBCOML                                                02990000
-SBQL     SUBCOM QUERY,NAME='EXECCOMM',MF=L                              03000000
-SBQLLEN  EQU   *-SBQL                                                   03010000
-SBSL     SUBCOM SET,NAME='EXECCOMM',ENTRY=EXECCOMM,MF=L                 03020000
-SBSLLEN  EQU   *-SBSL                                                   03030000
-SBCL     SUBCOM CLR,NAME='EXECCOMM',MF=L                                03040000
-SBCLLEN  EQU   *-SBCL                                                   03050000
-*                                                                       03060000
-ENVNAME  DS    CL8                Environment name                      03070000
-         DS    8X'FF'             FENCE                                 03080000
-*                                                                       03090000
-MYEPLIST DS    0D                                                       03100000
-         DS    6A                 Extended plist                        03110000
-*                                                                       03120000
-RXEPLIST DS    0A                                                       03130000
+SBQP     SUBCOM QUERY,NAME='EXECCOMM',MF=L
+SBSP     SUBCOM SET,NAME='EXECCOMM',ENTRY=EXECCOMM,MF=L
+SBCP     SUBCOM CLR,NAME='EXECCOMM',MF=L
+         LTORG ,
+  TITLE 'HOSTCMD: Savearea and variables'
+*
+* The LSTR data structure is used throughout BREXX to define
+* BREXX variables.
+*
+LSTR     DSECT
+LSTRPSTR DS    A                  Pointer to data
+LSTRLEN  DS    F                  Current length of the data
+LSTRLMAX DS    F                  Max data bytes allocated
+LSTRTYPE DS    H                  Data type
+LSTRING  EQU   0                     Character string data
+LINTEGER EQU   1                     Integer fata
+LREAL    EQU   2                     Floating point data
+LSTRSIZE EQU   *-LSTR
+*
+* This is the HOSTCMD dynamic storage area addressed by R13
+*
+         CMSCRAB
+         ORG   MAINSTK
+SUBCOML  SUBCOM QUERY,NAME='ENV',MF=L
+SUBCOMLL EQU   *-SUBCOML
+SBQL     SUBCOM QUERY,NAME='EXECCOMM',MF=L
+SBQLLEN  EQU   *-SBQL
+SBSL     SUBCOM SET,NAME='EXECCOMM',ENTRY=EXECCOMM,MF=L
+SBSLLEN  EQU   *-SBSL
+SBCL     SUBCOM CLR,NAME='EXECCOMM',MF=L
+SBCLLEN  EQU   *-SBCL
+*
+         DS    0D                 Align for use as a PSW
+ENVNAME  DS    CL8                Environment name
+         DS    8X'FF'             FENCE
+*
+FLAGS    DS    X                  Flags
+ENVISPSW EQU   X'80'              - The environment "name" is a PSW.
+TPLTRUNC EQU   X'40'              - Tokenized plist was truncated.
+MYEPLIST DS    0D
+         DS    6A                 Extended plist
+*
+RXEPLIST DS    0A
 RXECALLT DS    F                  0 = fetch value
 *                                 1 = set value
 RXENAME  DS    A                  Ptr to VARNAME string
@@ -434,17 +487,22 @@ RXEBUFFL DS    A                  Address of SHVVALL. A FETCH
 *                                 operation copies the calue
 *                                 from SHVBUFL to SHVVALL
 *                                 before calling RXEXCM
-*                                                                       03230000
+*
+*  DO NOT re-order the next two save areas!
+SAVEAREA DS    18F                Savearea for LPSW subcommand calls.
+MYSAVE   DS    16F                Savearea around LPSW calls.
+*  DO NOT re-order the above two save areas!
+*
 LINEDPL  LINEDIT MF=L,MAXSUBS=4
-VARNAME  DS    CL256              Uppercased variable name              03240000
+VARNAME  DS    CL256              Uppercased variable name
 *                                 Assumes variable name
 *                                    length <= 255
-WKAREALN EQU   *-CMSCRAB                                                03250000
+WKAREALN EQU   *-CMSCRAB
          BRXCTX ,
          GCCCRAB ,
-         SVCSAVE ,                                                      03260000
-         REGEQU ,                                                       03270000
-         SCBLOCK ,                                                      03280000
-         SHVBLOCK ,                                                     03290000
-         NUCON ,                                                        03300000
-         END                                                            03310000
+         SVCSAVE ,
+         REGEQU ,
+         SCBLOCK ,
+         SHVBLOCK ,
+         NUCON ,
+         END   ,

@@ -49,18 +49,17 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef __CMS__
-
-#include <cmssys.h>
-
-#endif
-
 #include "lstring.h"
 #include "rexx.h"
 #include "trace.h"
 #include "stack.h"
 #include "compile.h"
 #include "interpre.h"
+
+#ifdef CMS
+#include <cmssys.h>
+#include "cmsbrexx.h"
+#endif
 
 #ifndef WIN
 #if defined(MSDOS) || defined(__WIN32__)

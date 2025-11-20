@@ -1,0 +1,702 @@
+         TITLE 'MACROs'
+         MACRO ,
+&LABEL   $L    &TEXT
+         LCLC  &LINE
+&LINE    SETC  'LINE&SYSNDX'
+&LABEL   DC    V(&LINE),A(L'&LINE)
+LINETEXT CSECT ,
+         ENTRY &LINE
+&LINE    DC    C&TEXT
+CMSEPLA  CSECT ,
+         MEND  ,
+         TITLE 'CMSEPLA - Test program for Extended Plists'
+*
+*        VM/370 Community Edition versions 1.1.2 and earlier do not
+*        have support for EXECs in storage.  This test program can
+*        therefore be assembled and run to call bREXX directly, using
+*        the pointer in NUCON, bypassing DMSEXC et al.
+*
+*        It can also be assembled to call the CMS EXECutor directly,
+*        or by SVC 202.
+*
+*        To choose which, do this:
+*
+*        ASSEMBLE CMSEPLA (DISK SYSPARM ( BREXX|AEXEC|SVC )
+*
+         LCLC  &CALLTYP       How should we run the EXEC?
+&CALLTYP SETC  '&SYSPARM'     We check validity in RUNEXEC below.
+         SPACE 3
+CMSEPLA  CSECT
+         USING NUCON,0
+         USING CMSEPLA,R12   Set addressability
+         STM   R0,R15,0(R13)  Save regs.
+         LR    R2,R0          Preserve parameter
+         LR    R3,R1             lists.
+         LR    R6,R13         Temporary copy of USERSAVE pointer.
+         SPACE 3
+         LA    R0,(WRKLEN+7)/8
+         DMSFREE DWORDS=(0),TYPE=USER Allocate Work area
+         LR    R13,R1
+         USING WRKSECT,R13
+         LR    R0,R1
+         LA    R1,WRKLEN
+         SR    R15,R15
+         MVCL  R0,R14             Zero out the WRKSECT
+         ST    R6,WRKUSAVE
+         SPACE 3
+         CLC   =CL8'TEST1',8(R3)
+         BE    TEST1
+         CLC   =CL8'TEST2',8(R3)
+         BE    TEST2
+         CLC   =CL8'TEST3',8(R3)
+         BE    TEST3
+         CLC   =CL8'TEST4',8(R3)
+         BE    TEST4
+         CLC   =CL8'TEST5',8(R3)
+         BE    TEST5
+         CLC   =CL8'TEST6',8(R3)
+         BE    TEST6
+         CLC   =CL8'TEST7',8(R3)
+         BE    TEST7
+         CLC   =CL8'TEST8',8(R3)
+         BE    TEST8
+         CLC   =CL8'TEST9',8(R3)
+         BE    TEST9
+         BAL   R14,MSG001     "Unknown test name"
+         B     EXITRC
+         SPACE 3
+EXITOK   DS    0H
+         SR    R15,R15
+EXITRC   DS    0H
+         L     R2,WRKUSAVE    Get USERSAVE pointer back.
+         LR    R3,R15         Preserve RC.
+         LA    R0,(WRKLEN+7)/8  Return
+         LR    R1,R13              our
+         DMSFRET DWORDS=(0),LOC=(1)   WRKSECT.
+         LR    R15,R3         Get RC back.
+         LM    R0,R14,0(R2)   Restore regs.
+         BR    R14            Return to caller.
+         TITLE 'RUNEXEC - Run a test exec.'
+RUNEXEC  DS    0H
+         STM   R0,R15,WRKSAV1 Save regs.
+         AIF   ('&CALLTYP' EQ '').RUN001
+         AIF   ('&CALLTYP' EQ 'SVC').RUN001
+         AIF   ('&CALLTYP' EQ 'BREXX').RUN002
+         AIF   ('&CALLTYP' EQ 'AEXEC').RUN003
+         MNOTE 8,'SYSPARM ( &CALLTYP ) is invalid.'
+         L     R15,=F'-666'
+         AGO   .RUN999
+.RUN001  ANOP  ,              CALLTYP=SVC
+         SVC   202
+         DC    AL4(1)
+         AGO   .RUN999
+.RUN002  ANOP  ,              CALLTYP=BREXX
+         L     R14,=X'FFE00000' Set bREXX
+         L     R15,NUCBREXX      PSW.
+         AGO   .RUN010
+.RUN003  ANOP  ,              CALLTYP=AEXEC
+         LA    R14,0          Set DMSEX*
+         L     R15,AEXEC         PSW.
+.RUN010  ANOP  ,
+         SPKA  0              Get key 0 in case HRCxxxDS not installed.
+         STM   R14,R15,IPLPSW  Set startup PSW.
+         L     R2,WRKSAV1+(R2*4)  Pass caller's R2.
+         LA    R14,RUNRET     Set return address EXEC/bREXX.
+         LA    R13,WRKSAV2    Savearea for EXEC/bREXX.
+         XC    0(12*8,R13),0(R13)  Clear it.
+         PUSH  USING          EXEC/bREXX can destroy all but R13
+         DROP  ,                 so no other USINGs apply upon return.
+         USING NUCON,0
+         LR    R12,R15        EXEC/bREXX entry address.
+         LPSW  IPLPSW         Goto EXEC/bREXX.
+         SPACE 3
+         USING RUNRET,R14
+RUNRET   DS    0H             EXEC/bREXX returns to us here.
+         S     R13,=A(WRKSAV2-WRKSECT)
+         USING WRKSECT,R13
+         LR    R12,R14        Fix up
+         S     R12,=A(RUNRET-CMSEPLA)  basereg.
+         USING CMSEPLA,R12
+         DROP  R14
+         SPACE 3
+.RUN999  ANOP  ,
+         LM    R0,R14,WRKSAV1 Restore regs.
+         BR    R14            Return to caller.
+         TITLE 'BALREXEC - Run a test exec via BALR, not SVC'
+BALREXEC DS    0H
+         STM   R0,R15,WRKSAV1 Save regs.
+         AIF   ('&CALLTYP' EQ '').BALR003
+         AIF   ('&CALLTYP' EQ 'SVC').BALR003   Assume SVC->AEXEC
+         AIF   ('&CALLTYP' EQ 'BREXX').BALR002
+         AIF   ('&CALLTYP' EQ 'AEXEC').BALR003
+         MNOTE 8,'SYSPARM ( &CALLTYP ) is invalid.'
+         L     R15,=F'-666'
+         AGO   .BALR999
+.BALR002 ANOP  ,              CALLTYP=BREXX
+         L     R14,=X'FFE00000' Set bREXX
+         L     R15,NUCBREXX      PSW.
+         AGO   .BALR010
+.BALR003 ANOP  ,              CALLTYP=AEXEC
+         LA    R14,0          Set DMSEX*
+         L     R15,AEXEC         PSW.
+.BALR010 ANOP  ,
+         SPKA  0              Get key 0 in case HRCxxxDS not installed.
+         STM   R14,R15,IPLPSW  Set startup PSW.
+         L     R2,WRKSAV1+(R2*4)  Pass caller's R2.
+         LA    R14,BALRRET    Set return address EXEC/bREXX.
+         LA    R13,WRKSAV2    Savearea for EXEC/bREXX.
+         XC    0(12*8,R13),0(R13)  Clear it.
+         PUSH  USING          EXEC/bREXX can destroy all but R13
+         DROP  ,                 so no other USINGs apply upon return.
+         USING NUCON,0
+         LR    R12,R15        EXEC/bREXX entry address.
+         LPSW  IPLPSW         Goto EXEC/bREXX.
+         SPACE 3
+         USING BALRRET,R14
+BALRRET  DS    0H             EXEC/bREXX returns to us here.
+         S     R13,=A(WRKSAV2-WRKSECT)
+         USING WRKSECT,R13
+         LR    R12,R14        Fix up
+         S     R12,=A(BALRRET-CMSEPLA)  basereg.
+         USING CMSEPLA,R12
+         DROP  R14
+         SPACE 3
+.BALR999 ANOP  ,
+         LM    R0,R14,WRKSAV1 Restore regs.
+         BR    R14            Return to caller.
+         TITLE 'TEST1 - Run an EXEC with an EPLIST, but no FBLOCK.'
+TEST1    DS    0H
+         LA    R0,T001EPL
+         LA    R1,T001TPL
+         ICM   R1,B'1000',=X'0B' 4-word EPlist available
+         BAL   R14,RUNEXEC
+         CH    R15,=H'101'    Did we get expected RC?
+         BE    EXITOK         Yes, all is well
+         BAL   R14,MSG002     "Unexpected RC"
+         B     EXITRC         Tell caller we failed.
+         SPACE 3
+T001EPL  DS    0D
+         DC    A(T001VERB)    Cmd.
+         DC    A(T001ARG1)    Argstart.
+         DC    A(T001ARGE)    Argend.
+         DC    A(0)           -> FBLOCK
+         SPACE 3
+T001TPL  DS    0D
+T001VERB DC    CL8'EXEC'
+         DC    CL8'CMSEPL1'
+         DC    CL8'ThisIsALongMixedCaseArgument'
+         DC    CL8'ThisIsAnother'
+         DC    8X'FF'
+         SPACE 3
+T001ARG1 DC    C'CMSEPL1 ThisIsALongMixedCaseArgument ThisIsAnother'
+T001ARGE EQU   *
+         TITLE 'TEST2 - Run an EXEC with an FBLOCK and odd filetype.'
+TEST2    DS    0H
+         LA    R0,T002EPL
+         LA    R1,T002TPL
+         ICM   R1,B'1000',=X'0B' 4-word EPlist available
+         BAL   R14,RUNEXEC
+         CH    R15,=H'102'    Did we get expected RC?
+         BE    EXITOK         Yes, all is well
+         BAL   R14,MSG002     "Unexpected RC"
+         B     EXITRC         Tell caller we failed.
+         SPACE 3
+T002EPL  DS    0D
+         DC    A(T002VERB)    Cmd.
+         DC    A(T002ARG1)    Argstart.
+         DC    A(T002ARGE)    Argend.
+         DC    A(T002FBLK)    -> FBLOCK
+         SPACE 3
+T002TPL  DS    0D
+T002VERB DC    CL8'EXEC'
+         DC    CL8'TesTXxxX'  Will be overridden by FBLNAME & EPLARGBG.
+         DC    CL8'ThisIsAVeryLongArgument'
+         DC    CL8'SoIsThisOne'
+         DC    8X'FF'
+         SPACE 3
+T002FBLK DS    0D
+         DC    CL8'CMSEPL2'   Fn.
+         DC    CL8'TESTEXEC'  Ft.
+         DC    CL2'*'         Fm.
+         DC    AL2((T002FBLE-(*+2))/4) L'extension list in words
+T002FBLE EQU   *
+         SPACE 3
+T002ARG1 DC    C'tEStxXXx ThisIsAVeryLongArgument SoIsThisOne'
+T002ARGE EQU   *
+         TITLE 'TEST3 - Run an EXEC with an FBLOCK from storage.'
+TEST3    DS    0H
+         LA    R0,T003EPL
+         LA    R1,T003TPL
+         ICM   R1,B'1000',=X'0B' 4-word EPlist available
+         BAL   R14,RUNEXEC
+         CH    R15,=H'103'    Did we get expected RC?
+         BE    EXITOK         Yes, all is well
+         BAL   R14,MSG002     "Unexpected RC"
+         B     EXITRC         Tell caller we failed.
+         SPACE 3
+T003EPL  DS    0D
+         DC    A(T003VERB)    Cmd.
+         DC    A(T003ARG1)    Argstart.
+         DC    A(T003ARGE)    Argend.
+         DC    A(T003FBLK)    -> FBLOCK
+         SPACE 3
+T003TPL  DS    0D
+T003VERB DC    CL8'EXEC'
+         DC    CL8'TESTabCD'  Will be overridden by FBLNAME & EPLARGBG.
+         DC    8X'FF'
+         SPACE 3
+T003FBLK DS    0D
+         DC    CL8'CMsEpl3'   Fn.
+         DC    CL8'TESTEXEC'  Ft.
+         DC    CL2'*'         Fm.
+         DC    AL2((T003FBLE-(*+2))/4) L'extension list in words
+         DC    A(T003CODE)    Ext 1: First line.
+         DC    A(T003CODL)    Ext 1: Length of list.
+T003FBLE EQU   *
+         SPACE 3
+T003ARG1 DC    C'TESTABcd LongArgAbcd YetAnother'
+T003ARGE EQU   *
+         SPACE 3
+T003CODE DS    0D
+   $L '/* CMSEPL3 EXEC - See CMSEPLA ASSEMBLE:TEST3. */'
+   $L 'Parse version Version'
+   $L 'Say "TEST3 running on" Version'
+   $L 'Parse source System Environment FN FT FM Command Prefix'
+   $L 'If System <> "CMS" then Return 1'
+   $L 'If Environment <> "COMMAND" then Return 2'
+   $L 'If (FN FT) <> "CMsEpl3 TESTEXEC" | ,'
+   $L '   (Translate(FM) <> "A1" && FM <> "*") then Return 3'
+   $L 'If Command <> "TESTABcd" then Return 4'
+   $L 'If Prefix <> "TESTEXEC" then Return 5'
+   $L ' '
+   $L 'Parse arg Word1 Word2 Word3'
+   $L 'If Word1 <> "LongArgAbcd" then Return 6'
+   $L 'If Word2 <> "YetAnother" then Return 7'
+   $L 'If Word3 <> "" then Return 8'
+   $L 'If Address() <> Prefix then Return 9'
+   $L ' '
+   $L 'If SourceLine() <> 21 then Return 10'
+   $L ' '
+   $L '/* Tell CMSEPLA we succeeded. */'
+   $L 'Return 103'
+T003CODL EQU   *-T003CODE
+         TITLE 'TEST4 - Run an EXEC with an FBLOCK from storage and an *
+               explicit ADDRESS.'
+TEST4    DS    0H
+         LA    R0,T004EPL
+         LA    R1,T004TPL
+         ICM   R1,B'1000',=X'0B' 4-word EPlist available
+         BAL   R14,RUNEXEC
+         CH    R15,=H'104'    Did we get expected RC?
+         BE    EXITOK         Yes, all is well
+         BAL   R14,MSG002     "Unexpected RC"
+         B     EXITRC         Tell caller we failed.
+         SPACE 3
+T004EPL  DS    0D
+         DC    A(T004VERB)    Cmd.
+         DC    A(T004ARG1)    Argstart.
+         DC    A(T004ARGE)    Argend.
+         DC    A(T004FBLK)    -> FBLOCK
+         SPACE 3
+T004TPL  DS    0D
+T004VERB DC    CL8'EXEC'
+         DC    CL8'testefgh'  Will be overridden by FBLNAME & EPLARGBG.
+         DC    8X'FF'
+         SPACE 3
+T004FBLK DS    0D
+         DC    CL8'cMsEpL4'   Fn.
+         DC    CL8'TESTEXEC'  Ft.
+         DC    CL2'*'         Fm.
+         DC    AL2((T004FBLE-(*+2))/4) L'extension list in words
+         DC    A(T004CODE)    Ext 1: First line.
+         DC    A(T004CODL)    Ext 1: Length of list.
+         DC    CL8'BLIVET'    Ext 2: "Prefix" (i.e., ADDRESS())
+T004FBLE EQU   *
+         SPACE 3
+T004ARG1 DC    C'TesTeFgH LongArgEfgh AnotherLongy'
+T004ARGE EQU   *
+         SPACE 3
+T004CODE DS    0D
+   $L '/* CMSEPL4 EXEC - See CMSEPLA ASSEMBLE:TEST4. */'
+   $L 'Parse version Version'
+   $L 'Say "TEST4 running on" Version'
+   $L 'Parse source System Environment FN FT FM Command Prefix'
+   $L 'If System <> "CMS" then Return 1'
+   $L 'If Environment <> "COMMAND" then Return 2'
+   $L 'If (FN FT) <> "cMsEpL4 TESTEXEC" | ,'
+   $L '   (Translate(FM) <> "A1" && FM <> "*") then Return 3'
+   $L 'If Command <> "TesTeFgH" then Return 4'
+   $L 'If Prefix <> "BLIVET" then Return 5'
+   $L ' '
+   $L 'Parse arg Word1 Word2 Word3'
+   $L 'If Word1 <> "LongArgEfgh" then Return 6'
+   $L 'If Word2 <> "AnotherLongy" then Return 7'
+   $L 'If Word3 <> "" then Return 8'
+   $L 'If Address() <> Prefix then Return 9'
+   $L ' '
+   $L 'If SourceLine() <> 21 then Return 10'
+   $L ' '
+   $L '/* Tell CMSEPLA we succeeded. */'
+   $L 'Return 104'
+T004CODL EQU   *-T004CODE
+         TITLE 'TEST5 - Run an EXEC with an FBLOCK from storage and a P*
+               SW ADDRESS.'
+TEST5    DS    0H
+         LA    R0,T005EPL
+         LA    R1,T005TPL
+         ICM   R1,B'1000',=X'0B' 4-word EPlist available
+         BAL   R14,RUNEXEC
+         CH    R15,=H'105'    Did we get expected RC?
+         BE    EXITOK         Yes, all is well
+         BAL   R14,MSG002     "Unexpected RC"
+         B     EXITRC         Tell caller we failed.
+         SPACE 3
+T005EPL  DS    0D
+         DC    A(T005VERB)    Cmd.
+         DC    A(T005ARG1)    Argstart.
+         DC    A(T005ARGE)    Argend.
+         DC    A(T005FBLK)    -> FBLOCK
+         SPACE 3
+T005TPL  DS    0D
+T005VERB DC    CL8'EXEC'
+         DC    CL8'tEsTiJkL'  Will be overridden by FBLNAME & EPLARGBG.
+         DC    8X'FF'
+         SPACE 3
+T005FBLK DS    0D
+         DC    CL8'CMSEPL5'   Fn.
+         DC    CL8'TESTEXEC'  Ft.
+         DC    CL2'*'         Fm.
+         DC    AL2((T005FBLE-(*+2))/4) L'extension list in words
+         DC    A(T005CODE)    Ext 1: First line.
+         DC    A(T005CODL)    Ext 1: Length of list.
+         DC    XL8'0102030005060708' Ext 2: "Prefix" (i.e., ADDRESS()).
+T005FBLE EQU   *
+         SPACE 3
+T005ARG1 DC    C'TESTJKLM LongArgIjkl QuiteALongArg'
+T005ARGE EQU   *
+         SPACE 3
+T005CODE DS    0D
+   $L '/* CMSEPL5 EXEC - See CMSEPLA ASSEMBLE:TEST5. */'
+   $L 'Parse version Version'
+   $L 'Say "TEST5 running on" Version'
+   $L 'Parse source System Environment FN FT FM Command Prefix'
+   $L 'If System <> "CMS" then Return 1'
+   $L 'If Environment <> "COMMAND" then Return 2'
+   $L 'If (FN FT) <> "CMSEPL5 TESTEXEC" | ,'
+   $L '   (Translate(FM) <> "A1" && FM <> "*") then Return 3'
+   $L 'If Command <> "TESTJKLM" then Return 4'
+   $L 'If Prefix <> "?" then Return 5'
+   $L ' '
+   $L 'Parse arg Word1 Word2 Word3'
+   $L 'If Word1 <> "LongArgIjkl" then Return 6'
+   $L 'If Word2 <> "QuiteALongArg" then Return 7'
+   $L 'If Word3 <> "" then Return 8'
+   $L 'If C2X(Address()) <> "0102030005060708" then Return 9'
+   $L ' '
+   $L 'If SourceLine() <> 21 then Return 10'
+   $L ' '
+   $L '/* Tell CMSEPLA we succeeded. */'
+   $L 'Return 105'
+T005CODL EQU   *-T005CODE
+         TITLE 'TEST6 - Run an EXEC with an FBLOCK from storage and a P*
+               SW ADDRESS and an env name.'
+TEST6    DS    0H
+         LA    R0,T006EPL
+         LA    R1,T006TPL
+         ICM   R1,B'1000',=X'0B' 4-word EPlist available
+         BAL   R14,RUNEXEC
+         CH    R15,=H'106'    Did we get expected RC?
+         BE    EXITOK         Yes, all is well
+         BAL   R14,MSG002     "Unexpected RC"
+         B     EXITRC         Tell caller we failed.
+         SPACE 3
+T006EPL  DS    0D
+         DC    A(T006VERB)    Cmd.
+         DC    A(T006ARG1)    Argstart.
+         DC    A(T006ARGE)    Argend.
+         DC    A(T006FBLK)    -> FBLOCK
+         SPACE 3
+T006TPL  DS    0D
+T006VERB DC    CL8'EXEC'
+         DC    CL8'tEsTiJkL'  Will be overridden by FBLNAME & EPLARGBG.
+         DC    8X'FF'
+         SPACE 3
+T006FBLK DS    0D
+         DC    CL8'CMSepL6'   Fn.
+         DC    CL8'TESTEXEC'  Ft.
+         DC    CL2'*'         Fm.
+         DC    AL2((T006FBLE-(*+2))/4) L'extension list in words
+         DC    A(T006CODE)    Ext 1: First line.
+         DC    A(T006CODL)    Ext 1: Length of list.
+         DC    XL8'0102030006060708' Ext 2: "Prefix" (i.e., ADDRESS()).
+         DC    CL8'BLIVET'    Ext 3: Environment.
+T006FBLE EQU   *
+         SPACE 3
+T006ARG1 DC    C'TesTNopQ LongArgIjkl QuiteALongArg'
+T006ARGE EQU   *
+         SPACE 3
+T006CODE DS    0D
+   $L '/* CMSEPL6 EXEC - See CMSEPLA ASSEMBLE:TEST6. */'
+   $L 'Parse version Version'
+   $L 'Say "TEST6 running on" Version'
+   $L 'Parse source System Environment FN FT FM Command Prefix'
+   $L 'If System <> "CMS" then Return 1'
+   $L 'If Environment <> "COMMAND" then Return 2'
+   $L 'If (FN FT) <> "CMSepL6 TESTEXEC" | ,'
+   $L '   (Translate(FM) <> "A1" && FM <> "*") then Return 3'
+   $L 'If Command <> "TesTNopQ" then Return 4'
+   $L 'If Prefix <> "BLIVET" then Return 5'
+   $L ' '
+   $L 'Parse arg Word1 Word2 Word3'
+   $L 'If Word1 <> "LongArgIjkl" then Return 6'
+   $L 'If Word2 <> "QuiteALongArg" then Return 7'
+   $L 'If Word3 <> "" then Return 8'
+   $L 'If Address() <> "BLIVET" then Return 9'
+   $L ' '
+   $L 'If SourceLine() <> 21 then Return 10'
+   $L ' '
+   $L '/* Tell CMSEPLA we succeeded. */'
+   $L 'Return 106'
+T006CODL EQU   *-T006CODE
+         TITLE 'TEST7 - Run an EXEC with an FBLOCK from storage and a n*
+               amed SUBCOM and an env name.'
+TEST7    DS    0H
+         LA    R0,T007EPL
+         LA    R1,T007TPL
+         ICM   R1,B'1000',=X'0B' 4-word EPlist available
+         BAL   R14,RUNEXEC
+         CH    R15,=H'107'    Did we get expected RC?
+         BE    EXITOK         Yes, all is well
+         BAL   R14,MSG002     "Unexpected RC"
+         B     EXITRC         Tell caller we failed.
+         SPACE 3
+T007EPL  DS    0D
+         DC    A(T007VERB)    Cmd.
+         DC    A(T007ARG1)    Argstart.
+         DC    A(T007ARGE)    Argend.
+         DC    A(T007FBLK)    -> FBLOCK
+         SPACE 3
+T007TPL  DS    0D
+T007VERB DC    CL8'EXEC'
+         DC    CL8'tEsTiJkL'  Will be overridden by FBLNAME & EPLARGBG.
+         DC    8X'FF'
+         SPACE 3
+T007FBLK DS    0D
+         DC    CL8'CMSepL7'   Fn.
+         DC    CL8'TESTEXEC'  Ft.
+         DC    CL2'*'         Fm.
+         DC    AL2((T007FBLE-(*+2))/4) L'extension list in words
+         DC    A(T007CODE)    Ext 1: First line.
+         DC    A(T007CODL)    Ext 1: Length of list.
+         DC    CL8'BANANA'    Ext 2: "Prefix" (i.e., ADDRESS()).
+         DC    CL8'BLIVET'    Ext 3: Environment.
+T007FBLE EQU   *
+         SPACE 3
+T007ARG1 DC    C'TesTNopQ LongArgIjkl QuiteALongArg'
+T007ARGE EQU   *
+         SPACE 3
+T007CODE DS    0D
+   $L '/* CMSEPL7 EXEC - See CMSEPLA ASSEMBLE:TEST7. */'
+   $L 'Parse version Version'
+   $L 'Say "TEST7 running on" Version'
+   $L 'Parse source System Environment FN FT FM Command Prefix'
+   $L 'If System <> "CMS" then Return 1'
+   $L 'If Environment <> "COMMAND" then Return 2'
+   $L 'If (FN FT) <> "CMSepL7 TESTEXEC" | ,'
+   $L '   (Translate(FM) <> "A1" && FM <> "*") then Return 3'
+   $L 'If Command <> "TesTNopQ" then Return 4'
+   $L 'If Prefix <> "BLIVET" then Return 5'
+   $L ' '
+   $L 'Parse arg Word1 Word2 Word3'
+   $L 'If Word1 <> "LongArgIjkl" then Return 6'
+   $L 'If Word2 <> "QuiteALongArg" then Return 7'
+   $L 'If Word3 <> "" then Return 8'
+   $L 'If Address() <> "BLIVET" then Return 9'
+   $L ' '
+   $L 'If SourceLine() <> 21 then Return 10'
+   $L ' '
+   $L '/* Tell CMSEPLA we succeeded. */'
+   $L 'Return 107'
+T007CODL EQU   *-T007CODE
+         TITLE 'TEST8 - Run an EXEC that issues commands to a PSW env.'
+TEST8    DS    0H
+         LA    R0,T008EPL
+         LA    R1,T008TPL
+         ICM   R1,B'1000',=X'0B' 4-word EPlist available
+         L     R2,=X'FADEDBEE'
+*
+* No option for SVC linkage here - this always calls BALR-style, to be
+* able to check passing of R2.
+*
+         BAL   R14,BALREXEC
+         CH    R15,=H'108'    Did we get expected RC?
+         BE    EXITOK         Yes, all is well
+         BAL   R14,MSG002     "Unexpected RC"
+         B     EXITRC         Tell caller we failed.
+         SPACE 3
+         PUSH  USING
+         DROP  ,
+T008ENV  DS    0H
+         STM   R0,R15,0(R13)
+         BALR  R12,0
+         USING *,R12
+         LR    R11,R14
+         LR    R4,R0
+         LR    R5,R1
+         C     R6,=X'FADEDBEE'
+         BNE   T008ENV2
+         LINEDIT TEXT='Expected R2=FADEDBEE',DOT=NO
+T008ENV2 DS    0H
+         AGO   .T008EN4        Turn this off for debugging.
+         LR    R6,R2
+         LINEDIT TEXT='R0=........ R1=........ R2=........ R13=........*
+                R14=........',                                         *
+               SUB=(HEX,(R4),HEX,(R5),HEX,(R6),HEX,(R13),HEX,(R11)),   *
+               RENT=NO,DOT=NO
+         LINEDIT TEXT='EPLIST=.........................................*
+               ............',                                          *
+               SUB=(HEX4A,(R4)),RENT=NO,DOT=NO
+         L     R2,0(,R4)
+         LINEDIT TEXT='EPLCMD=.................',                      *
+               SUB=(HEX4A,(R2)),RENT=NO,DOT=NO
+         CLC   0(8,R2),T008PSW
+         BE    T008ENV3
+         LINEDIT TEXT='Expected EPLCMD=.................',             *
+               SUB=(HEX4A,T008PSW),RENT=NO,DOT=NO
+T008ENV3 DS    0H
+         L     R3,4(,R4)
+         L     R6,8(,R4)
+         SR    R6,R3
+         LINEDIT TEXT='EPLARGS=........................................*
+               ......................................................',*
+               SUB=(CHARA,((R3),(R6))),RENT=NO,DOT=NO
+         LINEDIT TEXT='TPLIST=.........................................*
+               ......................',                                *
+               SUB=(CHAR8A,(R5)),RENT=NO,DOT=NO,COMP=NO
+.T008EN4 ANOP  ,
+         WAITT ,
+         LM    R0,R14,0(R13)
+         LA    R15,42
+         BR    R14
+         POP   USING
+         SPACE 3
+T008EPL  DS    0D
+         DC    A(T008VERB)    Cmd.
+         DC    A(T008ARG1)    Argstart.
+         DC    A(T008ARGE)    Argend.
+         DC    A(T008FBLK)    -> FBLOCK
+         SPACE 3
+T008TPL  DS    0D
+T008VERB DC    CL8'EXEC'
+         DC    CL8'tEsTMnOp'  Will be overridden by FBLNAME & EPLARGBG.
+         DC    8X'FF'
+         SPACE 3
+T008FBLK DS    0D
+         DC    CL8'CMSEpl8'   Fn.
+         DC    CL8'TESTEXEC'  Ft.
+         DC    CL2'*'         Fm.
+         DC    AL2((T008FBLE-(*+2))/4) L'extension list in words
+         DC    A(T008CODE)    Ext 1: First line.
+         DC    A(T008CODL)    Ext 1: Length of list.
+T008PSW  DC    A(0,T008ENV)   Ext 2: "Prefix" (i.e., ADDRESS()).
+T008FBLE EQU   *
+         SPACE 3
+T008ARG1 DC    C'TesTmNoP LongArgIjkl QuiteALongArg'
+T008ARGE EQU   *
+         SPACE 3
+T008CODE DS    0D
+   $L '/* CMSEPL8 EXEC - See CMSEPLA ASSEMBLE:TEST8. */'
+   $L 'Parse version Version'
+   $L 'Say "TEST8 running on" Version'
+   $L 'Parse source System Environment FN FT FM Command Prefix'
+   $L 'If System <> "CMS" then Return 1'
+   $L 'If Environment <> "COMMAND" then Return 2'
+   $L 'If (FN FT) <> "CMSEpl8 TESTEXEC" | ,'
+   $L '   (Translate(FM) <> "A1" && FM <> "*") then Return 3'
+   $L 'If Command <> "TesTmNoP" then Return 4'
+   $L ' '
+   $L 'Parse arg Word1 Word2 Word3'
+   $L 'If Word1 <> "LongArgIjkl" then Return 5'
+   $L 'If Word2 <> "QuiteALongArg" then Return 6'
+   $L 'If Word3 <> "" then Return 7'
+   $L 'If C2X(Left(Address(), 1)) <> "00" then Return 8'
+   $L ' '
+   $L '"TESTASDF ABC 123 NowIsTheWinterOfOurDiscontent" ,'
+   $L '   "MadeGloriousSummerByThisSonOfYork"'
+   $L ' '
+   $L 'If RC <> 42 then Return 9'
+   $L 'If SourceLine() <> 24 then Return 10'
+   $L ' '
+   $L '/* Tell CMSEPLA we succeeded. */'
+   $L 'Return 108'
+T008CODL EQU   *-T008CODE
+         TITLE 'TEST9 - Run an EXEC odd filetype and function calls.'
+TEST9    DS    0H
+         LA    R0,T009EPL
+         LA    R1,T009TPL
+         ICM   R1,B'1000',=X'0B' 4-word EPlist available
+         BAL   R14,RUNEXEC
+         CH    R15,=H'109'    Did we get expected RC?
+         BE    EXITOK         Yes, all is well
+         BAL   R14,MSG002     "Unexpected RC"
+         B     EXITRC         Tell caller we failed.
+         SPACE 3
+T009EPL  DS    0D
+         DC    A(T009VERB)    Cmd.
+         DC    A(T009ARG1)    Argstart.
+         DC    A(T009ARGE)    Argend.
+         DC    A(T009FBLK)    -> FBLOCK
+         SPACE 3
+T009TPL  DS    0D
+T009VERB DC    CL8'EXEC'
+         DC    CL8'TesTyYzZ'  Will be overridden by FBLNAME & EPLARGBG.
+         DC    CL8'ThisIsAVeryBigArgument'
+         DC    CL8'ThisOneIsToo'
+         DC    8X'FF'
+         SPACE 3
+T009FBLK DS    0D
+         DC    CL8'CMSEPL9'  Fn.
+         DC    CL8'TESTEXEC'  Ft.
+         DC    CL2'*'         Fm.
+         DC    AL2((T009FBLE-(*+2))/4) L'extension list in words
+T009FBLE EQU   *
+         SPACE 3
+T009ARG1 DC    C'TestAsDf ThisIsAVeryBigArgument ThisOneIsToo'
+T009ARGE EQU   *
+         TITLE 'Messages'
+MSG001   DS    0H
+         XC    WRKLEDPL,WRKLEDPL
+         LINEDIT TEXT='TSTEPL001E Unknown test name: ........',        *
+               SUB=(CHARA,8(R3)),DISP=ERRMSG,MF=(E,WRKLEDPL)
+         LA    R15,1
+         BR    R14
+         SPACE 3
+MSG002   DS    0H
+         LR    R2,R15
+         LINEDIT TEXT='TSTEPL002E Unexpected return code ........',    *
+               SUB=(DEC,(R2)),DISP=ERRMSG,MF=(E,WRKLEDPL)
+         LA    R15,2
+         BR    R14
+         SPACE 3
+         TITLE 'Constants'
+         LTORG ,
+         TITLE 'Work Area'
+WRKSECT  DSECT ,
+WRKSAV1  DS    18A            Savearea.
+DOUB     DS    D              Doubleword work area.
+WRKUSAVE DS    A              -> CMS's USERSAVE at entry to us.
+WRKPLST0 DS    0D
+WRKLEDPL LINEDIT MAXSUBS=1,MF=L
+WRKPLSTS EQU   WRKPLST0,*-WRKPLST0
+         DS    0D
+WRKSAV2  DS    XL256          Savearea across bREXX calls.
+WRKLEN   EQU   *-WRKSECT
+         TITLE 'DSECTs'
+         NUCON ,
+         ORG   NUCON+X'90'
+NUCBREXX DS    A              bREXX address in memory
+         ORG   ,
+         EJECT ,
+         IO    ,
+         REGEQU ,
+         END   ,

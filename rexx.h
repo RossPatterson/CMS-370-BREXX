@@ -118,8 +118,13 @@
 typedef
 struct trxfile {
     Lstr name;  /* complete file path */
+#ifdef CMS
+    char *filename; /* filename string, not in name */
+    char *filetype; /* filetype string, not in name */
+#else
     char *filename; /* filename in name */
     char *filetype; /* filetype in name */
+#endif
     void *libHandle; /* Shared library handle*/
     Lstr file;  /* actual file  */
     struct trxfile *next; /* prev in list  */
@@ -164,6 +169,14 @@ struct tbltfunc {
 } TBltFunc;
 
 /* ----------- proc data structure ---------------- */
+#ifdef CMS
+/* CMS allows an environment to have both a name and a "prefix" (to which commands are directed). */
+typedef
+struct cmsenv {
+    PLstr prefix;  /* environment prefix */
+    PLstr name;  /* environment name */
+} CmsEnv;
+#endif
 typedef
 struct trxproc {
     int id;  /* procedure id  */
@@ -173,8 +186,13 @@ struct trxproc {
     size_t stacktop; /* stack after args */
     Scope scope;  /* Variables  */
     Args arg;  /* stck pos of args */
+#ifdef CMS
+    CmsEnv *env;  /* environment */
+    CmsEnv *env_alt;  /* alternate environment */
+#else
     PLstr env;  /* environment */
     PLstr env_alt;  /* alternate environment */
+#endif
     int digits;  /* numeric digits */
     int fuzz;  /* numeric fuzz  */
     int form;  /* numeric form  */

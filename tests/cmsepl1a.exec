@@ -1,0 +1,16 @@
+/* CMSEPL1A EXEC - See CMSEPLA ASSEMBLE:TEST1. */
+Parse source System Environment FN FT FM Command Prefix
+If System <> "CMS" then Return 1
+If Pos(" " || Environment,  " FUNCTION SUBROUTINE") = 0 then Return 2
+If (FN FT) <> "CMSEPL1A EXEC" | ,
+   (Translate(FM) <> "A1" & FM <> "*") then Return 3
+If Command <> "CMSEPL1A" then Return 4
+If Prefix <> "CMS" then Return 5
+
+If Arg() <> 1 then Return 6
+If Arg(1) = 'P' then Return 98
+If Arg(1) = 'Q' then Return 99
+
+If SourceLine() <> 16 then Return 7
+
+Return 8

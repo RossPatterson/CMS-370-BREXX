@@ -81,8 +81,6 @@
 
 #endif
 
-#include <cmssys.h>
-
 #include "lerror.h"
 #include "lstring.h"
 #include "options.h"
@@ -94,6 +92,11 @@
 #include "compile.h"
 #include "interpre.h"
 #include "context.h"
+
+#ifdef CMS
+#include <cmssys.h>
+#include "cmsbrexx.h"
+#endif
 
 #ifdef WCE
 # define MAX_EVENT_COUNT 50
@@ -237,7 +240,12 @@ I_LoadOption(const PLstr value, const int opt) {
 
     switch (opt) {
         case environment_opt:
+#ifdef CMS
+            /* The only use for this wants the prefix, not the name */
+            Lstrcpy(value, (context->rexx_proc)[(context->rexx_rx_proc)].env->prefix);
+#else
             Lstrcpy(value, (context->rexx_proc)[(context->rexx_rx_proc)].env);
+#endif
             break;
 
         case digits_opt:
@@ -263,12 +271,12 @@ I_LoadOption(const PLstr value, const int opt) {
                so we do it here instead :-(
              */
             int vslen = strlen(VERSIONSTR);
-            char * versionstr = malloc(vslen+1);
+            char * versionstr = MALLOC(vslen+1, "versionString");
             strcpy(versionstr, VERSIONSTR);
             strncpy(versionstr + vslen-8,  VERSIONSTR + vslen-11, 3); // "Mmm"
             strncpy(versionstr + vslen-11, VERSIONSTR + vslen-7,  3); // "dd "
             Lscpy(value, versionstr);
-            free(versionstr);
+            FREE(versionstr);
             break;
 
         case os_opt:
@@ -313,7 +321,16 @@ I_LoadOption(const PLstr value, const int opt) {
 
         case shell_opt:
 #ifdef CMS
-            Lstrcpy(value, (context->rexx_proc)[(context->rexx_rx_proc)].env);
+/* This is the definition per the IBM Rexx Reference manual:
+#define IS_PSW(field) ((field)[3] == 0x00)
+   but we need it to be more specific:
+*/
+#define IS_PSW(field) (LLEN(*(field)) == 8 && LSTR(*(field))[3] == 0x00)
+        if (IS_PSW((context->rexx_proc)[(context->rexx_rx_proc)].env->name))
+            Lscpy(value, "?");
+        else
+            Lstrcpy(value, (context->rexx_proc)[(context->rexx_rx_proc)].env->name);
+#undef IS_PSW
 #else
 #ifndef WCE
             ch = getenv(SHELL);
@@ -334,29 +351,80 @@ I_LoadOption(const PLstr value, const int opt) {
 static void
 I_StoreOption(const PLstr value, const int opt) {
     long l;
+#ifdef CMS
     Context *context = (Context *) CMSGetPG();
+    PLstr new_env_name;
+    PLstr new_env_prefix;
+#else
     PLstr new_env;
+#endif
 
     switch (opt) {
         case environment_opt:
             if (value && LLEN(*value) > 250)
                 (context->lstring_Lerror)(ERR_ENVIRON_TOO_LONG, 1, value);
+#ifdef CMS
+            LPMALLOC(new_env_name);
+            LPMALLOC(new_env_prefix);
+#else
             LPMALLOC(new_env);
+#endif
             if (value) {
+#ifdef CMS
+                Lstrcpy(new_env_name, value);
+                Lstrcpy(new_env_prefix, value);
+#else
                 Lstrcpy(new_env, value);
+#endif
             } else {
+#ifdef CMS
+                Lstrcpy(new_env_name, (context->rexx_proc)[(context->rexx_rx_proc)].env_alt->name);
+                Lstrcpy(new_env_prefix, (context->rexx_proc)[(context->rexx_rx_proc)].env_alt->prefix);
+#else
                 Lstrcpy(new_env, (context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
+#endif
             }
             if (((context->rexx_rx_proc) > 0) & ((context->rexx_proc)[(context->rexx_rx_proc)].env_alt ==
-                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env_alt))
+                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env_alt)) {
+#ifdef CMS
+                    (context->rexx_proc)[(context->rexx_rx_proc)].env_alt = MALLOC(sizeof(CmsEnv), "RxProcEnv");
+                    LPMALLOC((context->rexx_proc)[(context->rexx_rx_proc)].env_alt->name);
+                    LPMALLOC((context->rexx_proc)[(context->rexx_rx_proc)].env_alt->prefix);
+#else
                     LPMALLOC((context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
+#endif
+            }
+#ifdef CMS
+            Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env_alt->name,
+                (context->rexx_proc)[(context->rexx_rx_proc)].env->name);
+            Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env_alt->prefix,
+                (context->rexx_proc)[(context->rexx_rx_proc)].env->prefix);
+#else
             Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env_alt,
                 (context->rexx_proc)[(context->rexx_rx_proc)].env);
+#endif
             if (((context->rexx_rx_proc) > 0) & ((context->rexx_proc)[(context->rexx_rx_proc)].env ==
-                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env))
+                (context->rexx_proc)[(context->rexx_rx_proc) - 1].env)) {
+#ifdef CMS
+                    (context->rexx_proc)[(context->rexx_rx_proc)].env = MALLOC(sizeof(CmsEnv), "RxProcEnv");
+                    LPMALLOC((context->rexx_proc)[(context->rexx_rx_proc)].env->name);
+                    LPMALLOC((context->rexx_proc)[(context->rexx_rx_proc)].env->prefix);
+#else
                     LPMALLOC((context->rexx_proc)[(context->rexx_rx_proc)].env);
+#endif
+            }
+#ifdef CMS
+            Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env->name, new_env_name);
+            Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env->prefix, new_env_prefix);
+#else
             Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc)].env, new_env);
+#endif
+#ifdef CMS
+            LPFREE(new_env_name);
+            LPFREE(new_env_prefix);
+#else
             LPFREE(new_env);
+#endif
             break;
 
         case trace_opt:
@@ -711,7 +779,8 @@ I_CallFunction(void) {
                         realarg,
                         argv, lenv,
                         ct == CT_PROCEDURE,
-                        &ret_string);
+                        &ret_string,
+                        (context->rexxrxFileList)->filetype);
 
             /* Cleanup and handle result string */
             FREE(argv);
@@ -855,8 +924,15 @@ I_ReturnProc(void) {
         }
 
         if ((context->rexx_proc)[(context->rexx_rx_proc)].env !=
-            (context->rexx_proc)[(context->rexx_rx_proc) - 1].env) LPFREE(
-                (context->rexx_proc)[(context->rexx_rx_proc)].env);
+            (context->rexx_proc)[(context->rexx_rx_proc) - 1].env) {
+#ifdef CMS
+                LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env->name);
+                LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env->prefix);
+                FREE((context->rexx_proc)[(context->rexx_rx_proc)].env);
+#else
+                LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env);
+#endif
+            }
     }
 
     /* load previous data and exit */
@@ -960,12 +1036,32 @@ RxDoneInterStr(void) {
             (context->rexx_proc)[(context->rexx_rx_proc)].clauselen;
     if (((context->rexx_rx_proc) > 0) & ((context->rexx_proc)[(context->rexx_rx_proc)].env !=
         (context->rexx_proc)[(context->rexx_rx_proc) - 1].env)) {
+#ifdef CMS
+        Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc) - 1].env->name,
+                (context->rexx_proc)[(context->rexx_rx_proc)].env->name);
+        Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc) - 1].env->prefix,
+                (context->rexx_proc)[(context->rexx_rx_proc)].env->prefix);
+        LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env->name);
+        LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env->prefix);
+        FREE((context->rexx_proc)[(context->rexx_rx_proc)].env);
+#else
         Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc) - 1].env,
                 (context->rexx_proc)[(context->rexx_rx_proc)].env);
         LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env);
+#endif
+#ifdef CMS
+        Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc) - 1].env_alt->name,
+                (context->rexx_proc)[(context->rexx_rx_proc)].env_alt->name);
+        Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc) - 1].env_alt->prefix,
+                (context->rexx_proc)[(context->rexx_rx_proc)].env_alt->prefix);
+        LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env_alt->name);
+        LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env_alt->prefix);
+        FREE((context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
+#else
         Lstrcpy((context->rexx_proc)[(context->rexx_rx_proc) - 1].env_alt,
                 (context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
         LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env_alt);
+#endif
     }
 
     /* --- load previous data and exit ---- */
@@ -2356,8 +2452,15 @@ RxInterpret(void) {
         }
 
         if ((context->rexx_proc)[(context->rexx_rx_proc)].env !=
-            (context->rexx_proc)[(context->rexx_rx_proc) - 1].env) LPFREE(
-                (context->rexx_proc)[(context->rexx_rx_proc)].env);
+            (context->rexx_proc)[(context->rexx_rx_proc) - 1].env) {
+#ifdef CMS
+                LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env->name);
+                LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env->prefix);
+                FREE((context->rexx_proc)[(context->rexx_rx_proc)].env);
+#else
+                LPFREE((context->rexx_proc)[(context->rexx_rx_proc)].env);
+#endif
+            }
 
         (context->rexx_rx_proc)--;
         (context->interpreRx_id) =

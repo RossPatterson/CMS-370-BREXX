@@ -1,0 +1,31 @@
+/* CMSEPL9 TESTEXEC - See CMSEPLA ASSEMBLE:TEST9. */
+Parse version Version
+Say "TEST9 running on" Version
+Parse source System Environment FN FT FM Command Prefix
+If System <> "CMS" then Return 1
+If Environment <> "COMMAND" then Return 2
+If (FN FT) <> "CMSEPL9 TESTEXEC" | ,
+   (Translate(FM) <> "A1" & FM <> "*") then Return 3
+If Command <> "TestAsDf" then Return 4
+If Prefix <> "TESTEXEC" then Return 5
+
+Parse arg Word1 Word2 Word3
+If Word1 <> "ThisIsAVeryBigArgument" then Return 6
+If Word2 <> "ThisOneIsToo" then Return 7
+If Word3 <> "" then Return 8
+If Address() <> Prefix then Return 9
+
+If CMSEPL9B('A') <> 65 then Return 10
+
+Call CMSEPL9B 'B'
+If Result <> 56 then Return 11
+
+If CMSEPL9C('','C') <> 150 then Return 12
+
+Call CMSEPL9C '', 'D'
+If Result <> 151 then Return 13
+
+If SourceLine() <> 31 then Return 14
+
+/* Tell CMSEPLA we succeeded. */
+Return 109

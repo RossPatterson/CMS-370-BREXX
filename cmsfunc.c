@@ -9,6 +9,7 @@
 #include "lstring.h"
 #include "lerror.h"
 #include <cmssys.h>
+#include "cmsbrexx.h"
 
 /* following are C equivalents of flags in the NUCON macro */
 /*  CMS OPtions Byte */

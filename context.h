@@ -90,6 +90,9 @@ struct Context {
    BinLeaf *rexxsystemStr;
    BinLeaf *rexxnoValueStr;
    BinLeaf *rexxnotReadyStr;
+#ifdef CMS
+   PLstr rexxsystemPrefix; /* Actual target for host cmds */
+#endif
 
    /* bmem.c */
    void *bmem_mem_head;

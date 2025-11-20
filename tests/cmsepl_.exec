@@ -1,0 +1,86 @@
+/* Tests for Extended Plist and Fileblock support. */
+
+say 'Testing CMS EPlist and FBLOCK support ...'
+
+Parse source System .
+If System <> 'CMS' then Do
+    Say 'CMSEPL_ skipped - not running in CMS'
+    Return 0
+End
+
+Say 'Note: Use "CMSEPL_ BREXX" when testing bREXX under VM/CE 1.1.2.'
+Arg AsmParm .
+If AsmParm = '' | WordPos(AsmParm, 'AEXEC BREXX SVC') = 0 then Do
+   Say 'Invalid call type:' AsmParm
+   Exit 1
+End
+
+'SET EMSG TEXT'
+
+/* Setup. */
+'GLOBAL MACLIB DMSLCL CMSHRC DMSGPI DMSOM DMSSP CMSLIB'
+'NUCEXT CMSEPL'
+If RC = 0 then  'NUCXDROP CMSEPL'
+Signal on Error
+'ASSEMBLE CMSEPLA (DISK SYSPARM (' AsmParm ')'
+'NUCXTEXT CMSEPL CMSEPLA (SYSTEM'
+Signal off Error
+MaxRC = 0
+
+/* Test that EPLIST calls work at all. */
+'CMSEPL TEST1'
+If RC <> 0 then Say 'TEST1 failed RC=' || RC
+MaxRC = Max(MaxRC, RC)
+
+/* Test that EPLIST calls work with FBLOCKs and filetype overrides. */
+'CMSEPL TEST2'
+If RC <> 0 then Say 'TEST2 failed RC=' || RC
+MaxRC = Max(MaxRC, RC)
+
+/* Test that EPLIST calls work with FBLOCKs and in-storage files. */
+'CMSEPL TEST3'
+If RC <> 0 then Say 'TEST3 failed RC=' || RC
+MaxRC = Max(MaxRC, RC)
+
+/* Test that EPLIST calls work with FBLOCKs and in-storage files
+   that specify an explicit ADDRESS. */
+'CMSEPL TEST4'
+If RC <> 0 then Say 'TEST4 failed RC=' || RC
+MaxRC = Max(MaxRC, RC)
+
+/* Test that EPLIST calls work with an FBLOCK from storage and a PSW
+   ADDRESS. */
+'CMSEPL TEST5'
+MaxRC = Max(MaxRC, RC)
+If RC <> 0 then Say 'TEST5 failed RC=' || RC
+
+/* Test that EPLIST calls work with an FBLOCK from storage and a PSW
+   ADDRESS and an env name. */
+'CMSEPL TEST6'
+MaxRC = Max(MaxRC, RC)
+If RC <> 0 then Say 'TEST6 failed RC=' || RC
+
+/* Test that EPLIST calls work with an FBLOCK from storage and a named
+   SUBCOM and an env name. */
+'CMSEPL TEST7'
+MaxRC = Max(MaxRC, RC)
+If RC <> 0 then Say 'TEST7 failed RC=' || RC
+
+/* Test that EPLIST calls work with an EXEC that issues commands to a
+   PSW environment. */
+'CMSEPL TEST8'
+MaxRC = Max(MaxRC, RC)
+If RC <> 0 then Say 'TEST8 failed RC=' || RC
+
+/* Test that EXECs with non-EXEC filetypes can call functions with same. */
+'CMSEPL TEST9'
+If RC <> 0 then Say 'TEST9 failed RC=' || RC
+MaxRC = Max(MaxRC, RC)
+
+say 'CMSEPL done'
+Exit MaxRC
+
+Error:
+Say 'RC' RC 'from' SourceLine(SigL)
+say 'CMSEPL done'
+Exit RC

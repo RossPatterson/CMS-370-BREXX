@@ -109,8 +109,13 @@ R_O(const int func) {
             if ((context->rexx_proc)[(context->rexx_rx_proc)].env == NULL)
                 Lstrcpy(ARGR, &((context->rexxsystemStr)->key));
             else
+#ifdef CMS
+                Lstrcpy(ARGR,
+                        (context->rexx_proc)[(context->rexx_rx_proc)].env->name);
+#else
                 Lstrcpy(ARGR,
                         (context->rexx_proc)[(context->rexx_rx_proc)].env);
+#endif
             break;
 
 #ifndef __CMS__

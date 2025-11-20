@@ -1,0 +1,25 @@
+/* CMSEPL1 TESTEXEC - See CMSEPLA ASSEMBLE "TEST1". */
+Parse version Version
+Say "TEST1 running on" Version
+Parse source System Environment FN FT FM Command Prefix
+If System <> "CMS" then Return 1
+If Environment <> "COMMAND" then Return 2
+If (FN FT) <> "CMSEPL1 EXEC" | ,
+   (Translate(FM) <> "A1" & FM <> "*") then Return 3
+If Command <> "CMSEPL1" then Return 4
+If Prefix <> "CMS" then Return 5
+
+Parse arg Word1 Word2 Word3
+If Word1 <> "ThisIsALongMixedCaseArgument" then Return 6
+If Word2 <> "ThisIsAnother" then Return 7
+If Word3 <> "" then Return 8
+
+If CMSEPL1A('Q') <> 99  then Return 12
+
+Call CMSEPL1A 'P'
+If Result <> 98 then Return 13
+
+If SourceLine() <> 25 then Return 9
+
+/* Tell CMSEPLA we succeeded. */
+Return 101

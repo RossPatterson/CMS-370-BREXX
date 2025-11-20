@@ -1,0 +1,16 @@
+/* CMSEPL9B TESTEXEC - See CMSEPLA ASSEMBLE:TEST9. */
+Parse source System Environment FN FT FM Command Prefix
+If System <> "CMS" then Return 1
+If Pos(" " || Environment,  " FUNCTION SUBROUTINE") = 0 then Return 2
+If (FN FT) <> "CMSEPL9B TESTEXEC" | ,
+   (Translate(FM) <> "A1" & FM <> "*") then Return 3
+If Command <> "CMSEPL9B" then Return 4
+If Prefix <> "TESTEXEC" then Return 5
+
+If Arg() <> 1 then Return 6
+If Arg(1) = 'A' then Return 65
+If Arg(1) = 'B' then Return 56
+
+If SourceLine() <> 16 then Return 7
+
+Return 8

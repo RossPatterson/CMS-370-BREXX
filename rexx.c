@@ -68,6 +68,7 @@
 #ifdef __CMS__
 
 #include <cmssys.h>               // rpo
+#include <cmsfblk.h>
 
 #endif
 
@@ -163,16 +164,71 @@ RxInitialize(char *prorgram_name) {
     (context->rexxRCStr) = _Add2Lits(&str, FALSE);
     Lscpy(&str, "SYNTAX");
     (context->rexxsyntaxStr) = _Add2Lits(&str, FALSE);
+
 #ifdef __CMS__
-    Lscpy(&str, "CMS");
-    (context->rexxsystemStr) = _Add2Lits(&str,
-                                         FALSE);         // CMS is the default environment
+    /* CMS sets the default ADDRESS env as follows:
+        1) If there is an FBLOCK with a non-blank and non-null environment name,
+           use it for the name.  If its prefix is a PSW, use it for host
+           commands, otherwise use the environment name.
+        2) If there is an FBLOCK with a non-blank and non-null prefix, use it.
+        3) If there is an FBLOCK with a non-blank and non-null filetype, use it.
+        4) Use "CMS".
+    */
+
+#define IS_BLANK(field) (!memcmp((field), "        ", 8))
+#define IS_ZEROES(field) (!memcmp((field), "\0\0\0\0\0\0\0\0", 8))
+/* This is the definition per the IBM Rexx Reference manual: */
+#define IS_PSW(field) ((field)[3] == 0x00)
+
+    char *cp;
+    char env_name[9];
+    char env_prefix[9];
+    memset(env_name, ' ', sizeof env_name);
+    memset(env_prefix, ' ', sizeof env_prefix);
+    EPLIST *EPlist = CMSeplist();
+    FBLOCK *FBlock = (EPlist && EPlist->CallContext) ? (FBLOCK *) (EPlist->CallContext) : NULL;
+    if (FBlock && FBlock->lenwords >= 6 && !IS_BLANK(FBlock->env_name) && !IS_ZEROES(FBlock->env_name)) {
+        memcpy(&env_name, FBlock->env_name, 8);
+        if (!IS_ZEROES(FBlock->prefix) && IS_PSW(FBlock->prefix))
+            memcpy(&env_prefix, FBlock->prefix, 8);
+        else
+            memcpy(&env_prefix, env_name, 8);
+    } else if (FBlock && FBlock->lenwords >= 4 && !IS_BLANK(FBlock->prefix) && !IS_ZEROES(FBlock->prefix)) {
+        memcpy(&env_prefix, FBlock->prefix, 8);
+        memcpy(&env_name, env_prefix, 8);
+    } else if (FBlock && !IS_BLANK(FBlock->filetype) && !IS_ZEROES(FBlock->filetype) &&
+            (memcmp(FBlock->filetype, "EXEC    ", 8) != 0)) {
+        memcpy(&env_name, FBlock->filetype, 8);
+        memcpy(&env_prefix, env_name, 8);
+    } else {
+        memcpy(&env_name, "CMS     ", 8);
+        memcpy(&env_prefix, env_name, 8);
+    }
+    LPMALLOC(context->rexxsystemPrefix);
+    if (IS_PSW(env_prefix)) {
+        Lmcpy(context->rexxsystemPrefix, env_prefix, 8);
+    } else {
+        if ((cp = memchr(env_prefix, ' ', 8)) != NULL) *cp = '\0';
+        env_prefix[8] = '\0';
+        Lscpy(context->rexxsystemPrefix, env_prefix);
+    }
+    if (IS_PSW(env_name)) {
+        Lmcpy(&str, env_name, 8);
+    } else {
+        if ((cp = memchr(env_name, ' ', 8)) != NULL) *cp = '\0';
+        env_name[8] = '\0';
+        Lscpy(&str, env_name);
+    }
+#undef IS_BLANK
+#undef IS_ZEROES
+#undef IS_PSW
 #else
     Lscpy(&str, "SYSTEM");
-    (context->rexxsystemStr) = _Add2Lits(&str, FALSE);
 #endif
+    (context->rexxsystemStr) = _Add2Lits(&str, FALSE);
 
     LFREESTR(str);
+
 } /* RxInitialize */
 
 /* ----------------- RxFinalize ----------------- */
@@ -218,8 +274,34 @@ RxFileAlloc(char *fname) {
 /* ----------------- RxFileType ------------------- */
 void __CDECL
 RxFileType(RxFile *rxf) {
+#ifdef CMS
+    char *c1, *c2;
+    int len;
+#else
     char *c;
+#endif
 
+#ifdef CMS
+    /* Extract filename and filetype from "fn.ft.fm" */
+    rxf->filename = MALLOC(9, "RxFile filename");
+    strcpy(rxf->filename, "?");
+    rxf->filetype = MALLOC(9, "RxFile filetype");
+    strcpy(rxf->filetype, "?");
+    L2STR(&(rxf->name));
+    LASCIIZ(rxf->name);
+    if ((c1 = strchr(LSTR(rxf->name), '.')) != NULL) {
+        memset(rxf->filename, 0, 9);
+        len = c1 - LSTR(rxf->name);
+        len = len > 8 ? 8 : len;
+        strncpy(rxf->filename, LSTR(rxf->name), len);
+        if ((c2 = strchr(++c1, '.')) != NULL) {
+            memset(rxf->filetype, 0, 9);
+            len = c2 - c1;
+            len = len > 8 ? 8 : len;
+            strncpy(rxf->filetype, c1, len);
+        }
+    }
+#else
     /* find file type */
     c = LSTR(rxf->name) + LLEN(rxf->name);
     for (; c > LSTR(rxf->name) && *c != '.'; c--);;
@@ -229,6 +311,7 @@ RxFileType(RxFile *rxf) {
     if (c > LSTR(rxf->name))
         c++;
     rxf->filename = c;
+#endif
 } /* RxFileType */
 
 /* ----------------- RxFileFree ------------------- */
@@ -241,6 +324,10 @@ RxFileFree(RxFile *rxf) {
         rxf = rxf->next;
         LFREESTR(f->name);
         LFREESTR(f->file);
+#ifdef CMS
+        if (f->filename) FREE(f->filename);
+        if (f->filetype) FREE(f->filetype);
+#endif
         FREE(f);
     }
 } /* RxFileFree */
@@ -357,21 +444,76 @@ RxRun(char *filename, PLstr programstr,
 
     /* ====== first load the file ====== */
 #ifdef __CMS__
-    strcat(filename, ".EXEC.*");
+    /* CMS supports the "FBLOCK" interface, which is surfaced here as the CallContext struct. */
+    EPLIST *EPlist = CMSeplist();
+    FBLOCK *FBlock = (EPlist && EPlist->CallContext) ? (FBLOCK *) (EPlist->CallContext) : NULL;
+
+    /* CMS allows the caller to optionally specify the full fileid of the program. */
+    char new_filename[21+1];
+    memset(new_filename, 0, sizeof(new_filename));
+    if (FBlock && FBlock->filename[0] != ' '&& FBlock->filename[0] != '\0') {
+        char *cp;
+        strncpy(new_filename, FBlock->filename, 8);
+        if ((cp = strchr(new_filename, ' ')) != NULL) *cp = '\0';
+        strcat(new_filename, ".");
+        strncat(new_filename, FBlock->filetype, 8);
+        if ((cp = strchr(new_filename, ' ')) != NULL) *cp = '\0';
+        strcat(new_filename, ".");
+        if (FBlock->filemode[0] != ' ') {
+            strncat(new_filename, FBlock->filemode, 1);
+            if ((cp = strchr(new_filename, ' ')) != NULL) *cp = '\0';
+            if (FBlock->filemode[1] != ' ') {
+                strncat(new_filename, FBlock->filemode+1, 1);
+                if ((cp = strchr(new_filename, ' ')) != NULL) *cp = '\0';
+            }
+        }
+        else {
+            strcat(new_filename, "*");
+        }
+    } else {
+        /* If no FBLOCK info, then filetype is "EXEC" and filemode is "*" */
+        strcpy(new_filename, filename);
+        strcat(new_filename, ".EXEC.*");
+    }
+    filename = new_filename;
+
+    /* CMS allows the caller to optionally preload the file in memory. */
+    if (FBlock && FBlock->lenwords >= 2 && FBlock->descriptors && FBlock->descriptor_len) {
+        (context->rexxrxFileList) = RxFileAlloc(filename);
+        ADLEN *line;
+        ADLEN *lastline = FBlock->descriptors + (FBlock->descriptor_len / sizeof (ADLEN));
+        /* Compile() expects it in a single LSTR, so we have to copy it :-( */
+        size_t filesize = 0;
+        for (line = FBlock->descriptors; line < lastline; line++) {
+            filesize += line->Len + 1;
+        }
+        Lfx(&((context->rexxrxFileList)->file), filesize);
+        char *nextline = LSTR((context->rexxrxFileList)->file);
+        for (line = FBlock->descriptors; line < lastline; line++) {
+            memcpy(nextline, line->Data, line->Len);
+            nextline += line->Len;
+            *nextline = '\n';
+            nextline += 1;
+        }
+        LLEN((context->rexxrxFileList)->file) = filesize;
+        LTYPE((context->rexxrxFileList)->file) = LSTRING_TY;
+    }
 #endif
     if (filename) {
-        (context->rexxrxFileList) = RxFileAlloc(filename);
+        if (!(context->rexxrxFileList)) {
+            (context->rexxrxFileList) = RxFileAlloc(filename);
 
-        /* --- Load file --- */
-        if (!RxFileLoad((context->rexxrxFileList))) {
+            /* --- Load file --- */
+            if (!RxFileLoad((context->rexxrxFileList))) {
 #ifndef WCE
-            fprintf(STDERR, "Error %d running \"%s\": File not found\n",
-                    ERR_FILE_NOT_FOUND, LSTR((context->rexxrxFileList)->name));
+                fprintf(STDERR, "Error %d running \"%s\": File not found\n",
+                        ERR_FILE_NOT_FOUND, LSTR((context->rexxrxFileList)->name));
 #else
-            PUTS("Error: File not found.");
+                PUTS("Error: File not found.");
 #endif
-            RxFileFree((context->rexxrxFileList));
-            return 1;
+                RxFileFree((context->rexxrxFileList));
+                return 1;
+            }
         }
     } else {
         (context->rexxrxFileList) = RxFileAlloc("<STDIN>");
@@ -419,13 +561,38 @@ RxRun(char *filename, PLstr programstr,
     pr->stacktop = -1;  /* no arguments  */
 
     pr->scope = RxScopeMalloc();
+#ifdef __CMS__
+    pr->env = MALLOC(sizeof(CmsEnv), "RxProcEnv");
+    LPMALLOC(pr->env->name);
+    LPMALLOC(pr->env->prefix);
+    pr->env_alt = MALLOC(sizeof(CmsEnv), "RxProcEnv");
+    LPMALLOC(pr->env_alt->name);
+    LPMALLOC(pr->env_alt->prefix);
+#else
     LPMALLOC(pr->env);
-    if (environment)
-        Lscpy(pr->env, environment);
-    else
-        Lstrcpy(pr->env, &((context->rexxsystemStr)->key));
     LPMALLOC(pr->env_alt);
+#endif
+    if (environment) {
+#ifdef __CMS__
+        Lscpy(pr->env->name, environment);
+        Lscpy(pr->env->prefix, environment);
+#else
+        Lscpy(pr->env, environment);
+#endif
+    } else {
+#ifdef __CMS__
+        Lstrcpy(pr->env->name, &((context->rexxsystemStr)->key));
+        Lstrcpy(pr->env->prefix, (context->rexxsystemPrefix));
+#else
+        Lstrcpy(pr->env, &((context->rexxsystemStr)->key));
+#endif
+    }
+#ifdef __CMS__
+    Lstrcpy(pr->env_alt->name, pr->env->name);
+    Lstrcpy(pr->env_alt->prefix, pr->env->prefix);
+#else
     Lstrcpy(pr->env_alt, pr->env);
+#endif
 #ifdef __CMS__
     pr->digits = 9;
 #else
@@ -481,7 +648,13 @@ RxRun(char *filename, PLstr programstr,
     RxFileFree((context->rexxrxFileList));
     if (context->rawstdin) fclose(context->rawstdin);
 
-    LPFREE(pr->env);
+#ifdef CMS
+    LPFREE(pr->env->name);
+    LPFREE(pr->env->prefix);
+    FREE(pr->env);
+#else
+    LPFREE(pr->env));
+#endif
     if ((context->compileCompileClause)) {
         FREE((context->compileCompileClause));
         (context->compileCompileClause) = NULL;
