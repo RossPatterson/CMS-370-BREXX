@@ -49,7 +49,7 @@ return (sigl == 44)
 
 /* call passing sigl as arg */
 /* Do not move this test around - it knows its line numbers! */
-tc4: if system='CMS' then do; say 'skipped test 4 due to bug #xxx'; return 1; end
+tc4:
 call tc4a
 return result
 tc4a: procedure expose sigl
@@ -101,6 +101,19 @@ tc7b:
 parse source . calltype .
 return calltype == 'FUNCTION'
 tc7e:
+
+/* bREXX Issue 119 */
+call tc8a
+if result \== 1 then call test_failed '8'
+signal tc8z
+tc8a: procedure
+tc8v = 'XXX'
+call tc8b tc8v
+return result == 'XXX'
+tc8b:
+tc8v = 'YYY'
+return arg(1)
+tc8z:
 
 say '... CALL done'
 exit fail_count

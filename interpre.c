@@ -678,6 +678,11 @@ I_MakeArgs(const int calltype, const int na, const CTYPE existarg) {
     st = (context->interpre_RxStckTop); /* stack position of arguments */
     for (i = na - 1; i >= 0; i--) {
         if (existarg & bp) {
+            /* COPY2TMP any variables, to prevent changes from altering arg values. */
+            if ((context->interpre_RxStck)[st] != &((context->interpre__tmpstr)[st])) {
+                Lstrcpy(&((context->interpre__tmpstr)[st]), (context->interpre_RxStck)[st]);
+                (context->interpre_RxStck)[st] = &((context->interpre__tmpstr)[st]);
+            }
             arg->a[i] = (context->interpre_RxStck)[st];
             st--;
         } else
@@ -818,8 +823,8 @@ I_CallFunction(void) {
 
         } else {
             (context->interpreRxcip)++;
-            RxSetSpecialVar(SIGLVAR, line);
             I_MakeArgs(ct, nargs, existarg);
+            RxSetSpecialVar(SIGLVAR, line);
             (context->interpreRxcip) = (CIPTYPE *) (
                     (byte huge *) (context->interpreRxcodestart) + func->label);
             (context->interpreRxcip)++; /* skip the OP_NEWCLAUSE */
