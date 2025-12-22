@@ -1,5 +1,7 @@
 bREXX CMS Change LOG
 ====================
+I0097 - Expressions do not allow concatenation with ".".  (fix ported from
+        vlachoudis/brexx commit #9c9949039807113b48a22d6214110013fd2c6cde).
 I0108 - EXECCOMM doesn't support dropping variables.
 V0085 - Support FBLOCK interface
       - Improve debuggability: add disassembler, support debug in ASSEMBLE files.

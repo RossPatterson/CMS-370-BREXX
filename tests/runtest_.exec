@@ -44,6 +44,7 @@ interpreter ' d2c_'||suffix        ; fail_count=fail_count+rc
 interpreter ' d2x_'||suffix        ; fail_count=fail_count+rc
            /* errorms_ */
 interpreter ' errorte_'||suffix    ; fail_count=fail_count+rc
+interpreter ' expr_'||suffix       ; fail_count=fail_count+rc
            /* expose_ */
            /* factria_ */
 interpreter ' form_'||suffix       ; fail_count=fail_count+rc

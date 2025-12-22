@@ -262,7 +262,7 @@ Exp3(void) {
     _Pblank = (context->nextsymbsymbolPrevBlank);
 
     /* UNTIL NOT_SY there must be prefix and starting '(' operators */
-    while (((context->nextsymbsymbol) <= not_sy) || _Concat) {
+    while (((context->nextsymbsymbol) <= not_sy) || ((context->nextsymbsymbol)== dot_sy) || _Concat) {
         if ((context->compileCompileCodeLen) == pos)
             (context->lstring_Lerror)(ERR_INVALID_EXPRESSION, 0);
         if (_Concat) nextsymbol();
@@ -422,7 +422,7 @@ Exp8(void) {
         _CodeAddPtr(SYMBOLADD2LITS);
         TraceByte(variable_middle);
         nextsymbol();
-    } else if ((context->nextsymbsymbol) == literal_sy) {
+    } else if (((context->nextsymbsymbol) == literal_sy) || ((context->nextsymbsymbol) == dot_sy)) {
         _CodeAddByte(OP_PUSH);
         _CodeAddPtr(SYMBOLADD2LITS_KEY);
         TraceByte(litteral_middle);

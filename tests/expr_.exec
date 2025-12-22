@@ -1,0 +1,21 @@
+/* expressions */
+say 'Testing expressions ...'
+fail_count=0
+
+/* bREXX issue #97 */
+/* We use INTERPRET here because some Rexxes, including bREXX, fail the test
+   during compilation, so we need to compile while executing the test.
+*/
+signal on syntax name t1_s
+interpret 'say "blah blah blah".'
+signal t1_z
+t1_s: call test_failed '1'
+t1_z:
+signal off syntax
+
+say '... expressions done'
+exit fail_count
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

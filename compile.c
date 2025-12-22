@@ -1653,7 +1653,7 @@ C_signal(void) {
     void *ptr = NULL;
     Context *context = (Context *) CMSGetPG();
 
-    if ((context->nextsymbsymbol) == ident_sy) {
+    if (((context->nextsymbsymbol) == ident_sy) || ((context->nextsymbsymbol) == literal_sy) || ((context->nextsymbsymbol) == dot_sy)) {
         if (!CMP("OFF") || (!CMP("ON"))) {
             value = 0;
             if (!CMP("ON")) value = 1;
@@ -1924,7 +1924,7 @@ C_instr(bool until_end) {
     } else
         C_HostCmd();
 
-    if (!(context->compile_checked_semicolon))  /* if no one has checked for a */
+    if (!(context->compile_checked_semicolon))  /* if none has checked for a */
         MUSTBE_SEMICOLON; /* semicolon then check it now */
 
     (context->compileCompileNesting)--;
