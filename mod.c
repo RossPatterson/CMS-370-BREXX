@@ -18,10 +18,32 @@
 #include "lerror.h"
 #include "lstring.h"
 #include <cmssys.h>
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+  #include "options.h"
+#endif
 
 /* ------------------ Lmod ----------------- */
 void __CDECL
 Lmod(const PLstr to, const PLstr A, const PLstr B) {
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
+
+#if ALLOW_DECNUMBER
+    Context *context = (Context *) CMSGetPG();
+    if (CHECK_OPT(OPT_DECIMAL_MATH)) {
+        *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+        decContextZeroStatus(*dc);
+        decNumberRemainder(LDEC(*to), TODEC(*A), TODEC(*B), *cp);
+        if (decContextGetStatus(*dc))
+            (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+        LTYPE(*to) = LDECIMAL_TY;
+        LLEN(*to) = LMAXLEN(*to) = LDEC_LEN(*to);
+        return;
+    }
+#endif
     L2REAL(A);
     L2REAL(B);
     Context *context = (Context *) CMSGetPG();

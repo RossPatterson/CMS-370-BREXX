@@ -181,3 +181,6 @@
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
+
+/* Define to 1 if you want to support optional arbitrary-precision decimal arithmetic. */
+#define ALLOW_DECNUMBER 0

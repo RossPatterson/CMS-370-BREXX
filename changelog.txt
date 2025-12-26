@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+      - Support for large decimal arithmetic.
       - Delete temporary artifacts quickly to reduce GitHub Actions Storage usage.
 PV023 - Merge fix for "0**-1" crashing CMS from vlachoudis/brexx PR 23.
       - EXECCOMM debugging isn't checked correctly.

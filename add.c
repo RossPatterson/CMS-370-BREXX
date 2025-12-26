@@ -3,15 +3,35 @@
  */
 
 #include "lstring.h"
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+  #include "options.h"
+#endif
 
 /* ---------------- Ladd ------------------- */
 void __CDECL
 Ladd(const PLstr to, const PLstr A, const PLstr B) {
+    int int_a, int_b, overflow;
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
+
+#if ALLOW_DECNUMBER
+    Context *context = (Context *) CMSGetPG();
+    if (CHECK_OPT(OPT_DECIMAL_MATH)) {
+        *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+        decContextZeroStatus(*dc);
+        decNumberAdd(LDEC(*to), TODEC(*A), TODEC(*B), *cp);
+        if (decContextGetStatus(*dc))
+            (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+        LTYPE(*to) = LDECIMAL_TY;
+        LLEN(*to) = LMAXLEN(*to) = LDEC_LEN(*to);
+        return;
+    }
+#endif
     L2NUM(A);
     L2NUM(B);
-
-    int int_a, int_b, overflow;
-
     if ((LTYPE(*A) == LINTEGER_TY) && (LTYPE(*B) == LINTEGER_TY)) {
         /* OK 2 integers - lets add them and see if it is all good */
         int_a = LINT(*A);

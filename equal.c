@@ -32,6 +32,10 @@
 #include <cmssys.h>
 #include "lstring.h"
 
+#if ALLOW_DECNUMBER
+#error Not ready!
+#endif
+
 /* -------------------- Lequal ----------------- */
 int __CDECL
 Lequal(const PLstr A, const PLstr B) {

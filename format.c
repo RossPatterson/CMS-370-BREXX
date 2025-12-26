@@ -6,6 +6,10 @@
 #include <cmssys.h>
 #include <math.h>
 
+#if ALLOW_DECNUMBER
+#error Not ready!
+#endif
+
 typedef struct format_data {
     PLstr to;
     double from;

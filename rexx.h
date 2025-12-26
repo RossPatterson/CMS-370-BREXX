@@ -61,6 +61,9 @@
 #include "dqueue.h"
 #include "bintree.h"
 #include "variable.h"
+#if ALLOW_DECNUMBER
+  #include "dnCtxt.h"
+#endif
 
 #ifndef __REXX_H_
 #define __REXX_H_
@@ -207,6 +210,9 @@ struct trxproc {
     int clauselen; /* used in OP_INTERPRET */
     int trace;  /* trace type  */
     bool interactive_trace;
+#if ALLOW_DECNUMBER
+    decContext decContext; /* decNumber context for decimal math */
+#endif
 } RxProc;
 
 /* ------------- global variables ----------------- */

@@ -79,6 +79,11 @@ struct timeval_st {
 # include <winfunc.h>
 #endif
 
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+#endif
+
 /* -------------------------------------------------------------- */
 /*  ADDRESS()                                                     */
 /* -------------------------------------------------------------- */
@@ -564,6 +569,11 @@ R_datatype() {
 
     if (type == 'T') {   /* mine special type */
         switch (LTYPE(*ARG1)) {
+#if ALLOW_DECNUMBER
+            case LDECIMAL_TY:
+                Lscpy(ARGR, "DECIMAL");
+                break;
+#endif
             case LINTEGER_TY:
                 Lscpy(ARGR, "INTEGER");
                 break;
@@ -724,6 +734,10 @@ R_max() {
     int i;
     double r;
     Context *context = (Context *) CMSGetPG();
+#if ALLOW_DECNUMBER
+    decContext *dc;
+    decNumber num;
+#endif
 
     if (!ARGN)
         (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
@@ -732,7 +746,26 @@ R_max() {
     while ((i < ARGN) && ((context->rexxrxArg).a[i] == NULL)) i++;
     if (i == MAXARGS) (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
 
-    L2REAL(((context->rexxrxArg).a[i]));
+#if ALLOW_DECNUMBER
+    if (CHECK_OPT(OPT_DECIMAL_MATH)) {
+        *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+        decContextZeroStatus(*dc);
+        L2DEC(((context->rexxrxArg).a[i]));
+        num = LDEC(*((context->rexxrxArg).a[i]));
+        for (i++; i < ARGN; i++) {
+            if ((context->rexxrxArg).a[i] != NULL) {
+                L2DEC(((context->rexxrxArg).a[i]));
+                decNumberMax(num, num, LDEC(*((context->rexxrxArg).a[i])), *dc);
+            }
+        }
+        if (decContextGetStatus(*dc))
+            (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+#error Which error number?
+        Ldcpy(ARGR, num);
+        return;
+    }
+#endif
+		L2REAL(((context->rexxrxArg).a[i]));
     r = LREAL(*((context->rexxrxArg).a[i]));
     for (i++; i < ARGN; i++)
         if ((context->rexxrxArg).a[i] != NULL) {
@@ -750,6 +783,10 @@ R_min() {
     int i;
     double r;
     Context *context = (Context *) CMSGetPG();
+#if ALLOW_DECNUMBER
+    decContext *dc;
+    decNumber num;
+#endif
 
     if (!ARGN)
         (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
@@ -758,6 +795,25 @@ R_min() {
     while ((i < ARGN) && ((context->rexxrxArg).a[i] == NULL)) i++;
     if (i == MAXARGS) (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
 
+#if ALLOW_DECNUMBER
+    if (CHECK_OPT(OPT_DECIMAL_MATH)) {
+        *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+        decContextZeroStatus(*dc);
+        L2DEC(((context->rexxrxArg).a[i]));
+        num = LDEC(*((context->rexxrxArg).a[i]));
+        for (i++; i < ARGN; i++) {
+            if ((context->rexxrxArg).a[i] != NULL) {
+                L2DEC(((context->rexxrxArg).a[i]));
+                decNumberMin(num, num, LDEC(*((context->rexxrxArg).a[i])), *dc);
+            }
+        }
+        if (decContextGetStatus(*dc))
+            (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+#error Which error number?
+        Ldcpy(ARGR, num);
+        return;
+    }
+#endif
     L2REAL(((context->rexxrxArg).a[i]));
     r = LREAL(*((context->rexxrxArg).a[i]));
     for (i++; i < ARGN; i++)

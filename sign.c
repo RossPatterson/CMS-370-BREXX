@@ -16,13 +16,29 @@
  */
 
 #include "lstring.h"
+#if ALLOW_DECNUMBER
+  #include "dnNumber.h"
+#endif
 
 /* ------------------ Lsign --------------------- */
 int __CDECL
 Lsign(const PLstr num) {
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
     L2NUM(num);
 
     switch (LTYPE(*num)) {
+#if ALLOW_DECNUMBER
+        case LDECIMAL_TY:
+            if (decNumberIsNegative(LDEC(*num)))
+                return -1;
+            else if (decNumberIsZero(LDEC(*num)))
+                return 0;
+            else
+                return 1;
+
+#endif
         case LINTEGER_TY:
             if (LINT(*num) < 0)
                 return -1;

@@ -19,6 +19,11 @@
  */
 
 #include "lstring.h"
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+  #include "options.h"
+#endif
 
 /* -------------------- Ld2c -------------------- */
 void __CDECL
@@ -26,7 +31,14 @@ Ld2c(const PLstr to, const PLstr from, long n) {
     int i;
     long num, n2;
     bool negative;
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
 
+#if ALLOW_DECNUMBER
+    Context *context = (Context *) CMSGetPG();
+#error Not ready!
+#endif
     num = Lrdint(from);
 
     if (n == 0) {

@@ -24,14 +24,30 @@
 #include "lerror.h"
 #include "lstring.h"
 #include <cmssys.h>
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+  #include "options.h"
+#endif
 
 /* ------------------- Lbool ------------------ */
 int __CDECL
 Lbool(const PLstr num) {
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
     long i = 0;
     Context *context = (Context *) CMSGetPG();
 
     switch (LTYPE(*num)) {
+#if ALLOW_DECNUMBER
+        case LDECIMAL_TY:
+            decContextZeroStatus(*dc);
+            i = decNumberToInt32(LDEC(*num),*dc);
+            if (decContextGetStatus(*dc))
+                (context->lstring_Lerror)(ERR_UNLOGICAL_VALUE, 0);
+            break;
+#endif
         case LSTRING_TY:
             if (_Lisnum(num) == LSTRING_TY)
                 (context->lstring_Lerror)(ERR_UNLOGICAL_VALUE, 0);

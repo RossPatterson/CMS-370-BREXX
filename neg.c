@@ -16,11 +16,33 @@
  */
 
 #include "lstring.h"
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+  #include "options.h"
+#endif
 
 /* ------------------- Lneg ------------------ */
 void __CDECL
 Lneg(const PLstr to, const PLstr num) {
-    L2NUM(num);
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
+
+#if ALLOW_DECNUMBER
+    Context *context = (Context *) CMSGetPG();
+    if (CHECK_OPT(OPT_DECIMAL_MATH)) {
+        *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+        decContextZeroStatus(*dc);
+        decNumberMinus(LDEC(*to), TODEC(*num), *dc);
+        if (decContextGetStatus(*dc))
+            (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+        LTYPE(*to) = LDECIMAL_TY;
+        LLEN(*to) = LMAXLEN(*to) = LDEC_LEN(*to);
+        return;
+    }
+#endif
+		L2NUM(num);
 
     if (LTYPE(*num) == LINTEGER_TY) {
         LINT(*to) = -LINT(*num);
@@ -33,9 +55,26 @@ Lneg(const PLstr to, const PLstr num) {
     }
 } /* Lneg */
 
-/* ------------------- Lneg ------------------ */
+/* ------------------- Lplus ----------------- */
 void __CDECL
 Lplus(const PLstr to, const PLstr num) {
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
+
+#if ALLOW_DECNUMBER
+    Context *context = (Context *) CMSGetPG();
+    if (CHECK_OPT(OPT_DECIMAL_MATH)) {
+        *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+        decContextZeroStatus(*dc);
+        decNumberPlus(LDEC(*to), TODEC(*num), *dc);
+        if (decContextGetStatus(*dc))
+            (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+        LTYPE(*to) = LDECIMAL_TY;
+        LLEN(*to) = LMAXLEN(*to) = LDEC_LEN(*to);
+        return;
+    }
+#endif
     L2NUM(num);
 
     if (LTYPE(*num) == LINTEGER_TY) {
@@ -47,5 +86,5 @@ Lplus(const PLstr to, const PLstr num) {
         LTYPE(*to) = LREAL_TY;
         LLEN(*to) = sizeof(double);
     }
-} /* Lpos */
+} /* Lplus */
 

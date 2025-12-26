@@ -8,7 +8,12 @@ typedef struct OptList_st {
     long flags;
 } OptList;
 OptList optlist[] = {
-    {"STORAGE_DECIMAL", OPT_STORAGE_DECIMAL},
+    {"COMPAT_BREXX_1_0",                OPT_COMPAT_BREXX_1_0},
+    {"COMPAT_BREXX_1_1",                OPT_COMPAT_BREXX_1_1},
+#if ALLOW_DECNUMBER
+    {"DECIMAL_MATH",                    OPT_DECIMAL_MATH},
+#endif
+    {"STORAGE_DECIMAL",                 OPT_STORAGE_DECIMAL},
     {NULL, OPT_NONE},
 };
 

@@ -3,6 +3,11 @@
  */
 
 #include "lstring.h"
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+  #include "options.h"
+#endif
 
 /* ------------------- Lc2d ------------------------- */
 void __CDECL
@@ -10,9 +15,23 @@ Lc2d(const PLstr to, const PLstr from, long n) {
     int i;
     bool negative;
     long num;
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
 
     L2STR(from);
 
+#if ALLOW_DECNUMBER
+    Context *context = (Context *) CMSGetPG();
+    if (CHECK_OPT(OPT_DECIMAL_MATH)) {
+        *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+#error Wrong!  C2D() is binary string to decimal number!
+        decNumberFromString(LDEC(*to), LSTR(*from), *dc);
+        if (decContextGetStatus(*dc))
+            (context->lstring_Lerror)(ERR_INVALID_CHAR, 0);
+        return;
+    }
+#endif
     if (!LLEN(*from) || !n) {
         Licpy(to, 0);
         return;

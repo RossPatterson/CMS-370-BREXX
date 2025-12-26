@@ -30,7 +30,22 @@ Lexpose(const PLstr to, const PLstr A, const PLstr B) {
     bool minusA;
     bool minusB;
     Context *context = (Context *) CMSGetPG();
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
 
+#if ALLOW_DECNUMBER
+    if (CHECK_OPT(OPT_DECIMAL_MATH)) {
+        *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+        decContextZeroStatus(*dc);
+        decNumberPower(LDEC(*to), TODEC(*A), TODEC(*B), *dc);
+        if (decContextGetStatus(*dc))
+            (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+        LTYPE(*to) = LDECIMAL_TY;
+        LLEN(*to) = LMAXLEN(*to) = LDEC_LEN(*to);
+        return;
+    }
+#endif
     ar = Lrdreal(A);
     bi = Lrdint(B);
 

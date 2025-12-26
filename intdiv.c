@@ -18,13 +18,33 @@
 #include <cmssys.h>
 #include "lerror.h"
 #include "lstring.h"
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+  #include "options.h"
+#endif
 
 /* ---------------- Lintdiv ---------------- */
 void __CDECL
 Lintdiv(const PLstr to, const PLstr A, const PLstr B) {
     double b;
     Context *context = (Context *) CMSGetPG();
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
 
+#if ALLOW_DECNUMBER
+    if (CHECK_OPT(OPT_DECIMAL_MATH)) {
+        *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+        decContextZeroStatus(*dc);
+        decNumberDivideInteger(LDEC(*to), TODEC(*A), TODEC(*B), *cp);
+        if (decContextGetStatus(*dc))
+            (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+        LTYPE(*to) = LDECIMAL_TY;
+        LLEN(*to) = LMAXLEN(*to) = LDEC_LEN(*to);
+        return;
+    }
+#endif
     b = Lrdreal(B);
 
     if (b == 0) (context->lstring_Lerror)(ERR_ARITH_OVERFLOW, 0);
@@ -32,4 +52,4 @@ Lintdiv(const PLstr to, const PLstr A, const PLstr B) {
     LINT(*to) = (long) (Lrdreal(A) / b);
     LTYPE(*to) = LINTEGER_TY;
     LLEN(*to) = sizeof(long);
-} /* Lintdiv */
+    } /* Lintdiv */

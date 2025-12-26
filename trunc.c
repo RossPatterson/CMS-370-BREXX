@@ -23,10 +23,33 @@
  */
 
 #include "lstring.h"
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+  #include "options.h"
+#endif
 
 /* ---------------- Ltrunc ----------------- */
 void __CDECL
 Ltrunc(const PLstr to, const PLstr from, long n) {
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
+
+#if ALLOW_DECNUMBER
+    Context *context = (Context *) CMSGetPG();
+    if (CHECK_OPT(OPT_DECIMAL_MATH)) {
+        *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+        decContextZeroStatus(*dc);
+		???
+#error Not ready!
+        if (decContextGetStatus(*dc))
+            (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+        LTYPE(*to) = LDECIMAL_TY;
+        LLEN(*to) = LMAXLEN(*to) = LDEC_LEN(*to);
+        return;
+    }
+#endif
     if (n < 0) n = 0;
 
     Lround(from);

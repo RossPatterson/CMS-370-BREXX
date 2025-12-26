@@ -4,10 +4,18 @@
 
 #include "lstring.h"
 #include <stdio.h>
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+  #include "options.h"
+#endif
 
 /* ---------------- Lprint ------------------- */
 void __CDECL
 Lprint(FILEP f, const PLstr str) {
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
     Lstr tmp;
     int i, j;
 
@@ -17,6 +25,18 @@ Lprint(FILEP f, const PLstr str) {
     }
 
     switch (LTYPE(*str)) {
+#if ALLOW_DECNUMBER
+        case LDECIMAL_TY:
+            *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+            decContextZeroStatus(*dc);
+            LINITSTR(tmp);
+            decNumberToString(LDEC(*str), LSTR(tmp), *dc);
+            if (decContextGetStatus(*dc))
+                (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+            fprintf(f, "%.*s", LLEN(tmp), LSTR(tmp));
+            LFREESTR(tmp);
+        break;
+#endif
         case LSTRING_TY:
             /* Logic to handled embedded nulls - converted to spaces */
             i = 0;

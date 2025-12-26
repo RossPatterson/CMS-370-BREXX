@@ -22,6 +22,12 @@
 #include <cmssys.h>
 #include "lstring.h"
 
+#if ALLOW_DECNUMBER
+  #include "context.h"
+  #include "dnNumber.h"
+  #include "options.h"
+#endif
+
 /* --------------- Ldatatype ----------------- */
 /* returns -1 on error type                    */
 int __CDECL
@@ -90,6 +96,10 @@ Ldatatype(const PLstr str, char type) {
         case 'W':
             if (LTYPE(*str) == LINTEGER_TY) return TRUE;
             if (LTYPE(*str) == LREAL_TY) return Disint(LREAL(*str));
+#if ALLOW_DECNUMBER
+#error Not ready!
+            if (LTYPE(*str) == LDECIMAL_TY) return DecimalIsInt(LDEC(*str));
+#endif
             int tp = _Lisnum(str);
             if (tp == LINTEGER_TY) return TRUE;
             else return FALSE;

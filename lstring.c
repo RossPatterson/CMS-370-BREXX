@@ -7,6 +7,10 @@
 #include "lerror.h"
 #include "lstring.h"
 
+#if ALLOW_DECNUMBER
+#include <dnNumber.h>
+#endif
+
 #ifndef WIN32
 # if !defined(__CMS__) && !defined(__MVS__)
 # ifndef WIN
@@ -101,6 +105,17 @@ Lfx(const PLstr s, size_t len) {
 
 #endif
 } /* Lfx */
+
+#if ALLOW_DECNUMBER
+/* ---------------- Ldcpy ------------------ */
+void __CDECL
+Ldcpy(const PLstr to, const decNumber from) {
+    Lfx(to, LDEC_LEN(from));
+    MEMCPY(LDEC(*to), from, len);
+    LLEN(*to) = sizeof(long);
+    LTYPE(*to) = LDECIMAL_TY;
+} /* Ldcpy */
+#endif
 
 /* ---------------- Licpy ------------------ */
 void __CDECL
@@ -214,6 +229,12 @@ Lstrcpy(const PLstr to, const PLstr from) {
             case LSTRING_TY:
                 MEMCPY(LSTR(*to), LSTR(*from), LLEN(*from));
                 break;
+
+#if ALLOW_DECNUMBER
+            case LDECIMAL_TY:
+                LDEC(*to) = LDEC(*from);
+                break;
+#endif
 
             case LINTEGER_TY:
                 LINT(*to) = LINT(*from);
@@ -630,6 +651,9 @@ _Lisnum(const PLstr s) {
     int rc;
     char *ch;
     Context *context = (Context *) CMSGetPG();
+#if ALLOW_DECNUMBER
+#error Not ready!
+#endif
 
     context->lstring_lLastScannedNumber = 0.0;
     ch = LSTR(*s);
@@ -659,35 +683,92 @@ L2str(const PLstr s) {
     Lformat(s, s, -1, -1, -1, -1);
 } /* L2str */
 
+#if ALLOW_DECNUMBER
+/* ------------------ L2dec ------------------- */
+void __CDECL
+L2dec(const PLstr s) {
+    Context *context = (Context *) CMSGetPG();
+    decContext *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+    int d_size = sizeof(decNumber) + (dc->digits / DECDPN) - 1;
+    decNumber *d = MALLOC(d_size, "decNumber");
+
+    decContextZeroStatus(*dc);
+    switch (LTYPE(*s)) {
+        case LDECIMAL_TY:
+            LPFREE(d);
+            return;
+        case LINTEGER_TY:
+            decNumberFromInt32(*d, LINT(s));
+            break;
+        case LREAL_TY:
+            decNumberFromIBM370Float64(LDEC(*s), LREAL(*s));
+            if (decContextGetStatus(*dc))
+                (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+            break;
+        case LSTRING_TY:
+            LASCIIZ(*s);
+            decNumberFromString(*d, LSTR(*s), *dc);
+            if (decContextGetStatus(*dc))
+                (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+            break;
+        default:
+            (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+    }
+    Lfx(*s, d_size);
+    memcpy(LDEC(*s), *d, d_size);
+    LTYPE(*s) = LDECIMAL_TY;
+    LLEN(*s) = LDEC_LEN(*s);
+    LPFREE(d);
+} /* L2dec */
+#endif
+
 /* ------------------ L2int ------------------- */
 void __CDECL
 L2int(const PLstr s) {
     Context *context = (Context *) CMSGetPG();
-    if (LTYPE(*s) == LREAL_TY) {
-        if ((double) ((long) LREAL(*s)) == LREAL(*s))
-            LINT(*s) = (long) LREAL(*s);
-        else
-            (context->lstring_Lerror)(ERR_INVALID_INTEGER, 0);
-    } else { /* LSTRING_TY */
-        LASCIIZ(*s);
-        switch (_Lisnum(s)) {
-            case LINTEGER_TY:
-                /*///LINT(*s) = atol( LSTR(*s) ); */
-                LINT(*s) = (long) round(context->lstring_lLastScannedNumber);
-                break;
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
 
-            case LREAL_TY:
-                /*///LREAL(*s) = strtod( LSTR(*s), NULL ); */
-                LREAL(*s) = (context->lstring_lLastScannedNumber);
-                if ((double) ((long) LREAL(*s)) == LREAL(*s))
-                    LINT(*s) = (long) LREAL(*s);
-                else
-                    (context->lstring_Lerror)(ERR_INVALID_INTEGER, 0);
-                break;
-
-            default:
+    switch (LTYPE(*s)) {
+#if ALLOW_DECNUMBER
+        case LDECIMAL_TY:
+            *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+            decContextZeroStatus(*dc);
+            LINT(*s) = decNumberToInt32(LDEC(s), dc);
+            if (decContextGetStatus(*dc))
                 (context->lstring_Lerror)(ERR_INVALID_INTEGER, 0);
-        }
+            break;
+#endif
+        case LINTEGER_TY:
+            return;
+        case LREAL_TY:
+            if ((double) ((long) LREAL(*s)) == LREAL(*s))
+                LINT(*s) = (long) LREAL(*s);
+            else
+                (context->lstring_Lerror)(ERR_INVALID_INTEGER, 0);
+            break;
+        case LSTRING_TY:
+            LASCIIZ(*s);
+            switch (_Lisnum(s)) {
+                case LINTEGER_TY:
+                    /*///LINT(*s) = atol( LSTR(*s) ); */
+                    LINT(*s) = (long) round(context->lstring_lLastScannedNumber);
+                    break;
+                case LREAL_TY:
+                    /*///LREAL(*s) = strtod( LSTR(*s), NULL ); */
+                    LREAL(*s) = (context->lstring_lLastScannedNumber);
+                    if ((double) ((long) LREAL(*s)) == LREAL(*s))
+                        LINT(*s) = (long) LREAL(*s);
+                    else
+                        (context->lstring_Lerror)(ERR_INVALID_INTEGER, 0);
+                    break;
+                default:
+                    (context->lstring_Lerror)(ERR_INVALID_INTEGER, 0);
+            }
+            break;
+        default:
+            (context->lstring_Lerror)(ERR_INVALID_INTEGER, 0);
     }
     LTYPE(*s) = LINTEGER_TY;
     LLEN(*s) = sizeof(long);
@@ -697,14 +778,34 @@ L2int(const PLstr s) {
 void __CDECL
 L2real(const PLstr s) {
     Context *context = (Context *) CMSGetPG();
-    if (LTYPE(*s) == LINTEGER_TY)
-        LREAL(*s) = (double) LINT(*s);
-    else { /* LSTRING_TY */
-        LASCIIZ(*s);
-        if (_Lisnum(s) != LSTRING_TY)
-            /*/////LREAL(*s) = strtod( LSTR(*s), NULL ); */
-            LREAL(*s) = (context->lstring_lLastScannedNumber);
-        else
+#if ALLOW_DECNUMBER
+    decContext *dc;
+#endif
+
+    switch (LTYPE(*s)) {
+#if ALLOW_DECNUMBER
+        case LDECIMAL_TY:
+            *dc = (context->rexx_proc)[(context->rexx_rx_proc)].decContext;
+            decContextZeroStatus(*dc);
+            LREAL(*s) = decNumberToIBM370Float64(LDEC(*s));
+            if (decContextGetStatus(dc))
+                (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+            break;
+#endif
+        case LINTEGER_TY:
+            LREAL(*s) = (double) LINT(*s);
+            break;
+        case LREAL_TY:
+            return;
+        case LSTRING_TY:
+            LASCIIZ(*s);
+            if (_Lisnum(s) != LSTRING_TY)
+                /*/////LREAL(*s) = strtod( LSTR(*s), NULL ); */
+                LREAL(*s) = (context->lstring_lLastScannedNumber);
+            else
+                (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
+            break;
+        default:
             (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
     }
     LTYPE(*s) = LREAL_TY;
@@ -716,6 +817,9 @@ void Lround(PLstr var) {
     int n;
     double d;
 
+#if ALLOW_DECNUMBER
+#error Not ready!
+#endif
     L2REAL(var);
     d = LREAL(*var);
 
@@ -764,6 +868,15 @@ void __CDECL
 L2num(const PLstr s) {
     Context *context = (Context *) CMSGetPG();
     switch (_Lisnum(s)) {
+#if ALLOW_DECNUMBER
+#error Not ready!
+        case LDECIMAL_TY:
+            LDEC(*s) = ???;
+            LTYPE(*s) = LDECIMAL_TY;
+            LLEN(*s) = ???;
+            break;
+#endif
+
         case LINTEGER_TY:
             LINT(*s) = (long) round(context->lstring_lLastScannedNumber);
             LTYPE(*s) = LINTEGER_TY;
@@ -780,6 +893,10 @@ L2num(const PLstr s) {
             (context->lstring_Lerror)(ERR_BAD_ARITHMETIC, 0);
     }
 } /* L2num */
+
+#if ALLOW_DECNUMBER
+#error Do we need an Lrddec()?
+#endif
 
 /* ----------------- Lrdint ------------------ */
 long __CDECL

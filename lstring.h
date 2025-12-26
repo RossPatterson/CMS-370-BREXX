@@ -95,10 +95,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#if ALLOW_DECNUMBER
+  #include "dnNumber.h"
+#endif
 
 /* --- Lstring types --- */
 enum TYPES {
     LSTRING_TY,
+#if ALLOW_DECNUMBER
+    LDECIMAL_TY,
+#endif
     LINTEGER_TY,
     LREAL_TY
 };
@@ -115,10 +121,10 @@ typedef void __CDECL (*LerrorFunc)(const int, const int, ...);
 /* --- Lstring structure --- */
 /* ------------------------- */
 typedef struct Lstr_st {
-    char *pstr;  /* String (Data) pointer  */
-    size_t len;  /* Actual length of string(data) */
-    size_t maxlen;  /* Maximum length allocated for string */
-    short type;  /* Type of data STRING, INT, REAL */
+    char *pstr;  /* String/Decimal (Data) pointer  */
+    size_t len;  /* Actual length of string/decimal(data) */
+    size_t maxlen;  /* Maximum length allocated for string/decimal */
+    short type;  /* Type of data STRING, INT, REAL, DECIMAL */
 #ifdef USEOPTION
     short   options; /* Bit-options    */
 #endif
@@ -131,6 +137,9 @@ typedef Lstr *PLstr;
 #define LSTR(L)  ((L).pstr)
 #define LINT(L)  (*(long*)((L).pstr))
 #define LREAL(L) (*(double*)((L).pstr))
+#if ALLOW_DECNUMBER
+  #define LDEC(L) ((*(decNumber*)((L).pstr))
+#endif
 #define LLEN(L)  ((L).len)
 #define LTYPE(L) ((L).type)
 #define LMAXLEN(L) ((L).maxlen)
@@ -152,8 +161,14 @@ typedef Lstr *PLstr;
 /* --- number --- */
 #define IS_NUMBER(A) (_Lisnum(A) != LSTRING_TY)
 #define IS_INT(A) (LREAL(A) == (double)(long)LREAL(A))
-#define TOREAL(A) ((LTYPE(A)==LINTEGER_TY)? (double) LINT(A): LREAL(A))
-#define TOINT(A) ((LTYPE(A)==LINTEGER_TY)? LINT(A): (long)LREAL(A))
+#if ALLOW_DECNUMBER
+  #define TOREAL(A) ((LTYPE(A)==LINTEGER_TY)? (double) LINT(A) : (LTYPE(A)==LDECIMAL_TY)? L2real(A) : LREAL(A))
+  #define TOINT(A)  ((LTYPE(A)==LINTEGER_TY)? LINT(A)          : (LTYPE(A)==LDECIMAL_TY)? L2int(A)  : (long) LREAL(A))
+  #define TODEC(A)  ((LTYPE(A)==LINTEGER_TY)? L2dec(A)         : (LTYPE(A)==LDECIMAL_TY)? LDEC(A)   : L2dec(A))
+#else
+  #define TOREAL(A) ((LTYPE(A)==LINTEGER_TY)? (double) LINT(A): LREAL(A))
+  #define TOINT(A) ((LTYPE(A)==LINTEGER_TY)? LINT(A): (long)LREAL(A))
+#endif
 #define ODD(n)  ((n)&0x1)
 
 /* --- allocate strings --- */
@@ -201,11 +216,19 @@ typedef Lstr *PLstr;
 #define LSKIPWORD(S, P)  {while (((P)<LLEN(S)) && !ISSPACE(LSTR(S)[P])) (P)++;}
 
 /* --- transform --- */
+#if ALLOW_DECNUMBER
+  #define L2DEC(L) if (LTYPE(*(s))!=LDECIMAL_TY) L2dec((s))
+#endif
 #define L2INT(s) if (LTYPE(*(s))!=LINTEGER_TY) L2int((s))
 #define L2REAL(s) if (LTYPE(*(s))!=LREAL_TY) L2real((s))
 #define _L2NUM(s, t) if (LTYPE(*(s))==LSTRING_TY) _L2num((s),(t))
 #define L2NUM(s) if (LTYPE(*(s))==LSTRING_TY) L2num((s))
 #define L2STR(s) if (LTYPE(*(s))!=LSTRING_TY) L2str((s))
+
+#if ALLOW_DECNUMBER
+  /* --- decimal numbers */
+  #define LDEC_LEN(L) (sizeof(decNumber) + ( ( ((decNumber) ((L).pstr))->digits / DECDPN ) - 1) )
+#endif
 
 /* -------------------- definitions ---------------------- */
 /* --- lstring options --- */
