@@ -3,14 +3,6 @@ say 'Testing CHARS ...'
 fail_count=0
 parse source system .
 if system='CMS' then do
-    /* See https://github.com/adesutherland/CMS-370-BREXX/issues/113
-       and https://github.com/adesutherland/CMS-370-GCCLIB/issues/58.
-    */
-    say 'skipped all tests due to GCCLIB bug #58.'
-    say '... CHARS done'
-    exit
-end
-if system='CMS' then do
     file='test FILE A'
     address command 'ERASE' file
     expected_chars=(80+1)*2
@@ -31,8 +23,9 @@ end
 call lineout file, 'Line 2'
 call lineout file
 if chars(file)\==expected_chars       then call test_failed '1'
-call charin file, 10
-if chars(file) \= (expected_chars-10) then call test_failed '2'
+s = charin(file, , 6)
+if length(s) \= 6 then call test_failed '2'
+if chars(file) \= (expected_chars-6) then call test_failed '3'
 if system='CMS' then 'erase' file
 else if system='UNIX' then 'rm' file
 else if system='WIN64' then 'del' file
