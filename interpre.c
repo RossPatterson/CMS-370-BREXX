@@ -2127,10 +2127,15 @@ RxInterpret(void) {
                 /* RX_EXTERNAL   */
                 /* read data from external queue */
             case OP_RX_EXTERNAL:
+                /* PARSE EXTERNAL must not disturb the CMS console stack.    */
+                /* Use a direct console read to retrieve the line into a tmp */
+                /* var on top of the stack.                                  */
                 (context->interpre_RxStckTop)++;
                 STACKTOP = &((context->interpre__tmpstr)[(context
                         ->interpre_RxStckTop)]);
-                Lread(context->rawstdin, STACKTOP, LREADLINE);
+                Lfx(STACKTOP, 131);
+                LTYPE(*(STACKTOP)) = LSTRING_TY;
+                LLEN(*(STACKTOP)) = CMSdirectRead(LSTR(*(STACKTOP)));
                 DEBUGDISPLAY("RX_EXTERNAL");
                 goto main_loop;
 

@@ -26,7 +26,7 @@ if value \== 'N' then call test_failed '6: trace()=' value
 say 'test 6 expecting a trace ...'
 'exitneg_' || suffix
 if RC >=0 then call test_failed '6'
-else say '... was there one?'
+else say '... I hope there was one'
 
 trace N
 value = trace()
@@ -34,7 +34,7 @@ if value \== 'N' then call test_failed '7: trace()=' value
 say 'test 7 expecting no trace ...'
 'exitok_' || suffix
 if RC <>0 then call test_failed '7'
-else say '... was there one?'
+else say "... I hope there wasn't one"
 
 trace N
 value = trace()
@@ -42,14 +42,14 @@ if value \== 'N' then call test_failed '8: trace()=' value
 say 'test 8 expecting no trace ...'
 'exitpos_' || suffix
 if RC <=0 then call test_failed '8'
-else say '... was there one?'
+else say "... I hope there wasn't one"
 
 trace F
 if trace() \== 'F' then call test_failed '9'
 say 'test 9 expecting a trace ...'
 'exitneg_' || suffix
 if RC >=0 then call test_failed '9'
-else say '... was there one?'
+else say '... I hope there was one'
 
 trace F
 value = trace()
@@ -57,21 +57,21 @@ if value \== 'F' then call test_failed '10: trace()=' value
 say 'test 10 expecting no trace ...'
 'exitok_' || suffix
 if RC <>0 then call test_failed '10'
-else say '... was there one?'
+else say "... I hope there wasn't one"
 
 trace F
 if trace() \== 'F' then call test_failed '11'
 say 'test 11 expecting no trace ...'
 'exitpos_' || suffix
 if RC <=0 then call test_failed '11'
-else say '... was there one?'
+else say "... I hope there wasn't one"
 
 trace E
 if trace() \== 'E' then call test_failed '12'
 say 'test 12 expecting a trace ...'
 'exitneg_' || suffix
 if RC >=0 then call test_failed '12'
-else say '... was there one?'
+else say '... I hope there was one'
 
 trace E
 value = trace()
@@ -79,14 +79,39 @@ if value \== 'E' then call test_failed '13: trace()=' value
 say 'test 13 expecting no trace ...'
 'exitok_' || suffix
 if RC <>0 then call test_failed '13'
-else say '... was there one?'
+else say "... I hope there wasn't one"
 
 trace E
 if trace() \== 'E' then call test_failed '14'
 say 'test 14 expecting a trace ...'
 'exitpos_' || suffix
 if RC <=0 then call test_failed '14'
-else say '... was there one?'
+else say '... I hope there was one'
+
+/* Inspired by PARSE_ tests 34-36 */
+if system \= 'CMS' then do
+   say 'skipped tests 15-17 due to not running on CMS'
+   signal t15z
+end
+/* TRACE ? prompts the human, so we don't want to do this unless someone's at the console */
+'EXECIO * CP ( STEM t15a. STRING QUERY VIRTUAL 009'
+if translate(subword(t15a.1, 3, 2)) \= 'ON GRAF' then do
+   say 'skipped tests 15-17 due to not having a human at the console'
+   signal t15z
+end
+t15q = queued()
+queue 't16x = 666'
+t16x = 42
+say 'Please press ENTER for the next two lines'
+trace ?i
+nop
+trace o
+if queued() - t15q \== 1 then call test_failed '15'
+if t16x \= 42 then call test_failed '16'
+parse pull t17l
+interpret t17l
+if t16x \= 666 then call test_failed '17'
+t15z:
 
 say '... TRACE done'
 exit fail_count

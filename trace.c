@@ -293,24 +293,18 @@ TraceInstruction(CIPTYPE inst) {
 /* ---------------- TraceInteractive ------------------- */
 int __CDECL
 TraceInteractive(int frominterpret) {
-    char line[131];
-    char *p = line;
     Context *context = (Context *) CMSGetPG();
-    /* Interactive trace must not disturb the stack. Use */
-    /* a direct console read to retrieve the interactive */
-    /* trace command line, and then stack it LIFO so the */
-    /* next console read retrieves the trace command and */
-    /* leaves the original stack contents undisturbed.   */
-    CMSdirectRead(p);
-    CMSstackLine(p, CMS_STACKLIFO);
-
-    /* Read the interactive string into a tmp var */
+    /* Interactive trace must not disturb the CMS        */
+    /* console stack. Use  a direct console read to      */
+    /* retrieve the interactive trace command line into  */
+    /* a tmp var on top of the stack.                    */
     (context->interpre_RxStckTop)++;
     (context->interpre_RxStck)[(context->interpre_RxStckTop)] =
             &((context->interpre__tmpstr)[(context->interpre_RxStckTop)]);
-
-    Lread(STDIN, (context->interpre_RxStck)[(context->interpre_RxStckTop)],
-          LREADLINE);
+    Lfx((context->interpre_RxStck)[(context->interpre_RxStckTop)], 131);
+    LTYPE(*((context->interpre_RxStck)[(context->interpre_RxStckTop)])) = LSTRING_TY;
+    LLEN(*((context->interpre_RxStck)[(context->interpre_RxStckTop)])) =
+        CMSdirectRead(LSTR(*((context->interpre_RxStck)[(context->interpre_RxStckTop)])));
     if (!LLEN(*(context->interpre_RxStck)[(context->interpre_RxStckTop)])) {
         (context->interpre_RxStckTop)--;
         return FALSE;

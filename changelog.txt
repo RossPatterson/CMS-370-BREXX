@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0068 - PARSE EXTERNAL accidentally queries the stack.
 I0113 - CHARS() returns wrong value for newly-opened existing file.
       - Merge in HELP file changes from s390guy/vm370.
 I0119 - CALL passes arguments "by name", not "by value"

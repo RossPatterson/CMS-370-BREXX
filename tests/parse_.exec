@@ -337,6 +337,28 @@ else if system='UNIX' & words(s) \== 3 then call test_failed '33, s=/' || s || '
 else if system='WIN64' & words(s) \== 3 then call test_failed '33, s=/' || s || '/'
 if system='CMS' & word(s, 7) \== default_address then call test_failed '34, default_address=/' || default_address || '/, s=/' || s || '/'
 
+/* bREXX Issue 68 */
+if system \= 'CMS' then do
+   say 'skipped tests 34-36 due to not running on CMS'
+   signal t34z
+end
+/* PARSE EXTERNAL prompts the human, so we don't want to do this unless someone's at the console */
+'EXECIO * CP ( STEM t34a. STRING QUERY VIRTUAL 009'
+if translate(subword(t34a.1, 3, 2)) \= 'ON GRAF' then do
+   say 'skipped tests 34-36 due to not having a human at the console'
+   signal t34z
+end
+t34q = queued()
+queue 'Line 1'
+say 'Please type anything and press ENTER'
+parse external t35x
+if queued() - t34q \== 1 then call test_failed '34'
+if t35x = 'Line 1' then call test_failed '35'
+say 'You typed "' || t35x || '".  I hope that was correct.'
+parse pull t36y
+if t36y \== 'Line 1' then call test_failed '36'
+t34z:
+
 say '... PARSE done'
 exit fail_count
 test_failed:
