@@ -15,6 +15,6 @@ Usage Notes:
 
 2. The BRXGENM EXEC creates the following files on the A disk:
 
-   BRXLIB MACLIB
+   BREXXLIB MACLIB
 
           Contains the assembler macro files to make up the bREXX interpretor.
