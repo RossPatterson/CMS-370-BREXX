@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0123 - bREXX can't find file if resolved through CMS SYNONYM.
 I0068 - PARSE EXTERNAL accidentally queries the stack.
 I0113 - CHARS() returns wrong value for newly-opened existing file.
       - Merge in HELP file changes from s390guy/vm370.

@@ -49,6 +49,8 @@ main(int ac, char *av[]) {
     int entry_point;
     Context *context;
     unsigned int initial_debug;  /* Initial debugging status, copied to/from CMS. */
+    char prog_filename[8+1]; /* Program filename for CMS */
+    char *cp;
 
     if (!ac) return -1; /* Should never happen! */
 
@@ -153,7 +155,11 @@ main(int ac, char *av[]) {
     Lscpy(&(context->rexxrxReturnResult), "0");
     (context->rexxrxReturnCode) = 0;
 
-    RxRun(av[ia], NULL, args, &tracestr, NULL);
+    memset(prog_filename, '\0', sizeof prog_filename);
+    memcpy(prog_filename, CMSplist()[1], 8);
+    if ((cp = strchr(prog_filename, ' ')) != NULL) *cp = '\0';
+    prog_filename[8] = '\0';
+    RxRun(prog_filename, NULL, args, &tracestr, NULL);
 
     /* Need to get the result here before RxFinalise() */
     returnCode = (context->rexxrxReturnCode);

@@ -1,0 +1,45 @@
+/* Tests for invocation with synonymed files on CMS */
+
+say 'Testing CMSSYN ...'
+fail_count=0
+
+parse source System .
+if System <> 'CMS' then Do
+    say '... CMSSYN skipped - not running in CMS'
+    return 0
+end
+
+signal on error
+'COPYFILE CMSSYNS TXT A = SYNONYM A (RECFM F LRECL 80 OLDDATE REPLACE'
+'SYNONYM CMSSYNS' /* Sets CMSSYnb as CMSSYNA */
+signal off error
+
+/* Test running an un-synonymed EXEC */
+'CMSSYNA' 'CMSSYNA' 42
+if rc <> 42 then call test_failed '1'
+/* Test running a synonymed EXEC */
+'CMSSYNB' 'CMSSYNB' 53
+if rc <> 53 then call test_failed '2'
+/* Test running a abbreviated-synonym EXECs */
+'CMSSYN' 'CMSSYN' 31
+if rc <> 31 then call test_failed '3'
+'CMSSY' 'CMSSY' 20
+if rc <> 20 then call test_failed '4'
+
+signal on error
+'SYNONYM (CLEAR'
+'ERASE CMSSYNS SYNONYM A'
+signal off error
+
+say '... CMSSYN done'
+exit fail_count
+
+error:
+say 'error' rc 'from' sourceline(sigl)
+say '... CMSSYN done'
+exit rc
+
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

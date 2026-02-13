@@ -326,7 +326,7 @@ parse source s
 if system='CMS' & words(s) \== 7 then call test_failed '31, s=/' || s || '/'
 else if system='UNIX' & words(s) \== 3 then call test_failed '31, s=/' || s || '/'
 else if system='WIN64' & words(s) \== 3 then call test_failed '31, s=/' || s || '/'
-if system='CMS' & subword(s, 3, 3) \== 'parse_ EXEC *' then call test_failed '32, s=/' || s || '/'
+if system='CMS' & subword(s, 3, 3) \== 'PARSE_ EXEC *' then call test_failed '32, s=/' || s || '/'
 else if system='UNIX' & right(subword(s, 3, 1),11) \== 'parse_.exec' then call test_failed '32, s=/' || s || '/'
 else if system='WIN64' & right(subword(s, 3, 1),11) \== 'parse_.exec' then call test_failed '32, s=/' || s || '/'
 

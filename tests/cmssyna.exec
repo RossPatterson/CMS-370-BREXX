@@ -1,0 +1,13 @@
+/* CMSSYNA */
+parse source system how filename filetype filemode command environemnt
+parse arg expected_command result_rc
+
+if filename <> 'CMSSYNA' then do
+    say 'Filename is' filename', not CMSSYNA'
+    exit 100
+end
+if command <> expected_command then do
+    say 'Command is' command', not' expected_command
+    exit 200
+end
+return result_rc

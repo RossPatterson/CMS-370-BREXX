@@ -29,6 +29,7 @@ interpreter ' charin_'||suffix     ; fail_count=fail_count+rc
 interpreter ' charout_'||suffix    ; fail_count=fail_count+rc
 interpreter ' chars_'||suffix      ; fail_count=fail_count+rc
 interpreter ' cmsexcm_'||suffix    ; fail_count=fail_count+rc
+interpreter ' cmssyn_'||suffix     ; fail_count=fail_count+rc
 interpreter ' compare_'||suffix    ; fail_count=fail_count+rc
 interpreter ' conditi_'||suffix    ; fail_count=fail_count+rc
 interpreter ' copies_'||suffix     ; fail_count=fail_count+rc
