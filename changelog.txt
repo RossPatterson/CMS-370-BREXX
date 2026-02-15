@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+      - Fix some HELP errors, and clean up lots of HELP files.
       - Fix some tests that weren't running.
 I0123 - bREXX can't find file if resolved through CMS SYNONYM.
 I0068 - PARSE EXTERNAL accidentally queries the stack.
