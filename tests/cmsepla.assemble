@@ -34,11 +34,7 @@ CMSEPLA  CSECT
          LR    R3,R1             lists.
          LR    R6,R13         Temporary copy of USERSAVE pointer.
          SPACE 3
-         LA    R0,(WRKLEN+7)/8
-         DMSFREE DWORDS=(0),TYPE=USER Allocate Work area
-         LR    R13,R1
-         USING WRKSECT,R13
-         LR    R0,R1
+         LA    R0,WRKAREA
          LA    R1,WRKLEN
          SR    R15,R15
          MVCL  R0,R14             Zero out the WRKSECT
@@ -69,11 +65,6 @@ EXITOK   DS    0H
          SR    R15,R15
 EXITRC   DS    0H
          L     R2,WRKUSAVE    Get USERSAVE pointer back.
-         LR    R3,R15         Preserve RC.
-         LA    R0,(WRKLEN+7)/8  Return
-         LR    R1,R13              our
-         DMSFRET DWORDS=(0),LOC=(1)   WRKSECT.
-         LR    R15,R3         Get RC back.
          LM    R0,R14,0(R2)   Restore regs.
          BR    R14            Return to caller.
          TITLE 'RUNEXEC - Run a test exec.'
@@ -110,14 +101,11 @@ RUNEXEC  DS    0H
          LR    R12,R15        EXEC/bREXX entry address.
          LPSW  IPLPSW         Goto EXEC/bREXX.
          SPACE 3
-         USING RUNRET,R14
 RUNRET   DS    0H             EXEC/bREXX returns to us here.
-         S     R13,=A(WRKSAV2-WRKSECT)
-         USING WRKSECT,R13
-         LR    R12,R14        Fix up
-         S     R12,=A(RUNRET-CMSEPLA)  basereg.
-         USING CMSEPLA,R12
-         DROP  R14
+         BALR  R12,0
+         USING *,R12
+         S     R12,=A((RUNRET+2)-CMSEPLA)  Fix up basereg.
+         POP   USING
          SPACE 3
 .RUN999  ANOP  ,
          LM    R0,R14,WRKSAV1 Restore regs.
@@ -152,14 +140,11 @@ BALREXEC DS    0H
          LR    R12,R15        EXEC/bREXX entry address.
          LPSW  IPLPSW         Goto EXEC/bREXX.
          SPACE 3
-         USING BALRRET,R14
 BALRRET  DS    0H             EXEC/bREXX returns to us here.
-         S     R13,=A(WRKSAV2-WRKSECT)
-         USING WRKSECT,R13
-         LR    R12,R14        Fix up
-         S     R12,=A(BALRRET-CMSEPLA)  basereg.
-         USING CMSEPLA,R12
-         DROP  R14
+         BALR  R12,0
+         USING *,R12
+         S     R12,=A((BALRRET+2)-CMSEPLA)  Fix up basereg.
+         POP   USING
          SPACE 3
 .BALR999 ANOP  ,
          LM    R0,R14,WRKSAV1 Restore regs.
@@ -681,7 +666,7 @@ MSG002   DS    0H
          TITLE 'Constants'
          LTORG ,
          TITLE 'Work Area'
-WRKSECT  DSECT ,
+WRKAREA  DS    0D
 WRKSAV1  DS    18A            Savearea.
 DOUB     DS    D              Doubleword work area.
 WRKUSAVE DS    A              -> CMS's USERSAVE at entry to us.
@@ -690,7 +675,7 @@ WRKLEDPL LINEDIT MAXSUBS=1,MF=L
 WRKPLSTS EQU   WRKPLST0,*-WRKPLST0
          DS    0D
 WRKSAV2  DS    XL256          Savearea across bREXX calls.
-WRKLEN   EQU   *-WRKSECT
+WRKLEN   EQU   *-WRKAREA
          TITLE 'DSECTs'
          NUCON ,
          ORG   NUCON+X'90'

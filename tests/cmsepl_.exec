@@ -14,6 +14,7 @@ If AsmParm = '' | WordPos(AsmParm, 'AEXEC BREXX SVC') = 0 then Do
    Say 'Invalid call type:' AsmParm
    Exit 1
 End
+Say 'Called with CMSEPL_' AsmParm
 
 'SET EMSG TEXT'
 
@@ -23,7 +24,7 @@ End
 If RC = 0 then  'NUCXDROP CMSEPL'
 Signal on Error
 'ASSEMBLE CMSEPLA (DISK SYSPARM (' AsmParm ')'
-'NUCXTEXT CMSEPL CMSEPLA (SYSTEM'
+'NUCXTEXT CMSEPL CMSEPLA'
 Signal off Error
 MaxRC = 0
 

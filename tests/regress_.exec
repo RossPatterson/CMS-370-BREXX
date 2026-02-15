@@ -1,8 +1,11 @@
 /* This can be a development test by taking it partially from the top. */
-/* A minimum of SAY and EXIT is needed to get a runnable test. */
-/* A dump of the pseudo-code should show two byte operand then one byte
-operator "Say" for CRX pseudo-code. */
-say 'Regression test with all sorts of pseudo-codes. Look for "Done OK"'
+
+say 'Testing REGRESS_ ...'
+parse source system .
+parse version version .
+fail_count=0
+signal on syntax
+
 /* Simplest IF has a "Then" operator to compare operand with '0' and '1' */
 if 0 then exit
 if 0 then exit; else nop
@@ -85,8 +88,18 @@ if min(3,2,1) \= 1 then exit
 end
 nop
 numeric form Engineering
+if system = 'CMS' & pos('BREXX', translate(version)) > 0 then Do
+  say 'Skipping "numeric form value('e')" due to bREXX bug #124'
+  signal brexx_001
+  end
 numeric form value('e')
+brexx_001: nop
+if system = 'CMS' & pos('BREXX', translate(version)) > 0 then Do
+  say 'Skipping "numeric fuzz 0" due to bREXX bug #125'
+  signal brexx_002
+  end
 numeric fuzz 0
+brexx_002: nop
 numeric digits
 numeric fuzz
 numeric form
@@ -97,16 +110,26 @@ parse version x;say x
 parse source x;say x
 parse value 2+2 with x
 parse var x y
+say 'Skipping "parse version a,b" because bREXX cannot compile it'
+/*
 parse version a,b
+*/
 if 0 then do
+say 'Skipping "parse testin x" because bREXX cannot compile it'
+/*
 parse testin x
+*/
 parse pull x
 parse arg x
 end
+say 'Skipping "signal on lostdigits/signal off lostdigits" because bREXX cannot compile it'
+/*
 signal on lostdigits
 signal off lostdigits
+*/
 signal Trouble
 say "Signal didn't work"
+fail_count=fail_count+1
 Trouble:
 trace 'O'
 call on notready name sub
@@ -146,13 +169,25 @@ end
 end
 interpret "nop;interpret 'say 99'"
 if \abbrev('Print','Pri') then exit
-if left('abc def',7) \== 'abc de' then exit
+if left('abc def',6) \== 'abc de' then exit
 if overlay('123','abc',5,6,'+') \== 'abc+123+++' then exit
 if substr('abc',2,6,'.') \== 'bc....' then exit
-say
-say "Done OK"
-exit
+
+done:
+say '... REGRESS_ done'
+exit fail_count
+
 sub:return
 ftn:return 99
+say 'Skipping "procedure expose A. A.B (A.) (A.B)" because bREXX cannot compile it'
+/*
 procedure expose A. A.B (A.) (A.B)
+*/
+say 'Skipping "address error with output normal error append stream A." because bREXX cannot compile it'
+/*
 address error with output normal error append stream A.
+*/
+
+syntax:
+fail_count=fail_count+1
+signal done

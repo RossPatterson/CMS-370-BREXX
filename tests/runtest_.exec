@@ -4,6 +4,7 @@ if interpreter='' then interpreter='rexx'
 parse source source 1 system .
 parse version rexx_version
 say 'Rexx version' rexx_version 'on' system
+say 'Rexx version' rexx_version 'on' system
 suffix = '.exec'
 if system='CMS' then
 do
@@ -15,9 +16,9 @@ fail_count=0
 interpreter ' abbrev_'||suffix     ; fail_count=fail_count+rc
 interpreter ' abs_'||suffix        ; fail_count=fail_count+rc
 interpreter ' address_'||suffix    ; fail_count=fail_count+rc
-           /* add_test */
+interpreter ' add_test'||suffix    ; fail_count=fail_count+rc
 interpreter ' arg_'||suffix        ; fail_count=fail_count+rc
-           /* arithtst */
+interpreter ' arithtst'||suffix    ; fail_count=fail_count+rc
 interpreter ' bitand_'||suffix     ; fail_count=fail_count+rc
 interpreter ' bitor_'||suffix      ; fail_count=fail_count+rc
 interpreter ' bitxor_'||suffix     ; fail_count=fail_count+rc
@@ -28,6 +29,7 @@ interpreter ' changes_'||suffix    ; fail_count=fail_count+rc
 interpreter ' charin_'||suffix     ; fail_count=fail_count+rc
 interpreter ' charout_'||suffix    ; fail_count=fail_count+rc
 interpreter ' chars_'||suffix      ; fail_count=fail_count+rc
+interpreter ' cmsepl_'||suffix 'BREXX' ; fail_count=fail_count+rc
 interpreter ' cmsexcm_'||suffix    ; fail_count=fail_count+rc
 interpreter ' cmssyn_'||suffix     ; fail_count=fail_count+rc
 interpreter ' compare_'||suffix    ; fail_count=fail_count+rc
@@ -43,11 +45,11 @@ interpreter ' delword_'||suffix    ; fail_count=fail_count+rc
 interpreter ' digits_'||suffix     ; fail_count=fail_count+rc
 interpreter ' d2c_'||suffix        ; fail_count=fail_count+rc
 interpreter ' d2x_'||suffix        ; fail_count=fail_count+rc
-           /* errorms_ */
+           /* errorms_ isn't a test, just displays message texts */
 interpreter ' errorte_'||suffix    ; fail_count=fail_count+rc
+interpreter ' expose_'||suffix     ; fail_count=fail_count+rc
 interpreter ' expr_'||suffix       ; fail_count=fail_count+rc
-           /* expose_ */
-           /* factria_ */
+           /* factria_ is an external function for testfac_ */
 interpreter ' form_'||suffix       ; fail_count=fail_count+rc
 interpreter ' format_'||suffix     ; fail_count=fail_count+rc
 interpreter ' fuzz_'||suffix       ; fail_count=fail_count+rc
@@ -70,9 +72,9 @@ interpreter ' pos_'||suffix        ; fail_count=fail_count+rc
 interpreter ' qualify_'||suffix    ; fail_count=fail_count+rc
 interpreter ' queued_'||suffix     ; fail_count=fail_count+rc
 interpreter ' random_'||suffix     ; fail_count=fail_count+rc
-           /* regress_ */
+interpreter ' regress_'||suffix    ; fail_count=fail_count+rc
 interpreter ' reverse_'||suffix    ; fail_count=fail_count+rc
-           /* rexxtest */
+interpreter ' rexxtest'||suffix 'a bb ccc dd e' ; fail_count=fail_count+rc
 interpreter ' right_'||suffix      ; fail_count=fail_count+rc
 interpreter ' sign_'||suffix       ; fail_count=fail_count+rc
 interpreter ' signal_'||suffix     ; fail_count=fail_count+rc
@@ -83,12 +85,13 @@ interpreter ' strip_'||suffix      ; fail_count=fail_count+rc
 interpreter ' substr_'||suffix     ; fail_count=fail_count+rc
 interpreter ' subword_'||suffix    ; fail_count=fail_count+rc
 interpreter ' symbol_'||suffix     ; fail_count=fail_count+rc
-           /* testfac_ */
+           /* testdat_ needs DATE() conversions */
+interpreter ' testfac_'||suffix    ; fail_count=fail_count+rc
 interpreter ' time_'||suffix       ; fail_count=fail_count+rc
 interpreter ' trace_'||suffix      ; fail_count=fail_count+rc
 interpreter ' transla_'||suffix    ; fail_count=fail_count+rc
 interpreter ' trunc_'||suffix      ; fail_count=fail_count+rc
-           /* t_mult */
+interpreter ' t_mult'||suffix      ; fail_count=fail_count+rc
 interpreter ' value_'||suffix      ; fail_count=fail_count+rc
 interpreter ' verify_'||suffix     ; fail_count=fail_count+rc
 interpreter ' word_'||suffix       ; fail_count=fail_count+rc
@@ -101,5 +104,5 @@ interpreter ' x2b_'||suffix        ; fail_count=fail_count+rc
 interpreter ' x2c_'||suffix        ; fail_count=fail_count+rc
 interpreter ' x2d_'||suffix        ; fail_count=fail_count+rc
 say 'failed' fail_count 'tests'
-exit fail_count
 if system='CMS' then 'CP SPOOL CONS STOP CLOSE'
+exit fail_count

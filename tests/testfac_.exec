@@ -1,12 +1,25 @@
 /* rexx test factorial function */
-rc = assertEQ( factrial(1), 1)
-rc = rc + assertEQ( factrial(2), 4)
-rc = rc + assertEQ( factrial(3), 18)
-rc = rc + assertEQ( factrial(4), 96)
-rc = rc + assertEQ( factrial(5), 600)
-rc = rc + assertEQ( factrial(6), 4320)
-rc = rc + assertEQ( factrial(7), 35280)
-rc = rc + assertEQ( factrial(8), 322560)
-rc = rc + assertEQ( factrial(9), 3265920)
+say 'Testing TESTFAC_ ...'
+fail_count=0
 
-say 'factorial:' rc
+parse source source 1 system .
+if system='CMS' then suffix = ''
+else suffix = '.exec'
+
+interpret "if factria_" || suffix || "(1) <> 1        then call test_failed 1"
+interpret "if factria_" || suffix || "(2) <> 4        then call test_failed 2"
+interpret "if factria_" || suffix || "(3) <> 18       then call test_failed 3"
+interpret "if factria_" || suffix || "(4) <> 96       then call test_failed 4"
+interpret "if factria_" || suffix || "(5) <> 600      then call test_failed 5"
+interpret "if factria_" || suffix || "(6) <> 4320     then call test_failed 6"
+interpret "if factria_" || suffix || "(7) <> 35280    then call test_failed 7"
+interpret "if factria_" || suffix || "(8) <> 322560   then call test_failed 8"
+interpret "if factria_" || suffix || "(9) <> 3265920  then call test_failed 9"
+
+say '... TESTFAC_ done'
+exit fail_count
+
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return

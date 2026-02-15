@@ -3,14 +3,22 @@
  * which was a later addition, not yet available
  * in Rexx 3.40
  */    
-say 'exposetest v1'
+say 'Testing EXPOSE ...'
+fail_count=0
 
 aap = 'noot'
-say testex1()
-say testex2()
+if testex1() \== 'noot' then call test_failed 1
+if testex2() \== 'AAP'  then call test_failed 2
 x= 'aap'
-say testex3()
-exit
+if testex3() \== 'noot' then call test_failed 3
+
+say '... EXPOSE done'
+exit fail_count
+
+test_failed:
+say 'failed in test' arg(1)
+fail_count=fail_count+1
+return
 
 testex1: procedure expose aap
 return aap

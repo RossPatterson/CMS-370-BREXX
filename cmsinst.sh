@@ -78,6 +78,10 @@ if [ "$INST_MODE" = "bin-tape" ] ; then
 	herccontrol "/TAPE REW (TAP2"  -w "^Ready;"
 	herccontrol "/TAPE LOAD * EXEC A (TAP2"  -w "^Ready;"
 	herccontrol "/TAPE REW (TAP2"  -w "^Ready;"
+	herccontrol "/TAPE LOAD * TESTEXEC A (TAP2"  -w "^Ready;"
+	herccontrol "/TAPE REW (TAP2"  -w "^Ready;"
+	herccontrol "/TAPE LOAD CMSEPLA ASSEMBLE A (TAP2"  -w "^Ready;"
+	herccontrol "/TAPE REW (TAP2"  -w "^Ready;"
 	herccontrol "/TAPE LOAD CMSEXCM ASSEMBLE A (TAP2"  -w "^Ready;"
 	herccontrol "/TAPE REW (TAP2"  -w "^Ready;"
 	herccontrol "/TAPE LOAD CMSSYNS TXT A (TAP2"  -w "^Ready;"
@@ -142,6 +146,7 @@ if [ "$INST_MODE" = "bin-vmarc" ] ; then
 	# Prepare to test installation
 	herccontrol "/VMARC UNPK BREXXSRC VMARC A * EXEC A (OLDDATE"  -w "^Ready;"
 	herccontrol "/VMARC UNPK BREXXSRC VMARC A CMSEXCM ASSEMBLE A (OLDDATE"  -w "^Ready;"
+	herccontrol "/VMARC UNPK BREXXSRC VMARC A CMSEPL* * A (OLDDATE REPLACE"  -w "^Ready;"
 	herccontrol "/VMARC UNPK BREXXSRC VMARC A CMSSYN* * A (OLDDATE REPLACE"  -w "^Ready;"
 	herccontrol "/SPOOL PUNCH CMSUSER CONT" -w "^Ready;"
 	herccontrol "/EXPLOIT (BRXTESTS) DISK DUMP &FN &FT A" -w "^Ready;"

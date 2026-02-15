@@ -1,6 +1,192 @@
-parse arg stmt
-interpret 'rc =' stmt
-if rc = 0 then rc = 'ok '
-if rc = 1 then rc = 'fail'
-say rc stmt
+/**************************************************************************************************/
+/* Perform a REXX smoke test.                                                                     */
+/* Robert O'Hara, Redmond, Washington, June 2010.                                                 */
+/**************************************************************************************************/
+address COMMAND
+SAY ""; SAY "Beginning smoke test..."
+fail_count=0
+ 
+/* ---------------------------------------------------------------------------------------------- */
+/* Test instructions.                                                                             */
+/* ---------------------------------------------------------------------------------------------- */
+SAY ""; SAY "Phase 1: Instructions"
+SAY "Testing ADDRESS..."
+"CP QUERY TIME"
+SAY "Testing ARG..."
+PARSE ARG a b c d e
+ARG f g h i j
+SAY "  Argument 1 is" a "or" f
+SAY "  Argument 2 is" b "or" g
+SAY "  Argument 3 is" c "or" h
+SAY "  Argument 4 is" d "or" i
+SAY "  Argument 5 is" e "or" j
+CALL Subroutine
+SAY "Testing QUEUE..."
+QUEUE "here we are"
+SAY "Testing PUSH..."
+PUSH "here we go"
+SAY "Testing PARSE PULL..."
+PARSE PULL a
+IF a = "here we go" THEN SAY "PARSE PULL verified."
+ELSE SAY "PARSE PULL ***ERROR ["a"]"
+PULL a
+IF a = "HERE WE ARE" THEN SAY "QUEUE      verified."
+ELSE SAY "PULL       ***ERROR ["a"]"
+SAY "Testing SIGNAL..."
+SIGNAL SigTest1
+CALL test_failed "SIGNAL"
+SigTest1:
+SAY "SIGNAL     verified."
+/*
+jump = "SigTest2"
+SIGNAL VALUE jump
+SAY "SIGNAL VALUE ***ERROR***"
+SigTest2:
+SAY "SIGNAL     verified."
+*/
+ 
+/* ---------------------------------------------------------------------------------------------- */
+/* Test operators and variables.                                                                  */
+/* ---------------------------------------------------------------------------------------------- */
+SAY ""; SAY "Phase 2: Operators and Variables"
+bar = 12
+IF bar = 12 THEN
+   SAY "Assignment verified."; ELSE CALL test_failed "Assignment"
+foo.12 = "wow"
+IF foo.bar = "wow" THEN
+   SAY "Stems      verified."; ELSE CALL test_failed "Stems"
+ 
+/* ---------------------------------------------------------------------------------------------- */
+/* Test built-in functions.                                                                       */
+/* ---------------------------------------------------------------------------------------------- */
+SAY ""; SAY "Phase 3: Built-In Functions"
+IF Abbrev("abbreviation", "abbrev", 4) = 1 & Abbrev("abbreviation", "abbey", 4) = 0 THEN
+   SAY "Abbrev     verified."; ELSE CALL test_failed "Abbrev"
+IF Abs(5) = 5 & Abs(-5) = 5 THEN
+   SAY "Abs        verified."; ELSE CALL test_failed "Abs"
+SAY "Address()  returned:" Address()
+a = Arg()
+IF a > 0 THEN SAY "Arg()      returned:" a "  Argument" a "is ["Arg(a)"]"
+ELSE SAY "Arg()      returned:" a
+IF B2x("11000001") = "C1" THEN
+   SAY "B2x        verified."; ELSE CALL test_failed "B2x"
+IF BitAnd("73"x, "27"x) = "23"x THEN
+   SAY "BitAnd     verified."; ELSE CALL test_failed "BitAnd"
+IF BitOr("15"x, "24"x) = "35"x THEN
+   SAY "BitOr      verified."; ELSE CALL test_failed "BitOr"
+IF BitXor("12"x, "22"x) = "30"x THEN
+   SAY "BitXor     verified."; ELSE CALL test_failed "BitXor"
+IF C2D("A"x) = 10 THEN
+   SAY "C2D        verified."; ELSE CALL test_failed "C2D"
+IF C2X("A"x) = "0A" THEN
+   SAY "C2X        verified."; ELSE CALL test_failed "C2X"
+IF Center("a", 5, ".") = "..a.." THEN
+   SAY "Center     verified."; ELSE CALL test_failed "Center"
+IF ChangeStr("a", "abca", "x") = "xbcx" THEN
+   SAY "ChangeStr  verified."; ELSE CALL test_failed "ChangeStr"
+IF Compare("abcd", "abxd") = 3 THEN
+   SAY "Compare    verified."; ELSE CALL test_failed "Compare"
+SAY "Condition  ignored."
+IF Copies("abc", 3) = "abcabcabc" THEN
+   SAY "Copies     verified."; ELSE CALL test_failed "Copies"
+IF CountStr("a", "abca") = 2 THEN
+   SAY "CountStr   verified."; ELSE CALL test_failed "CountStr"
+IF D2C(193) = "A" THEN
+   SAY "D2C        verified."; ELSE CALL test_failed "D2C"
+IF D2X(193) = "C1" THEN
+   SAY "D2X        verified."; ELSE CALL test_failed "D2X"
+IF DataType("abc") = "CHAR" & DataType("123") = "NUM" THEN
+   SAY "DataType   verified."; ELSE CALL test_failed "DataType"
+SAY "Date()     returned:" Date()
+IF DelStr("abcd", 3) = "ab" THEN
+   SAY "DelStr     verified."; ELSE CALL test_failed "DelStr"
+IF DelWord("Now is the time", 2, 2) = "Now time" THEN
+   SAY "DelWord    verified."; ELSE CALL test_failed "DelWord"
+SAY "Digits()   returned:" Digits()
+IF ErrorText(16) = "Label not found" THEN
+   SAY "ErrorText  verified."; ELSE CALL test_failed "ErrorText"
+SAY "Form()     returned:" Form()
+IF Format(" - 12.73", , 4) = "-12.7300" THEN
+   SAY "Format     verified."; ELSE SAY "Format     ***ERROR*** Format(' - 12.73', , 4) returned" Format(" - 12.73", , 4)
+SAY "Fuzz()     returned:" Fuzz()
+IF Insert("x", "abcdef", 3) = "abcxdef" THEN
+   SAY "Insert     verified."; ELSE CALL test_failed "Insert"
+IF LastPos(" ", "abc def ghi") = 8 THEN
+   SAY "LastPos    verified."; ELSE CALL test_failed "LastPos"
+IF Left("abc", 4) = "abc " THEN
+   SAY "Left       verified."; ELSE CALL test_failed "Left"
+IF Length("abc") = 3 THEN
+   SAY "Length     verified."; ELSE CALL test_failed "Length"
+IF Max(12, 6, 7, 9) = 12 THEN
+   SAY "Max        verified."; ELSE CALL test_failed "Max"
+IF Min(12, 6, 7, 9) = 6 THEN
+   SAY "Min        verified."; ELSE CALL test_failed "Min"
+IF Overlay("x", "abcd", 3) = "abxd" THEN
+   SAY "Overlay    verified."; ELSE CALL test_failed "Overlay"
+IF Pos("day", "Saturday") = 6 THEN
+   SAY "Pos        verified."; ELSE CALL test_failed "Pos"
+PUSH "foobar"
+IF Queued() = 1 THEN
+   SAY "Queued     verified."; ELSE CALL test_failed "Queued"
+PULL foo
+SAY "Random()   returned:" Random()
+IF Reverse("abc") = "cba" THEN
+   SAY "Reverse    verified."; ELSE CALL test_failed "Reverse"
+IF Right("abc", 4) = " abc" THEN
+   SAY "Right      verified."; ELSE CALL test_failed "Right"
+IF Sign(57.7) = 1 & Sign(0.0) = 0 & Sign(-33) = -1 THEN
+   SAY "Sign       verified."; ELSE CALL test_failed "Sign"
+SAY "SourceLine" SourceLine(3)
+IF Space("  a    b    c  ") = "a b c" THEN
+   SAY "Space      verified."; ELSE CALL test_failed "Space"
+IF Strip("  abc  ") = "abc" THEN
+   SAY "Strip      verified."; ELSE CALL test_failed "Strip"
+IF Substr("abcdef", 3, 2) = "cd" THEN
+   SAY "Substr     verified."; ELSE CALL test_failed "Substr"
+IF SubWord("Now is the time", 2, 2) = "is the" THEN
+   SAY "SubWord    verified."; ELSE CALL test_failed "SubWord"
+n = 3
+IF Symbol("*") = "BAD" & Symbol("n") = "VAR" & Symbol("foobar") = "LIT" THEN
+   SAY "Symbol     verified."; ELSE CALL test_failed "Symbol" Symbol("*") Symbol("n") Symbol("f")
+SAY "Time()     returned:" Time()
+SAY "Trace()    returned:" Trace()
+IF Translate("abc") = "ABC" THEN
+   SAY "Translate  verified."; ELSE CALL test_failed "Translate"
+IF Trunc(12.3756, 2) = 12.37 THEN
+   SAY "Trunc      verified."; ELSE CALL test_failed "Trunc"
+SAY "Userid()   returned:" Userid()
+fred = 57
+IF Value("fred") = 57 THEN
+   SAY "Value      verified."; ELSE CALL test_failed "Value"
+IF Verify("123", "1234567890") = 0 & Verify("1a3", "1234567890") = 2 THEN
+   SAY "Verify     verified."; ELSE CALL test_failed "Verify"
+IF Word("Now is the time", 3) = "the" THEN
+   SAY "Word       verified."; ELSE CALL test_failed "Word"
+IF WordIndex("Now is the time", 3) = 8 THEN
+   SAY "WordIndex  verified."; ELSE CALL test_failed "WordIndex"
+IF WordLength("Now is the time", 3) = 3 THEN
+   SAY "WordLength verified."; ELSE CALL test_failed "WordLength"
+IF WordPos("the", "Now is the time") = 3 THEN
+   SAY "WordPos    verified."; ELSE CALL test_failed "WordPos"
+IF Words("Now is the time") = 4 THEN
+   SAY "Words      verified."; ELSE CALL test_failed "Words"
+IF X2B("C1") = "11000001" THEN
+   SAY "X2B        verified."; ELSE CALL test_failed "X2B"
+IF X2C("C1") = "A" THEN
+   SAY "X2C        verified."; ELSE CALL test_failed "X2C"
+IF XRange("01"x, "0F"x) = "0102030405060708090A0B0C0D0E0F"x THEN
+   SAY "XRange     verified."; ELSE CALL test_failed "XRange"
+ 
+Finish:
+SAY ""; SAY "Smoke test is complete."
+EXIT fail_count
 
+test_failed:
+say 'failed in test' arg(1) '***ERROR***'
+fail_count=fail_count+1
+return
+ 
+Subroutine: PROCEDURE
+SAY "CALL       verified."
+SAY "PROCEDURE  verified."
+RETURN
