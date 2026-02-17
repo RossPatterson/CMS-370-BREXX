@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0125 - NUMERIC FUZZ rejects 0.
 I0124 - NUMERIC FORM VALUE doesn't honor abbreviations
       - Minor build tools updates.
       - Fix some HELP errors, and clean up lots of HELP files.

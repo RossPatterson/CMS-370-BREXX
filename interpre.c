@@ -460,7 +460,7 @@ I_StoreOption(const PLstr value, const int opt) {
                 (context->rexx_proc)[(context->rexx_rx_proc)].fuzz = 0;
             else {
                 l = Lrdint(value);
-                if (l <= 0)
+                if (l < 0)
                     (context->lstring_Lerror)(ERR_INVALID_INTEGER, 6, value);
                 (context->rexx_proc)[(context->rexx_rx_proc)].fuzz = (int) l;
             }

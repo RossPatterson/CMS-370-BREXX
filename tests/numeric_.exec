@@ -20,6 +20,7 @@ t1v='s'; numeric form value t1v
 numeric form value 'e'
 numeric form value 's'
 numeric fuzz
+numeric fuzz 0
 numeric fuzz 2
 signal t1z
 t1a:
