@@ -471,12 +471,16 @@ I_StoreOption(const PLstr value, const int opt) {
 
         case form_value_opt:
             Lupper(value);
-            if (lcmp(value, "ENGINEERING") == 0)
-                (context->rexx_proc)[(context->rexx_rx_proc)].form = 1;
-            else if (lcmp(value, "SCIENTIFIC") == 0)
-                (context->rexx_proc)[(context->rexx_rx_proc)].form = 0;
-            else
-                (context->lstring_Lerror)(ERR_INVALID_RESULT, 3, value);
+            switch (LSTR(*value)[0]) {
+                case 'E':
+                    (context->rexx_proc)[(context->rexx_rx_proc)].form = 1;
+                    break;
+                case 'S':
+                    (context->rexx_proc)[(context->rexx_rx_proc)].form = 0;
+                    break;
+                default:
+                    (context->lstring_Lerror)(ERR_INVALID_RESULT, 3, value);
+            }
             break;
 
         case form_opt:
