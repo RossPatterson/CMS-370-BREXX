@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+      - EXECCOMM debugging isn't checked correctly.
 PV021 - Merge fix for prefix operators for vlachoudis/brexx issue 19.
       - Add internals documentation for developers.
 

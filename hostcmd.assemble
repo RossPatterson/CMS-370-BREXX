@@ -411,8 +411,11 @@ NOBADNM  DS    0H
 * of EXECCOMM.                                               *
 *------------------------------------------------------------*
 RXERET   DS     0H
-         TM    SHVCODE,C's'   Some kind of SET?
-         BE    RXERNDBG       Yes, skip.
+         CLI   SHVCODE,SHVFETCH  Is it a FETCH?
+         BE    RXERDBG        Yes, display the result.
+         CLI   SHVCODE,SHVSYFET  Is it a FETCH?
+         BNE   RXERNDBG       No, no display.
+RXERDBG  DS    0H
          L     R1,GCCCRABA    Get the GCCCRAB.
          USING GCCCRAB,R1
          L     R1,PGLOBAL     Get the bREXX context.
