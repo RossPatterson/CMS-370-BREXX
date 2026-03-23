@@ -1,6 +1,6 @@
 /* Modified for VM/370 CMS and GCC by Robert O'Hara, July 2010. */
 
-#define CMS_VERSION "1.2.0-beta-02"
+#define CMS_VERSION "1.2.0"
 
 /*
 #define __DEBUG__
