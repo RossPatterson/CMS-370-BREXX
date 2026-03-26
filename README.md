@@ -83,7 +83,7 @@ the one from the new release.
 8. Extract the archive of `HELP` files: `VMARC UNPK BREXXSRC VMARC A BRXHELP VMARC A (OLDDATE`.
 9. Extract the `HELP` files: `VMARC UNPK BRXHELP VMARC A * * A (OLDDATE`.
 10. Move the `* HELPREXX` files to the `HELP` disk (typically `MAINT 19D`).
-11. Merge the `REXX HELPTASK` file into the HELP HELPTASK` file on the `HELP`
+11. Merge the `REXX HELPTASK` file into the `HELP HELPTASK` file on the `HELP`
     disk.
 12. Re-save the CMS saved system to update the shared Y-stat:
    1. `DEFINE STORAGE 16M`
@@ -112,7 +112,7 @@ the one from the new release.
 9. Detach the tape drives: `DETACH 181-182`.
 10. Extract the `HELP` files: `VMARC UNPK BRXHELP VMARC A * * A (OLDDATE`.
 11. Move the `* HELPREXX` files to the `HELP` disk (typically `MAINT 19D`).
-12. Merge the `REXX HELPTASK` file into the HELP HELPTASK` file on the `HELP`
+12. Merge the `REXX HELPTASK` file into the `HELP HELPTASK` file on the `HELP`
     disk.
 13. Re-save the CMS saved system to update the shared Y-stat:
    1. `DEFINE STORAGE 16M`
