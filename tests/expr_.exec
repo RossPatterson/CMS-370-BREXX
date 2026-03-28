@@ -13,8 +13,28 @@ t1_s: call test_failed '1'
 t1_z:
 signal off syntax
 
+/* bREXX (Valdis Vachloudis's) issue #19 */
+/* We use INTERPRET here because some Rexxes, including bREXX, fail the test
+   during compilation, so we need to compile while executing the test.
+*/
+signal on syntax name t2_s
+t2_a = 1
+t2_b = \t2_a
+if t2_b <> 0 then call test_failed '2b'
+interpret 't2_c = -\t2_b'
+if t2_c <> -1 then call test_failed '2c'
+interpret 't2_d = --t2_a'
+if t2_d <> 1 then call test_failed '2d'
+interpret 't2_e = +-+-\0'
+if t2_e <> 1 then call test_failed '2e'
+signal t2_z
+t2_s: call test_failed '2'
+t2_z:
+signal off syntax
+
 say '... expressions done'
 exit fail_count
+
 test_failed:
 say 'failed in test' arg(1)
 fail_count=fail_count+1

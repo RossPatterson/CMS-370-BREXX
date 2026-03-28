@@ -381,36 +381,42 @@ Exp6(void) {
 /* ----------------- Exp7 ----------------- */
 static void __CDECL
 Exp7(void) {
-    enum symboltype _symbol;
-    int prefix;
     CTYPE pos;
+    int op = 0;
     Context *context = (Context *) CMSGetPG();
 
     pos = (context->compileCompileCodeLen);
-    _symbol = (context->nextsymbsymbol);
+    switch((context->nextsymbsymbol)) {
 
-    if (((context->nextsymbsymbol) == not_sy) ||
-        ((context->nextsymbsymbol) == plus_sy) ||
-        ((context->nextsymbsymbol) == minus_sy)) {
-        nextsymbol();
-        prefix = TRUE;
-    } else
-        prefix = FALSE;
+        case minus_sy:
+            op = OP_NEG;
+            nextsymbol();
+            Exp7();
+            break;
 
-    Exp8();
+        case not_sy:
+            op = OP_NOT;
+            nextsymbol();
+            Exp7();
+            break;
 
-    if (prefix) {
-        if ((context->compileCompileCodeLen) == pos)
-            (context->lstring_Lerror)(ERR_INVALID_EXPRESSION, 0);
-        InsTmp(pos, TRUE);
-        if (_symbol == not_sy)
-            _CodeAddByte(OP_NOT);
-        else if (_symbol == plus_sy)
-            _CodeAddByte(OP_PLUS);
-        else
-            _CodeAddByte(OP_NEG);
-        TraceByte(operator_middle);
+        case plus_sy:
+            op = OP_PLUS;
+            nextsymbol();
+            Exp7();
+            break;
+
+        default:
+            Exp8();
+            return;
     }
+
+    if ((context->compileCompileCodeLen) == pos)
+        (context->lstring_Lerror)(ERR_INVALID_EXPRESSION, 0);
+
+    InsTmp(pos, TRUE);
+    _CodeAddByte(op);
+    TraceByte(operator_middle);
 } /* Exp7 */
 
 /* ----------------- Exp8 ----------------- */

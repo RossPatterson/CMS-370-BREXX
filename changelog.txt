@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+PV021 - Merge fix for prefix operators for vlachoudis/brexx issue 19.
       - Add internals documentation for developers.
 
 1.2.0 - 23 Mar 2026
