@@ -53,6 +53,12 @@ id=''
 Call ver 0**0 , 1               , 30
 Call ver 3*/* comment */*3 , 27 , 31
 
+id = 32
+x=0**-1
+Call err "SYNTAX" ID
+R32:
+id=''
+
 Call over
 
 over:

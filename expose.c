@@ -18,6 +18,8 @@
  *
  */
 
+#include <cmssys.h>
+#include "lerror.h"
 #include "lstring.h"
 
 /* -----------------  expose ---------------- */
@@ -27,6 +29,7 @@ Lexpose(const PLstr to, const PLstr A, const PLstr B) {
     long bi;
     bool minusA;
     bool minusB;
+    Context *context = (Context *) CMSGetPG();
 
     ar = Lrdreal(A);
     bi = Lrdint(B);
@@ -54,9 +57,10 @@ Lexpose(const PLstr to, const PLstr A, const PLstr B) {
     }
     if (minusA) r = -r;
 
-    if (minusB)
+    if (minusB) {
+        if (r == 0) (context->lstring_Lerror)(ERR_ARITH_OVERFLOW, 0);
         LREAL(*to) = 1 / r;
-    else
+    } else
         LREAL(*to) = r;
 
     LTYPE(*to) = LREAL_TY;
