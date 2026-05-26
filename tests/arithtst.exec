@@ -59,6 +59,19 @@ Call err "SYNTAX" ID
 R32:
 id=''
 
+/* This is PR 24 in Vacloudis's bREXX */
+t33_$= ''
+do t33_j=0 to 7
+    t33_$= t33_$ t33_f(t33_j)
+end
+call ver t33_$, '12 12 12 12 12 12 12 12', 33
+signal t33_z
+
+t33_f: t33_$= 12
+return t33_$
+
+t33_z: nop
+
 Call over
 
 over:

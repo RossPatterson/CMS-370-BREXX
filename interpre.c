@@ -1427,13 +1427,18 @@ RxInterpret(void) {
                 /* check to see if we have already its position */
                 if (inf->id == (context->interpreRx_id)) {
                     leaf = inf->leaf[0];
-                    STACKTOP = LEAFVAL(leaf);
+                    Lstrcpy(&((context->interpre__tmpstr)[(context->interpre_RxStckTop)]),
+                        LEAFVAL(leaf));
+                    STACKTOP = &((context->interpre__tmpstr)[(context->interpre_RxStckTop)]);
                 } else {
                     leaf = RxVarFind((context->interpre_VarScope), litleaf,
                                      &found);
-                    if (found)
-                        STACKTOP = LEAFVAL(leaf);
-                    else {
+                    if (found) {
+                        Lstrcpy(&((context->interpre__tmpstr)[(context->interpre_RxStckTop)]),
+                            LEAFVAL(leaf));
+                        STACKTOP = &((context->interpre__tmpstr)[(context->interpre_RxStckTop)]);
+
+                    } else {
                         if (inf->stem) {
                             /* Lstrcpy to a temp variable */
                             Lstrcpy(&((context->interpre__tmpstr)[(context

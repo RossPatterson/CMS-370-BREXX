@@ -1,5 +1,7 @@
 bREXX CMS Change LOG
 ====================
+PV024 - Merge fix for failure to preserve variable value from modification
+        later in expression from vlachoudis/brexx PR 24.
       - Delete temporary artifacts quickly to reduce GitHub Actions Storage usage.
 PV023 - Merge fix for "0**-1" crashing CMS from vlachoudis/brexx PR 23.
       - EXECCOMM debugging isn't checked correctly.
