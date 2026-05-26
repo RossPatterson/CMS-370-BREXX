@@ -1,5 +1,7 @@
 bREXX CMS Change LOG
 ====================
+PV024 - Merge fix for failure to preserve variable value from modification
+        later in expression from vlachoudis/brexx PR 24.
         Minor improvements to internal documentation.
 I0120 - LINEIN() does not default to reading STDIN.
 I0126 - RANDOM(n) should be RANDOM(max), but is RANDOM(min).
