@@ -47,6 +47,16 @@ call lineout file
 if system='CMS' then 'erase' file
 else if system='UNIX' then 'rm' file
 else if system='WIN64' then 'del' file
+if system \= 'CMS' then do
+   say 'skipped tests 8-9 due to not running on CMS'
+   signal t9z
+end
+t8q = queued()
+queue 'H'
+if queued() - t8q \== 1 then call test_failed '8'
+t9x = charin()
+if t9x \= 'H' then call test_failed '9'
+t9z:
 say '... CHARIN done'
 exit fail_count
 test_failed:

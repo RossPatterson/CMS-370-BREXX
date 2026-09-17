@@ -91,13 +91,13 @@ else say '... I hope there was one'
 /* Inspired by PARSE_ tests 34-36 */
 if system \= 'CMS' then do
    say 'skipped tests 15-17 due to not running on CMS'
-   signal t15z
+   signal t17z
 end
 /* TRACE ? prompts the human, so we don't want to do this unless someone's at the console */
 'EXECIO * CP ( STEM t15a. STRING QUERY VIRTUAL 009'
 if translate(subword(t15a.1, 3, 2)) \= 'ON GRAF' then do
    say 'skipped tests 15-17 due to not having a human at the console'
-   signal t15z
+   signal t17z
 end
 t15q = queued()
 queue 't16x = 666'
@@ -111,7 +111,7 @@ if t16x \= 42 then call test_failed '16'
 parse pull t17l
 interpret t17l
 if t16x \= 666 then call test_failed '17'
-t15z:
+t17z:
 
 say '... TRACE done'
 exit fail_count

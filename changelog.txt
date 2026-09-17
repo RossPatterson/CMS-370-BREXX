@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0120 - LINEIN() does not default to reading STDIN.
 I0126 - RANDOM(n) should be RANDOM(max), but is RANDOM(min).
       - Updates to match VM/370 Docker v1.6.11.
       - Delete temporary artifacts quickly to reduce GitHub Actions Storage usage.

@@ -260,7 +260,7 @@ R_charlinein(const int func) {
     long start, length;
     Context *context = (Context *) CMSGetPG();
 
-    if (!IN_RANGE(1, ARGN, 3))
+    if (!IN_RANGE(0, ARGN, 3))
         (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
     i = stdin;
     if (exist(1))
@@ -292,7 +292,7 @@ R_charlineout(const int func) {
     PLstr str;
     Context *context = (Context *) CMSGetPG();
 
-    if (!IN_RANGE(1, ARGN, 3))
+    if (!IN_RANGE(0, ARGN, 3))
         (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
     i = stdout;
     if (exist(1))
