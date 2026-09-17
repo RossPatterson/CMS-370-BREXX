@@ -770,36 +770,38 @@ R_min() {
 
 /* -------------------------------------------------------------- */
 /* RANDOM((min)(,(max)(,seed)))                                   */
+/* RANDOM(max)                                                    */
 /* -------------------------------------------------------------- */
 void __CDECL
 R_random() {
-    long min, max;
+    long min = 0, max = 999;
     static long seed;
     static int sewed = 0;
     Context *context = (Context *) CMSGetPG();
 
     if (!IN_RANGE(0, ARGN, 3)) (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
 
-    if (exist(1)) {
-        min = Lrdint(ARG1);
-        if (min < 0) (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
-    } else
-        min = 0;
-
-    if (exist(2)) {
-        max = Lrdint(ARG2);
-        if (max < 0) (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
-    } else
-        max = 999;
-
+    if (ARGN == 1) {
+        max = Lrdint(ARG1);
+    } else {
+        if (exist(1)) {
+            min = Lrdint(ARG1);
+        }
+        if (exist(2)) {
+            max = Lrdint(ARG2);
+        }
+        if (exist(3)) {
+            seed = Lrdint(ARG3);
+            if (seed < 0) (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
+            srand((unsigned) seed);
+            sewed = 1;
+        }
+    }
+    if (min < 0) (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
+    if (max < 0) (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
     if (min > max) (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
 
-    if (exist(3)) {
-        seed = Lrdint(ARG3);
-        if (seed < 0) (context->lstring_Lerror)(ERR_INCORRECT_CALL, 0);
-        srand((unsigned) seed);
-        sewed = 1;
-    } else if (sewed == 0) {
+    if (sewed == 0) {
         sewed = 1;
 #ifndef WCE
         seed = (time((time_t *) 0) % (3600 * 24));

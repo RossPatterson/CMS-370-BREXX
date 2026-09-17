@@ -2,12 +2,18 @@
 say 'Testing RANDOM ...'
 fail_count=0
 /* These from TRL2. */
-say 'Values may differ.'
-say 'RANDOM()='random()
-say 'RANDOM(5,8)='random(5,8)
-say 'RANDOM(,,1989)='random(,,1989)
-say 'RANDOM(2)='random(2)
-/* These from Mark Hessling. */
+t1v = random()
+if t1v < 0 then call test_failed '1.1'
+if t1v > 999 then call test_failed '1.2'
+t2v = random(5,8)
+if t2v < 5 then call test_failed '2.1'
+if t2v > 8 then call test_failed '2.2'
+t3v = random(,,1989)
+if t3v < 0 then call test_failed '3.1'
+if t3v > 1989 then call test_failed '3.2'
+t4v = random(2)
+if t4v < 0 then call test_failed '4.1'
+if t4v > 2 then call test_failed '4.2'
 say '... RANDOM done'
 exit fail_count
 test_failed:

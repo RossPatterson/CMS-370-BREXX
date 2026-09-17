@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0126 - RANDOM(n) should be RANDOM(max), but is RANDOM(min).
       - Updates to match VM/370 Docker v1.6.11.
       - Delete temporary artifacts quickly to reduce GitHub Actions Storage usage.
 PV023 - Merge fix for "0**-1" crashing CMS from vlachoudis/brexx PR 23.
