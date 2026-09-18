@@ -9,7 +9,7 @@ Community Edition](http://vm370.org/vm)).  You can read  Vlachoudis's original
 [README.md](READMEVV.md) for his explanation of bREXX, as it was originally
 written for MS-DOS, and as it grew to support Unix, Linux, and MS-Windows.
 There is also a [port to MVS](https://github.com/mvslovers/brexx370), but
-despite hints in the source, this port is separate from it.
+despite hints in that source, this port is separate from it.
 
 ## Code Structure
 
@@ -20,7 +20,7 @@ bREXX-specific pseudo-instruction set
 * the _[interpreter](#interpreter)_, which executes the pseudo-instructions
 * the _[Libstring library](#libstring-library)_, which handles all Rexx data
 and performs operations upon them
-* the _[built-in functions](#built-in-functions), which perform all the
+* the _[built-in functions](#built-in-functions)_, which perform all the
 pre-defined functions
 
 ### Main Program
@@ -87,7 +87,7 @@ The _Libstring library_ is a collection of C routines that manipulate Rexx
 values, which are stored as `LStr` objects, and which therefore may be C
 `long`, `double`, or `char` array variables.
 
-The _Libstring library is is composed primarily of the following source files:
+The _Libstring library_ is is composed primarily of the following source files:
 * [`lstring.c`](lstring.c), which implements the various `LStr` primitive
 operations.
 * [`lstring.h`](lstring.h), which defines the `LStr` C structure and many
@@ -151,10 +151,11 @@ highest in-use array index) is `context->interpre_RxStckTop`.  The stack size
 is set from the [`STACK_SIZE` constant](rexx.h).
 
 If bREXX is compiled with the `DEBUG` C pre-processor symbol defined,
-`RxDoneInterpret()` will display the remaining stack contents (`_i.e._`, the
-elements from 0 to the `stack top`).  While this may be an indication of the
+`RxDoneInterpret()` will display the remaining stack contents (_i.e._, the
+elements from 0 to the _stack top_).  While this may be an indication of the
 _interpreter_ failing to manage the stack pointer correctly, it is also the
-case that Rexx programs may terminate in ways that leave data in the stack.
+case that Rexx programs may legitinmately terminate in ways that leave data on
+the stack.
 
 ### Temporary variables
 Temporary variables are stored in the array
@@ -194,10 +195,10 @@ stack, but on CMS, it uses the CMS OS's native stack.
 ## Build Process
 
 bREXX for CMS is built entirely on CMS, from source code stored in CMS files.
-The `BRXBUILD EXEC` procedure runs that process from start to finish, using
-other `BRXwhatever EXEC`s as building blocks.  It is delivered for VM/370
-Community Edition as the `MAINTC` userid and the `GCCBRX` simulated DASD
-volume.
+The [`BRXBUILD EXEC`](tools/brxbuild.exec) procedure runs that process from
+start to finish, using other `BRXwhatever EXEC`s as building blocks.  It is
+delivered for VM/370 Community Edition as the `MAINTC` userid and the `GCCBRX`
+simulated DASD volume.
 
 The `MAINTC` userid is organized as follows, with all the minidisks being on
 the `GCCBRX` simulated DASD volume:
@@ -215,10 +216,11 @@ for more details on the tools used by `BRXBUILD`.
 
 ### File lists
 
-* tools/brxhelp.exec - all the test files that go on the `MAINT 19D` HELP
-minidisk.
-* tools/brxtools.exec - all the tools that go on the `MAINTC 19C` minidisk.
-* tools/brxtests.exec - all the test files.
+* [`tools/brxhelp.exec`](tools/brxhelp.exec) - all the HELP files that go on
+the `MAINT 19D` HELP minidisk.
+* [`tools/brxtools.exec`](tools/brxtools.exec) - all the tools that go on the
+`MAINTC 19C` minidisk.
+* [`tools/brxtests.exec`](tools/brxtests.exec) - all the test files.
 
 ### GitHub Build System
 
@@ -228,12 +230,12 @@ which launches VM/370 Community Edition in a Docker container, runs `BRXBUILD`,
 and packages the results as VMARC files, AWSTAPE simulated tape files, and a
 simulated 3350 DASD.  It operates through the GitHub Actions system, and is
 comprised of the following files:
-* .github/workflows/build.yml - the driver that GitHubg uses to launch the
-build
-* cmsbuild.sh - a Linux shell script used by `build.yml` to import the source,
-run `BRXBUILD`, and export the results.
-* cmsinst.sh - a Linux shell script used by `build.yml` to test the various
-ways to install bREXX from the `BRXBUILD` results.
+* [`.github/workflows/build.yml`](.github/workflows/build.yml) - the driver
+that GitHubg uses to launch the build.
+* [`cmsbuild.sh`](cmsbuild.sh) - a Linux shell script used by `build.yml` to
+import the source, run `BRXBUILD`, and export the results.
+* [`cmsinst.sh`](cmsinst.sh) - a Linux shell script used by `build.yml` to test
+the various ways to install bREXX from the `BRXBUILD` results.
 
 
 ### Releasing
