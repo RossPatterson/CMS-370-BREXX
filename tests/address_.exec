@@ -1,30 +1,52 @@
 /* ADDRESS() and ADDRESS */
 say 'Testing ADDRESS function ...'
 fail_count=0
+
 parse source system .
 select
     when system = 'CMS' then default = 'CMS'
     when system = 'UNIX' then default = 'SYSTEM'
     when system = 'WIN64' then default = 'SYSTEM'
-    otherwise say 'test 1 undefined'
+    otherwise say 'test 101 undefined'
 end
-if address() \== default then call test_failed '1'
+if address() \== default then call test_failed '101'
 address 'aaa'
-if address() \== 'aaa' then call test_failed '2'
+if address() \== 'aaa' then call test_failed '102'
 address 'bbb'
-if address() \== 'bbb' then call test_failed '3'
+if address() \== 'bbb' then call test_failed '103'
 address
-if address() \== 'aaa' then call test_failed '4'
+if address() \== 'aaa' then call test_failed '104'
 address
-if address() \== 'bbb' then call test_failed '5'
+if address() \== 'bbb' then call test_failed '105'
+func_fail_count = fail_count
+
 say 'Testing ADDRESS statement ...'
 fail_count=0
 if system = 'CMS' then Do
+    address command
     ''
-    if rc \= 0 then call test_failed '6, RC=' rc
+    if rc \= 0 then call test_failed '201, RC=' rc
+/*  'LOAD DUMPPLST (CLEAR'
+    'GENMOD DUMPPLST'
+    address command 'LISTFILE DUMPPLST MODULE * ( LABEL'
+*/  address command 'LISTFILE EXITOK_ EXEC * ( LABEL'
+    args = ''
+    do 70
+       args = args random()
+    end
+trace i
+/*  address command 'DUMPPLST' args
+*/  address command 'EXEC EXITOK_' args
+trace o
+    if rc \= 0 then call test_failed '202, RC=' rc
+/*  'ERASE DUMPPLST MODULE'
+*/
 end
+
+fail_count = fail_count + func_fail_count
 say '... ADDRESS done'
 exit fail_count
+
 test_failed:
 say 'failed in test' arg(1)
 fail_count=fail_count+1

@@ -1,6 +1,7 @@
 bREXX CMS Change LOG
 ====================
-        Minor improvements to internal documentation.
+I0127 - Host commands aren't run if too long.
+      - Minor improvements to internal documentation.
 I0120 - LINEIN() does not default to reading STDIN.
 I0126 - RANDOM(n) should be RANDOM(max), but is RANDOM(min).
       - Updates to match VM/370 Docker v1.6.11.
