@@ -102,14 +102,15 @@ if [ "$INST_MODE" = "bin-vmarc" ] ; then
 	herccontrol "/LOGON MAINT CPCMS" -w "^VM Community Edition"
 	herccontrol "/" -w "^Ready;"
 	# 4. Upload `brexxbin.vmarc` to VM
-	herccontrol -m >tmp; read MARKER <tmp; rm tmp
+	MARKER=`herccontrol -m`
 #            12345678901234567890123456789012345678901234567890123456789012345678901234567890
 	echo -n "USERID MAINT                                                                    " | iconv -f cp819 -t cp1047 > tmp
 	echo -n ":READ BREXXBIN VMARC                                                            " | iconv -f cp819 -t cp1047 >> tmp
 	cat BREXX/brexxbin.vmarc >> tmp
 	netcat -q 0 localhost 3505 < tmp
 	rm tmp
-	herccontrol "/" -w "RDR FILE"
+	herccontrol -w "HHCRD012I" -f "$MARKER"
+	herccontrol "/" -w "RDR FILE"	# Wait for reader to process file
 	herccontrol "/READCARD * * A" -w "^Ready;"
 	# 5. Extract the pre-built bREXX file:
 	herccontrol "/VMARC UNPK BREXXBIN VMARC A BREXX TEXT A (OLDDATE REPLACE" -w "^Ready"	# Might get RC=8, sort of OK.
@@ -118,15 +119,15 @@ if [ "$INST_MODE" = "bin-vmarc" ] ; then
 	herccontrol "/COPYFILE BREXX TEXT A = = Y2 (OLDDATE REPLACE TYPE" -w "^Ready;"
 	herccontrol "/ACCESS 19E Y/S" -w "^Ready;"
 	# 7. Upload `brexxsrc.vmarc` to VM
-	herccontrol -m >tmp; read MARKER <tmp; rm tmp
+	MARKER=`herccontrol -m`
 #            12345678901234567890123456789012345678901234567890123456789012345678901234567890
 	echo -n "USERID MAINT NAME BREXXSRC VMARC                                                " | iconv -f cp819 -t cp1047 > tmp
 	echo -n ":READ BREXXSRC VMARC                                                            " | iconv -f cp819 -t cp1047 >> tmp
 	cat BREXX/brexxsrc.vmarc >> tmp
 	netcat -q 0 localhost 3505 < tmp
 	rm tmp
-	herccontrol -w "HHCRD012I" -f $MARKER	# Wait for reader to process file
-	herccontrol "/" -w "RDR FILE"
+	herccontrol -w "HHCRD012I" -f "$MARKER"
+	herccontrol "/" -w "RDR FILE"	# Wait for reader to process file
 	herccontrol "/READCARD * * A" -w "^Ready;"
 	# 8. Extract the archive of `HELP` files:
 	herccontrol "/VMARC UNPK BREXXSRC VMARC A BRXHELP VMARC A (OLDDATE REPLACE" -w "^Ready;"
@@ -176,14 +177,14 @@ if [ "$INST_MODE" = "dasd" ] ; then
 	# 5. Upload the `maintc.direct` file ...
 	# ... skipped, as VM/CE 1.1.2 has the MAINTC directory entry already.
 	# 6. Upload the `newbrexx.exec` file ...
-	herccontrol -m >tmp; read MARKER <tmp; rm tmp
+	MARKER=`herccontrol -m`
 	echo "USERID MAINT NAME NEWBREXX EXEC" > tmp
 	echo ":READ NEWBREXX EXEC" >> tmp
 	cat BREXX/newbrexx.exec >> tmp
 	netcat -q 0 localhost 3505 < tmp
 	rm tmp
-	herccontrol -w "HHCRD012I" -f $MARKER	# Wait for reader to process file
-	herccontrol "/" -w "RDR FILE"
+	herccontrol -w "HHCRD012I" -f "$MARKER"
+	herccontrol "/" -w "RDR FILE"	# Wait for reader to process file
 	herccontrol "/ACCESS 5E5 B" -w "^Ready;"
 	herccontrol "/READCARD * * B" -w "^Ready;"
 	herccontrol "/ACCESS 5E5 B/B" -w "^Ready;"
@@ -282,24 +283,26 @@ if [ "$INST_MODE" = "src-vmarc" ] ; then
 	herccontrol "/LOGON MAINTC MAINTC" -w "^VM Community Edition"
 	herccontrol "/" -w "^Ready;"
 	# 4. Upload `brexxbin.vmarc` to VM
-	herccontrol -m >tmp; read MARKER <tmp; rm tmp
+	MARKER=`herccontrol -m`
 #            12345678901234567890123456789012345678901234567890123456789012345678901234567890
 	echo -n "USERID MAINTC NAME BREXXBIN VMARC                                               " | iconv -f cp819 -t cp1047 > tmp
 	echo -n ":READ BREXXBIN VMARC                                                            " | iconv -f cp819 -t cp1047 >> tmp
 	cat BREXX/brexxbin.vmarc >> tmp
 	netcat -q 0 localhost 3505 < tmp
 	rm tmp
-	herccontrol "/" -w "RDR FILE"
+	herccontrol -w "HHCRD012I" -f "$MARKER"
+	herccontrol "/" -w "RDR FILE"	# Wait for reader to process file
 	herccontrol "/READCARD * * A" -w "^Ready;"
 	# 5. Upload `brexxsrc.vmarc` to VM
-	herccontrol -m >tmp; read MARKER <tmp; rm tmp
+	MARKER=`herccontrol -m`
 #            12345678901234567890123456789012345678901234567890123456789012345678901234567890
 	echo -n "USERID MAINTC NAME BREXXSRC VMARC                                               " | iconv -f cp819 -t cp1047 > tmp
 	echo -n ":READ BREXXSRC VMARC                                                            " | iconv -f cp819 -t cp1047 >> tmp
 	cat BREXX/brexxsrc.vmarc >> tmp
 	netcat -q 0 localhost 3505 < tmp
 	rm tmp
-	herccontrol "/" -w "RDR FILE"
+	herccontrol -w "HHCRD012I" -f "$MARKER"
+	herccontrol "/" -w "RDR FILE"	# Wait for reader to process file
 	herccontrol "/READCARD * * A" -w "^Ready;"
 	# 6. Extract the loader exec:
 	herccontrol "/VMARC UNPK BREXXSRC VMARC A BRXLOAD EXEC A (OLDDATE REPLACE" -w "^Ready;"

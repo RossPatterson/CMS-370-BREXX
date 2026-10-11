@@ -34,46 +34,46 @@ herccontrol "/ERASE * * B1" -w "^Ready;"
 
 # Get Source
 yata -c -f archive.yata
-herccontrol -m >tmp; read mark <tmp; rm tmp
+MARKER=`herccontrol -m`
 echo "USERID MAINTC\n:READ  ARCHIVE  YATA    " > tmp
 cat archive.yata >> tmp
 netcat -q 0 localhost 3505 < tmp
 rm tmp
-herccontrol -w "HHCRD012I" -f $mark
-herccontrol "/" -w "RDR FILE"
+herccontrol -w "HHCRD012I" -f "$MARKER"
+herccontrol "/" -w "RDR FILE"	# Wait for reader to process file
 herccontrol "/yata -x -f READER -d b" -w "^Ready;"
 
 # Get test suite
 yata -c -d tests -f archive.yata
-herccontrol -m >tmp; read mark <tmp; rm tmp
+MARKER=`herccontrol -m`
 echo "USERID  MAINTC\n:READ  ARCHIVE  YATA    " > tmp
 cat archive.yata >> tmp
 netcat -q 0 localhost 3505 < tmp
 rm tmp
-herccontrol -w "HHCRD012I" -f $mark
-herccontrol "/" -w "RDR FILE"
+herccontrol -w "HHCRD012I" -f "$MARKER"
+herccontrol "/" -w "RDR FILE"	# Wait for reader to process file
 herccontrol "/yata -x -f READER -d b" -w "^Ready;"
 
 # Get test tools
 yata -c -d tools -f archive.yata
-herccontrol -m >tmp; read mark <tmp; rm tmp
+MARKER=`herccontrol -m`
 echo "USERID  MAINTC\n:READ  ARCHIVE  YATA    " > tmp
 cat archive.yata >> tmp
 netcat -q 0 localhost 3505 < tmp
 rm tmp
-herccontrol -w "HHCRD012I" -f $mark
-herccontrol "/" -w "RDR FILE"
+herccontrol -w "HHCRD012I" -f "$MARKER"
+herccontrol "/" -w "RDR FILE"	# Wait for reader to process file
 herccontrol "/yata -x -f READER -d b" -w "^Ready;"
 
 # Get help files
 yata -c -d help -f archive.yata
-herccontrol -m >tmp; read mark <tmp; rm tmp
+MARKER=`herccontrol -m`
 echo "USERID  MAINTC\n:READ  ARCHIVE  YATA    " > tmp
 cat archive.yata >> tmp
 netcat -q 0 localhost 3505 < tmp
 rm tmp
-herccontrol -w "HHCRD012I" -f $mark
-herccontrol "/" -w "RDR FILE"
+herccontrol -w "HHCRD012I" -f "$MARKER"
+herccontrol "/" -w "RDR FILE"	# Wait for reader to process file
 herccontrol "/yata -x -f READER -d b" -w "^Ready;"
 
 # Fix Source Files
