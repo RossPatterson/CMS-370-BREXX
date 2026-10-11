@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+I0129 - CI builds are using GCCLIB from before VM/370 CE 1.1.2.
 I0128 - Make build and install scripts tolerate PyHercControl issue #2
         (multi-word marker value).
       - Minor improvements to internal documentation.
