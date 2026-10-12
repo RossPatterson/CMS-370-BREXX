@@ -30,7 +30,7 @@ jobs:
       working-directory: /opt/hercules/vm370
       run: |
         chmod -R ugo+rw *
-        . /opt/hercules/vm370/setup.sh
+        . /usr/local/hercules/setup.sh
         hercules -f hercules.conf -d >/dev/null 2>/dev/null &
         cd io
         chmod +x cmsbuild.sh
@@ -99,7 +99,7 @@ jobs:
           VERSION_STRING: ${{needs.build-cms.outputs.VERSION_STRING}}
         run: |
           chmod -R ugo+rw *
-          . /opt/hercules/vm370/setup.sh
+          . /usr/local/hercules/setup.sh
           hercules -f hercules.conf -d >/dev/null 2>/dev/null &
           cd io
           chmod +x cmsinst.sh

@@ -1,6 +1,7 @@
 bREXX CMS Change LOG
 ====================
 I0127 - Host commands aren't run if too long.
+      - Updates to match VM/370 Docker v1.6.11.
       - Delete temporary artifacts quickly to reduce GitHub Actions Storage usage.
 
 1.2.0 - 23 Mar 2026
