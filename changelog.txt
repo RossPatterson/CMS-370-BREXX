@@ -1,5 +1,6 @@
 bREXX CMS Change LOG
 ====================
+1.2.1 - 12 Oct 2026
 I0127 - Host commands aren't run if too long.
 I0129 - CI builds are using GCCLIB from before VM/370 CE 1.1.2.
       - Updates to match VM/370 Docker v1.6.11.
