@@ -1,6 +1,7 @@
 bREXX CMS Change LOG
 ====================
 I0127 - Host commands aren't run if too long.
+      - Delete temporary artifacts quickly to reduce GitHub Actions Storage usage.
 
 1.2.0 - 23 Mar 2026
 I0125 - NUMERIC FUZZ rejects 0.

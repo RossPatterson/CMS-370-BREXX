@@ -59,6 +59,7 @@ jobs:
       with:
         name: BREXX
         path: ./exe
+        retention-days: 2   # We don't need them after the workflow ends.
 
 #**************************************************#
   test-install:
